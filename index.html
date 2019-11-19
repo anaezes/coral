@@ -5,19 +5,23 @@
         <meta content="utf-8" http-equiv="encoding">
         <script src="https://aframe.io/releases/0.7.0/aframe.min.js"></script>
         <script src="https://cdn.rawgit.com/tizzle/aframe-orbit-controls-component/master/dist/aframe-orbit-controls-component.min.js"></script>
-        <!--script src="index.js"></-->
+        <script src="https://cdn.rawgit.com/mrdoob/three.js/82bd697ef06acf5c4173775abe053d7a499a6722/examples/js/Mirror.js"></script>
+        <script src="https://cdn.rawgit.com/mrdoob/three.js/82bd697ef06acf5c4173775abe053d7a499a6722/examples/js/WaterShader.js"></script>
+
+        <script src="index.js"></script>
     </head>
 
     <body>
             <a-scene>
                 <a-assets>
                     <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
+                    <img id="water-normal" src="img/waternormals.jpg" >
                     <a-asset-item id="rocks-obj" src="img/rocks-3.obj"></a-asset-item>
                     <a-asset-item id="rocks-mtl" src="img/rocks-3.mtl"></a-asset-item>
                 </a-assets>
 
                 <a-sky src="#skyTexture" theta-length="90" radius="30" position="0 -1 0"></a-sky>
-                <a-obj-model id="target" src="#rocks-obj" mtl="#rocks-mtl" position="0 -1 0" scale="0.5 0.5 0.5"></a-obj-model>
+                <a-obj-model id="target" src="#rocks-obj" mtl="#rocks-mtl" position="-5 -1 -15" scale="0.5 0.5 0.5"></a-obj-model>
                 <a-entity id="ground" 
                           geometry="primitive: cylinder; radius: 30; height: 0.1" 
                           position="0 -1 0" 
@@ -26,7 +30,7 @@
                 <a-entity
                     id="camera"
                     camera
-                    position="0 0 20"
+                    position="0 2 20"
                     orbit-controls="
                         autoRotate: false;
                         target: #target;
@@ -39,9 +43,10 @@
                     <a-animation attribute="position"
                                 dur="10000"
                                 easing="linear"
-                                to="0 0 -10">
+                                to="0 2 -10">
                     </a-animation>
-                </a-entity>                
+                    <a-ocean-plane material="normalMap: #water-normal;" position="0 -5 -0.5" opacity="0.6" ></a-ocean> 
+                    </a-entity>  
             </a-scene>
         </body>
 </html>
