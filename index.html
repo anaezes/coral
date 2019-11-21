@@ -18,6 +18,8 @@
                     <img id="water-normal" src="img/waternormals.jpg" >
                     <a-asset-item id="rocks-obj" src="img/rocks-3.obj"></a-asset-item>
                     <a-asset-item id="rocks-mtl" src="img/rocks-3.mtl"></a-asset-item>
+                    <a-asset-item id="auv-obj" src="img/AUVorange.obj"></a-asset-item>
+                    <a-asset-item id="auv-mtl" src="img/AUVorange.mtl"></a-asset-item>
                 </a-assets>
 
                 <a-sky src="#skyTexture" theta-length="90" radius="30" position="0 -1 0"></a-sky>
@@ -41,10 +43,11 @@
                         maxDistance:15;"
                     mouse-cursor="">
                     <a-animation attribute="position"
-                                dur="10000"
+                                dur="20000"
                                 easing="linear"
-                                to="0 2 -10">
+                                to="0 2 -20">
                     </a-animation>
+                    <a-obj-model id="target" src="#auv-obj" mtl="#auv-mtl" position="0.25 -2 -6.5" scale="0.5 0.5 0.5" rotation="0 180 0"></a-obj-model>
                     <a-ocean-plane material="normalMap: #water-normal;" position="0 -5 -0.5" opacity="0.6" ></a-ocean> 
                     </a-entity>  
             </a-scene>
