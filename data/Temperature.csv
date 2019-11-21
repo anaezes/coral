@@ -1,0 +1,461 @@
+timestamp (seconds since 01/01/1970), system, entity , value (°c)
+1516839952.797, lauv-xplore-1, Power Supply, 14.000
+1516839952.807, lauv-xplore-1, Power Supply, 14.000
+1516839952.811, lauv-xplore-1, Water Quality Sensor, 14.045
+1516839952.840, lauv-xplore-1, Motor Controller (MCU), 24.000
+1516839952.840, lauv-xplore-1, Motor Controller (Bridge), 12.000
+1516839952.840, lauv-xplore-1, Motor, 10.000
+1516839952.861, lauv-xplore-1, Depth Sensor, 10.282
+1516839952.961, lauv-xplore-1, Depth Sensor, 10.282
+1516839952.974, lauv-xplore-1, Mainboard (Core), 26.625
+1516839952.974, lauv-xplore-1, Mainboard (SuperIO), 23.062
+1516839952.974, lauv-xplore-1, Mainboard (Board), 21.312
+1516839953.008, lauv-xplore-1, Power Supply, 14.000
+1516839953.017, lauv-xplore-1, Power Supply, 14.000
+1516839953.023, lauv-xplore-1, Power Supply, 14.000
+1516839953.031, lauv-xplore-1, Power Supply, 14.000
+1516839953.038, lauv-xplore-1, Power Supply, 14.000
+1516839953.045, lauv-xplore-1, Power Supply, 14.000
+1516839953.052, lauv-xplore-1, Power Supply, 14.000
+1516839953.060, lauv-xplore-1, Power Supply, 14.000
+1516839953.062, lauv-xplore-1, Depth Sensor, 10.282
+1516839953.068, lauv-xplore-1, Power Supply, 14.000
+1516839953.076, lauv-xplore-1, Power Supply, 14.000
+1516839953.083, lauv-xplore-1, Power Supply, 14.000
+1516839953.090, lauv-xplore-1, Power Supply, 14.000
+1516839953.097, lauv-xplore-1, Power Supply, 14.000
+1516839953.106, lauv-xplore-1, Power Supply, 14.000
+1516839953.113, lauv-xplore-1, Power Supply, 14.000
+1516839953.121, lauv-xplore-1, Power Supply, 14.000
+1516839953.127, lauv-xplore-1, Power Supply, 14.000
+1516839953.135, lauv-xplore-1, Power Supply, 14.000
+1516839953.141, lauv-xplore-1, Power Supply, 14.000
+1516839953.149, lauv-xplore-1, Power Supply, 14.000
+1516839953.156, lauv-xplore-1, Power Supply, 14.000
+1516839953.162, lauv-xplore-1, Depth Sensor, 10.282
+1516839953.163, lauv-xplore-1, Power Supply, 14.000
+1516839953.171, lauv-xplore-1, Power Supply, 14.000
+1516839953.200, lauv-xplore-1, Power Supply, 13.500
+1516839953.208, lauv-xplore-1, Power Supply, 13.500
+1516839953.215, lauv-xplore-1, Power Supply, 13.500
+1516839953.224, lauv-xplore-1, Power Supply, 13.500
+1516839953.231, lauv-xplore-1, Power Supply, 13.500
+1516839953.237, lauv-xplore-1, Power Supply, 14.000
+1516839953.244, lauv-xplore-1, Power Supply, 14.000
+1516839953.251, lauv-xplore-1, Power Supply, 14.000
+1516839953.258, lauv-xplore-1, Power Supply, 14.000
+1516839953.262, lauv-xplore-1, Depth Sensor, 10.282
+1516839953.266, lauv-xplore-1, Power Supply, 14.000
+1516839953.273, lauv-xplore-1, Power Supply, 13.500
+1516839953.280, lauv-xplore-1, Power Supply, 13.500
+1516839953.288, lauv-xplore-1, Power Supply, 13.500
+1516839953.294, lauv-xplore-1, Power Supply, 13.500
+1516839953.301, lauv-xplore-1, Power Supply, 13.500
+1516839953.311, lauv-xplore-1, Power Supply, 13.500
+1516839953.318, lauv-xplore-1, Power Supply, 13.500
+1516839953.325, lauv-xplore-1, Power Supply, 13.500
+1516839953.332, lauv-xplore-1, Power Supply, 13.500
+1516839953.339, lauv-xplore-1, Power Supply, 13.500
+1516839953.347, lauv-xplore-1, Power Supply, 14.000
+1516839953.354, lauv-xplore-1, Power Supply, 14.000
+1516839953.361, lauv-xplore-1, Power Supply, 14.000
+1516839953.362, lauv-xplore-1, Depth Sensor, 10.282
+1516839953.370, lauv-xplore-1, Power Supply, 14.000
+1516839953.376, lauv-xplore-1, Power Supply, 14.000
+1516839953.406, lauv-xplore-1, Power Supply, 13.500
+1516839953.413, lauv-xplore-1, Power Supply, 13.500
+1516839953.420, lauv-xplore-1, Power Supply, 13.500
+1516839953.428, lauv-xplore-1, Power Supply, 13.500
+1516839953.434, lauv-xplore-1, Power Supply, 13.500
+1516839953.441, lauv-xplore-1, Power Supply, 14.000
+1516839953.449, lauv-xplore-1, Power Supply, 14.000
+1516839953.455, lauv-xplore-1, Power Supply, 14.000
+1516839953.461, lauv-xplore-1, Depth Sensor, 10.282
+1516839953.463, lauv-xplore-1, Power Supply, 14.000
+1516839953.469, lauv-xplore-1, Power Supply, 14.000
+1516839953.477, lauv-xplore-1, Power Supply, 13.500
+1516839953.484, lauv-xplore-1, Power Supply, 13.500
+1516839953.492, lauv-xplore-1, Power Supply, 13.500
+1516839953.499, lauv-xplore-1, Power Supply, 13.500
+1516839953.506, lauv-xplore-1, Power Supply, 13.500
+1516839953.513, lauv-xplore-1, Power Supply, 13.500
+1516839953.520, lauv-xplore-1, Power Supply, 13.500
+1516839953.529, lauv-xplore-1, Power Supply, 13.500
+1516839953.536, lauv-xplore-1, Power Supply, 13.500
+1516839953.544, lauv-xplore-1, Power Supply, 13.500
+1516839953.551, lauv-xplore-1, Power Supply, 13.500
+1516839953.558, lauv-xplore-1, Power Supply, 13.500
+1516839953.561, lauv-xplore-1, Depth Sensor, 10.282
+1516839953.565, lauv-xplore-1, Power Supply, 13.500
+1516839953.573, lauv-xplore-1, Power Supply, 13.500
+1516839953.602, lauv-xplore-1, Power Supply, 14.000
+1516839953.661, lauv-xplore-1, Depth Sensor, 10.299
+1516839953.761, lauv-xplore-1, Depth Sensor, 10.299
+1516839953.801, lauv-xplore-1, Power Supply, 13.500
+1516839953.811, lauv-xplore-1, Water Quality Sensor, 14.054
+1516839953.861, lauv-xplore-1, Depth Sensor, 10.299
+1516839953.962, lauv-xplore-1, Depth Sensor, 10.299
+1516839953.977, lauv-xplore-1, Mainboard (Core), 26.000
+1516839953.977, lauv-xplore-1, Mainboard (SuperIO), 23.000
+1516839953.978, lauv-xplore-1, Mainboard (Board), 21.562
+1516839954.002, lauv-xplore-1, Power Supply, 14.000
+1516839954.062, lauv-xplore-1, Depth Sensor, 10.299
+1516839954.162, lauv-xplore-1, Depth Sensor, 10.299
+1516839954.262, lauv-xplore-1, Depth Sensor, 10.299
+1516839954.362, lauv-xplore-1, Depth Sensor, 10.299
+1516839954.461, lauv-xplore-1, Depth Sensor, 10.299
+1516839954.502, lauv-xplore-1, Power Supply, 14.000
+1516839954.561, lauv-xplore-1, Depth Sensor, 10.299
+1516839954.601, lauv-xplore-1, Power Supply, 14.000
+1516839954.608, lauv-xplore-1, Power Supply, 14.000
+1516839954.661, lauv-xplore-1, Depth Sensor, 10.315
+1516839954.703, lauv-xplore-1, Power Supply, 14.000
+1516839954.761, lauv-xplore-1, Depth Sensor, 10.315
+1516839954.811, lauv-xplore-1, Water Quality Sensor, 14.047
+1516839954.840, lauv-xplore-1, Motor Controller (MCU), 23.000
+1516839954.840, lauv-xplore-1, Motor Controller (Bridge), 12.000
+1516839954.840, lauv-xplore-1, Motor, 10.000
+1516839954.861, lauv-xplore-1, Depth Sensor, 10.315
+1516839954.902, lauv-xplore-1, Power Supply, 14.000
+1516839954.961, lauv-xplore-1, Depth Sensor, 10.315
+1516839954.973, lauv-xplore-1, Mainboard (Core), 26.000
+1516839954.974, lauv-xplore-1, Mainboard (SuperIO), 23.000
+1516839954.974, lauv-xplore-1, Mainboard (Board), 21.562
+1516839955.062, lauv-xplore-1, Depth Sensor, 10.315
+1516839955.103, lauv-xplore-1, Power Supply, 14.000
+1516839955.162, lauv-xplore-1, Depth Sensor, 10.315
+1516839955.262, lauv-xplore-1, Depth Sensor, 10.315
+1516839955.304, lauv-xplore-1, Power Supply, 13.500
+1516839955.362, lauv-xplore-1, Depth Sensor, 10.315
+1516839955.462, lauv-xplore-1, Depth Sensor, 10.315
+1516839955.561, lauv-xplore-1, Depth Sensor, 10.315
+1516839955.635, lauv-xplore-1, Power Supply, 14.000
+1516839955.643, lauv-xplore-1, Power Supply, 14.000
+1516839955.661, lauv-xplore-1, Depth Sensor, 10.299
+1516839955.761, lauv-xplore-1, Depth Sensor, 10.299
+1516839955.804, lauv-xplore-1, Power Supply, 14.000
+1516839955.811, lauv-xplore-1, Water Quality Sensor, 14.043
+1516839955.861, lauv-xplore-1, Depth Sensor, 10.299
+1516839955.961, lauv-xplore-1, Depth Sensor, 10.299
+1516839955.974, lauv-xplore-1, Mainboard (Core), 25.687
+1516839955.974, lauv-xplore-1, Mainboard (SuperIO), 23.125
+1516839955.974, lauv-xplore-1, Mainboard (Board), 21.625
+1516839956.004, lauv-xplore-1, Power Supply, 14.000
+1516839956.062, lauv-xplore-1, Depth Sensor, 10.299
+1516839956.162, lauv-xplore-1, Depth Sensor, 10.299
+1516839956.205, lauv-xplore-1, Power Supply, 14.000
+1516839956.262, lauv-xplore-1, Depth Sensor, 10.299
+1516839956.361, lauv-xplore-1, Depth Sensor, 10.299
+1516839956.403, lauv-xplore-1, Power Supply, 14.000
+1516839956.461, lauv-xplore-1, Depth Sensor, 10.299
+1516839956.561, lauv-xplore-1, Depth Sensor, 10.299
+1516839956.604, lauv-xplore-1, Power Supply, 14.000
+1516839956.661, lauv-xplore-1, Depth Sensor, 10.315
+1516839956.672, lauv-xplore-1, Power Supply, 14.000
+1516839956.678, lauv-xplore-1, Power Supply, 14.000
+1516839956.761, lauv-xplore-1, Depth Sensor, 10.315
+1516839956.811, lauv-xplore-1, Water Quality Sensor, 14.057
+1516839956.840, lauv-xplore-1, Motor Controller (MCU), 23.000
+1516839956.840, lauv-xplore-1, Motor Controller (Bridge), 12.000
+1516839956.840, lauv-xplore-1, Motor, 11.000
+1516839956.861, lauv-xplore-1, Depth Sensor, 10.315
+1516839956.962, lauv-xplore-1, Depth Sensor, 10.315
+1516839956.973, lauv-xplore-1, Mainboard (Core), 25.687
+1516839956.974, lauv-xplore-1, Mainboard (SuperIO), 23.125
+1516839956.974, lauv-xplore-1, Mainboard (Board), 21.625
+1516839957.062, lauv-xplore-1, Depth Sensor, 10.315
+1516839957.105, lauv-xplore-1, Power Supply, 13.500
+1516839957.162, lauv-xplore-1, Depth Sensor, 10.315
+1516839957.261, lauv-xplore-1, Depth Sensor, 10.315
+1516839957.304, lauv-xplore-1, Power Supply, 14.000
+1516839957.361, lauv-xplore-1, Depth Sensor, 10.315
+1516839957.461, lauv-xplore-1, Depth Sensor, 10.315
+1516839957.505, lauv-xplore-1, Power Supply, 14.000
+1516839957.561, lauv-xplore-1, Depth Sensor, 10.315
+1516839957.661, lauv-xplore-1, Depth Sensor, 10.348
+1516839957.706, lauv-xplore-1, Power Supply, 14.000
+1516839957.714, lauv-xplore-1, Power Supply, 14.000
+1516839957.761, lauv-xplore-1, Depth Sensor, 10.348
+1516839957.811, lauv-xplore-1, Water Quality Sensor, 14.056
+1516839957.861, lauv-xplore-1, Depth Sensor, 10.348
+1516839957.905, lauv-xplore-1, Power Supply, 14.000
+1516839957.961, lauv-xplore-1, Depth Sensor, 10.348
+1516839957.974, lauv-xplore-1, Mainboard (Core), 25.437
+1516839957.974, lauv-xplore-1, Mainboard (SuperIO), 23.250
+1516839957.974, lauv-xplore-1, Mainboard (Board), 21.562
+1516839958.062, lauv-xplore-1, Depth Sensor, 10.348
+1516839958.162, lauv-xplore-1, Depth Sensor, 10.348
+1516839958.262, lauv-xplore-1, Depth Sensor, 10.348
+1516839958.362, lauv-xplore-1, Depth Sensor, 10.348
+1516839958.405, lauv-xplore-1, Power Supply, 14.000
+1516839958.462, lauv-xplore-1, Depth Sensor, 10.348
+1516839958.561, lauv-xplore-1, Depth Sensor, 10.348
+1516839958.605, lauv-xplore-1, Power Supply, 14.000
+1516839958.662, lauv-xplore-1, Depth Sensor, 10.331
+1516839958.735, lauv-xplore-1, Power Supply, 14.000
+1516839958.742, lauv-xplore-1, Power Supply, 14.000
+1516839958.761, lauv-xplore-1, Depth Sensor, 10.331
+1516839958.806, lauv-xplore-1, Power Supply, 14.000
+1516839958.810, lauv-xplore-1, Water Quality Sensor, 14.048
+1516839958.861, lauv-xplore-1, Depth Sensor, 10.331
+1516839958.940, lauv-xplore-1, Motor Controller (MCU), 23.000
+1516839958.940, lauv-xplore-1, Motor Controller (Bridge), 12.000
+1516839958.940, lauv-xplore-1, Motor, 10.000
+1516839958.961, lauv-xplore-1, Depth Sensor, 10.331
+1516839958.973, lauv-xplore-1, Mainboard (Core), 25.437
+1516839958.974, lauv-xplore-1, Mainboard (SuperIO), 23.250
+1516839958.974, lauv-xplore-1, Mainboard (Board), 21.562
+1516839959.006, lauv-xplore-1, Power Supply, 13.500
+1516839959.061, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.144, lauv-xplore-1, Power Supply, 14.000
+1516839959.163, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.206, lauv-xplore-1, Power Supply, 14.000
+1516839959.262, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.362, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.462, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.562, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.661, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.707, lauv-xplore-1, Power Supply, 14.000
+1516839959.761, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.811, lauv-xplore-1, Water Quality Sensor, 14.048
+1516839959.861, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.906, lauv-xplore-1, Power Supply, 13.500
+1516839959.961, lauv-xplore-1, Depth Sensor, 10.331
+1516839959.974, lauv-xplore-1, Mainboard (Core), 25.250
+1516839959.974, lauv-xplore-1, Mainboard (SuperIO), 23.062
+1516839959.974, lauv-xplore-1, Mainboard (Board), 21.562
+1516839959.989, lauv-xplore-1, Power Supply, 14.000
+1516839959.996, lauv-xplore-1, Power Supply, 14.000
+1516839960.061, lauv-xplore-1, Depth Sensor, 10.331
+1516839960.106, lauv-xplore-1, Power Supply, 14.000
+1516839960.161, lauv-xplore-1, Depth Sensor, 10.331
+1516839960.261, lauv-xplore-1, Depth Sensor, 10.331
+1516839960.306, lauv-xplore-1, Power Supply, 14.000
+1516839960.362, lauv-xplore-1, Depth Sensor, 10.331
+1516839960.462, lauv-xplore-1, Depth Sensor, 10.331
+1516839960.507, lauv-xplore-1, Power Supply, 14.000
+1516839960.562, lauv-xplore-1, Depth Sensor, 10.331
+1516839960.661, lauv-xplore-1, Depth Sensor, 10.348
+1516839960.761, lauv-xplore-1, Depth Sensor, 10.348
+1516839960.811, lauv-xplore-1, Water Quality Sensor, 14.045
+1516839960.861, lauv-xplore-1, Depth Sensor, 10.348
+1516839960.961, lauv-xplore-1, Depth Sensor, 10.348
+1516839960.973, lauv-xplore-1, Mainboard (Core), 25.250
+1516839960.974, lauv-xplore-1, Mainboard (SuperIO), 23.062
+1516839960.974, lauv-xplore-1, Mainboard (Board), 21.562
+1516839961.007, lauv-xplore-1, Power Supply, 14.000
+1516839961.023, lauv-xplore-1, Power Supply, 14.000
+1516839961.030, lauv-xplore-1, Power Supply, 14.000
+1516839961.040, lauv-xplore-1, Motor Controller (MCU), 23.000
+1516839961.040, lauv-xplore-1, Motor Controller (Bridge), 12.000
+1516839961.040, lauv-xplore-1, Motor, 10.000
+1516839961.061, lauv-xplore-1, Depth Sensor, 10.348
+1516839961.161, lauv-xplore-1, Depth Sensor, 10.348
+1516839961.206, lauv-xplore-1, Power Supply, 14.000
+1516839961.262, lauv-xplore-1, Depth Sensor, 10.348
+1516839961.362, lauv-xplore-1, Depth Sensor, 10.348
+1516839961.407, lauv-xplore-1, Power Supply, 14.000
+1516839961.462, lauv-xplore-1, Depth Sensor, 10.348
+1516839961.562, lauv-xplore-1, Depth Sensor, 10.348
+1516839961.608, lauv-xplore-1, Power Supply, 14.000
+1516839961.661, lauv-xplore-1, Depth Sensor, 10.365
+1516839961.761, lauv-xplore-1, Depth Sensor, 10.365
+1516839961.807, lauv-xplore-1, Power Supply, 14.000
+1516839961.811, lauv-xplore-1, Water Quality Sensor, 14.063
+1516839961.861, lauv-xplore-1, Depth Sensor, 10.365
+1516839961.962, lauv-xplore-1, Depth Sensor, 10.365
+1516839961.974, lauv-xplore-1, Mainboard (Core), 25.687
+1516839961.975, lauv-xplore-1, Mainboard (SuperIO), 23.187
+1516839961.975, lauv-xplore-1, Mainboard (Board), 21.687
+1516839962.058, lauv-xplore-1, Power Supply, 14.000
+1516839962.061, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.065, lauv-xplore-1, Power Supply, 14.000
+1516839962.161, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.262, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.308, lauv-xplore-1, Power Supply, 14.000
+1516839962.362, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.462, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.508, lauv-xplore-1, Power Supply, 14.000
+1516839962.562, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.661, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.709, lauv-xplore-1, Power Supply, 14.000
+1516839962.761, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.811, lauv-xplore-1, Water Quality Sensor, 14.059
+1516839962.861, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.908, lauv-xplore-1, Power Supply, 14.000
+1516839962.961, lauv-xplore-1, Depth Sensor, 10.365
+1516839962.974, lauv-xplore-1, Mainboard (Core), 25.687
+1516839962.974, lauv-xplore-1, Mainboard (SuperIO), 23.187
+1516839962.974, lauv-xplore-1, Mainboard (Board), 21.687
+1516839963.061, lauv-xplore-1, Depth Sensor, 10.365
+1516839963.108, lauv-xplore-1, Power Supply, 14.000
+1516839963.115, lauv-xplore-1, Power Supply, 14.000
+1516839963.140, lauv-xplore-1, Motor Controller (MCU), 24.000
+1516839963.140, lauv-xplore-1, Motor Controller (Bridge), 12.000
+1516839963.140, lauv-xplore-1, Motor, 10.000
+1516839963.161, lauv-xplore-1, Depth Sensor, 10.365
+1516839963.261, lauv-xplore-1, Depth Sensor, 10.365
+1516839963.361, lauv-xplore-1, Depth Sensor, 10.365
+1516839963.461, lauv-xplore-1, Depth Sensor, 10.365
+1516839963.562, lauv-xplore-1, Depth Sensor, 10.365
+1516839963.610, lauv-xplore-1, Power Supply, 14.000
+1516839963.661, lauv-xplore-1, Depth Sensor, 10.348
+1516839963.761, lauv-xplore-1, Depth Sensor, 10.348
+1516839963.809, lauv-xplore-1, Power Supply, 14.000
+1516839963.811, lauv-xplore-1, Water Quality Sensor, 14.067
+1516839963.861, lauv-xplore-1, Depth Sensor, 10.348
+1516839963.961, lauv-xplore-1, Depth Sensor, 10.348
+1516839963.974, lauv-xplore-1, Mainboard (Core), 25.500
+1516839963.974, lauv-xplore-1, Mainboard (SuperIO), 23.375
+1516839963.974, lauv-xplore-1, Mainboard (Board), 22.000
+1516839964.009, lauv-xplore-1, Power Supply, 14.000
+1516839964.061, lauv-xplore-1, Depth Sensor, 10.348
+1516839964.123, lauv-xplore-1, Power Supply, 14.000
+1516839964.130, lauv-xplore-1, Power Supply, 14.000
+1516839964.162, lauv-xplore-1, Depth Sensor, 10.348
+1516839964.210, lauv-xplore-1, Power Supply, 14.000
+1516839964.261, lauv-xplore-1, Depth Sensor, 10.348
+1516839964.362, lauv-xplore-1, Depth Sensor, 10.348
+1516839964.410, lauv-xplore-1, Power Supply, 14.000
+1516839964.462, lauv-xplore-1, Depth Sensor, 10.348
+1516839964.561, lauv-xplore-1, Depth Sensor, 10.348
+1516839964.661, lauv-xplore-1, Depth Sensor, 10.414
+1516839964.761, lauv-xplore-1, Depth Sensor, 10.414
+1516839964.811, lauv-xplore-1, Water Quality Sensor, 14.056
+1516839964.861, lauv-xplore-1, Depth Sensor, 10.414
+1516839964.910, lauv-xplore-1, Power Supply, 14.000
+1516839964.961, lauv-xplore-1, Depth Sensor, 10.414
+1516839964.973, lauv-xplore-1, Mainboard (Core), 25.500
+1516839964.974, lauv-xplore-1, Mainboard (SuperIO), 23.375
+1516839964.974, lauv-xplore-1, Mainboard (Board), 22.000
+1516839965.061, lauv-xplore-1, Depth Sensor, 10.414
+1516839965.109, lauv-xplore-1, Power Supply, 14.000
+1516839965.156, lauv-xplore-1, Power Supply, 14.000
+1516839965.161, lauv-xplore-1, Depth Sensor, 10.414
+1516839965.163, lauv-xplore-1, Power Supply, 14.000
+1516839965.240, lauv-xplore-1, Motor Controller (MCU), 23.000
+1516839965.240, lauv-xplore-1, Motor Controller (Bridge), 12.000
+1516839965.240, lauv-xplore-1, Motor, 10.000
+1516839965.261, lauv-xplore-1, Depth Sensor, 10.414
+1516839965.310, lauv-xplore-1, Power Supply, 14.500
+1516839965.362, lauv-xplore-1, Depth Sensor, 10.414
+1516839965.462, lauv-xplore-1, Depth Sensor, 10.414
+1516839965.509, lauv-xplore-1, Power Supply, 14.000
+1516839965.562, lauv-xplore-1, Depth Sensor, 10.414
+1516839965.661, lauv-xplore-1, Depth Sensor, 10.398
+1516839965.709, lauv-xplore-1, Power Supply, 14.000
+1516839965.761, lauv-xplore-1, Depth Sensor, 10.398
+1516839965.811, lauv-xplore-1, Water Quality Sensor, 14.053
+1516839965.861, lauv-xplore-1, Depth Sensor, 10.398
+1516839965.961, lauv-xplore-1, Depth Sensor, 10.398
+1516839965.974, lauv-xplore-1, Mainboard (Core), 25.562
+1516839965.974, lauv-xplore-1, Mainboard (SuperIO), 23.312
+1516839965.974, lauv-xplore-1, Mainboard (Board), 21.500
+1516839966.061, lauv-xplore-1, Depth Sensor, 10.398
+1516839966.161, lauv-xplore-1, Depth Sensor, 10.398
+1516839966.189, lauv-xplore-1, Power Supply, 14.000
+1516839966.217, lauv-xplore-1, Power Supply, 14.000
+1516839966.261, lauv-xplore-1, Depth Sensor, 10.398
+1516839966.361, lauv-xplore-1, Depth Sensor, 10.398
+1516839966.411, lauv-xplore-1, Power Supply, 14.000
+1516839966.461, lauv-xplore-1, Depth Sensor, 10.398
+1516839966.562, lauv-xplore-1, Depth Sensor, 10.398
+1516839966.611, lauv-xplore-1, Power Supply, 14.000
+1516839966.661, lauv-xplore-1, Depth Sensor, 10.414
+1516839966.761, lauv-xplore-1, Depth Sensor, 10.414
+1516839966.810, lauv-xplore-1, Power Supply, 14.000
+1516839966.811, lauv-xplore-1, Water Quality Sensor, 14.049
+1516839966.861, lauv-xplore-1, Depth Sensor, 10.414
+1516839966.961, lauv-xplore-1, Depth Sensor, 10.414
+1516839966.973, lauv-xplore-1, Mainboard (Core), 25.562
+1516839966.974, lauv-xplore-1, Mainboard (SuperIO), 23.312
+1516839966.974, lauv-xplore-1, Mainboard (Board), 21.500
+1516839967.011, lauv-xplore-1, Power Supply, 14.000
+1516839967.061, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.161, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.221, lauv-xplore-1, Power Supply, 14.000
+1516839967.227, lauv-xplore-1, Power Supply, 14.000
+1516839967.261, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.340, lauv-xplore-1, Motor Controller (MCU), 23.000
+1516839967.340, lauv-xplore-1, Motor Controller (Bridge), 12.000
+1516839967.340, lauv-xplore-1, Motor, 10.000
+1516839967.362, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.462, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.511, lauv-xplore-1, Power Supply, 14.000
+1516839967.562, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.661, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.711, lauv-xplore-1, Power Supply, 14.000
+1516839967.761, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.811, lauv-xplore-1, Water Quality Sensor, 14.055
+1516839967.861, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.911, lauv-xplore-1, Power Supply, 14.000
+1516839967.961, lauv-xplore-1, Depth Sensor, 10.414
+1516839967.974, lauv-xplore-1, Mainboard (Core), 25.375
+1516839967.974, lauv-xplore-1, Mainboard (SuperIO), 23.062
+1516839967.975, lauv-xplore-1, Mainboard (Board), 21.687
+1516839968.062, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.112, lauv-xplore-1, Power Supply, 14.000
+1516839968.162, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.253, lauv-xplore-1, Power Supply, 14.000
+1516839968.259, lauv-xplore-1, Power Supply, 14.000
+1516839968.262, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.311, lauv-xplore-1, Power Supply, 14.000
+1516839968.361, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.461, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.561, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.662, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.762, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.811, lauv-xplore-1, Water Quality Sensor, 14.060
+1516839968.813, lauv-xplore-1, Power Supply, 14.000
+1516839968.861, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.961, lauv-xplore-1, Depth Sensor, 10.414
+1516839968.973, lauv-xplore-1, Mainboard (Core), 25.375
+1516839968.974, lauv-xplore-1, Mainboard (SuperIO), 23.062
+1516839968.974, lauv-xplore-1, Mainboard (Board), 21.687
+1516839969.011, lauv-xplore-1, Power Supply, 14.000
+1516839969.061, lauv-xplore-1, Depth Sensor, 10.414
+1516839969.161, lauv-xplore-1, Depth Sensor, 10.414
+1516839969.213, lauv-xplore-1, Power Supply, 14.000
+1516839969.261, lauv-xplore-1, Depth Sensor, 10.414
+1516839969.300, lauv-xplore-1, Power Supply, 14.000
+1516839969.308, lauv-xplore-1, Power Supply, 14.000
+1516839969.340, lauv-xplore-1, Motor Controller (MCU), 23.000
+1516839969.340, lauv-xplore-1, Motor Controller (Bridge), 12.000
+1516839969.340, lauv-xplore-1, Motor, 10.000
+1516839969.361, lauv-xplore-1, Depth Sensor, 10.414
+1516839969.412, lauv-xplore-1, Power Supply, 14.000
+1516839969.461, lauv-xplore-1, Depth Sensor, 10.414
+1516839969.561, lauv-xplore-1, Depth Sensor, 10.414
+1516839969.612, lauv-xplore-1, Power Supply, 14.000
+1516839969.661, lauv-xplore-1, Depth Sensor, 10.447
+1516839969.763, lauv-xplore-1, Depth Sensor, 10.447
+1516839969.811, lauv-xplore-1, Water Quality Sensor, 14.052
+1516839969.861, lauv-xplore-1, Depth Sensor, 10.447
+1516839969.962, lauv-xplore-1, Depth Sensor, 10.447
+1516839969.974, lauv-xplore-1, Mainboard (Core), 26.000
+1516839969.974, lauv-xplore-1, Mainboard (SuperIO), 23.437
+1516839969.974, lauv-xplore-1, Mainboard (Board), 21.812
+1516839970.062, lauv-xplore-1, Depth Sensor, 10.447
+1516839970.113, lauv-xplore-1, Power Supply, 14.000
+1516839970.162, lauv-xplore-1, Depth Sensor, 10.447
+1516839970.262, lauv-xplore-1, Depth Sensor, 10.447
+1516839970.313, lauv-xplore-1, Power Supply, 14.000
+1516839970.334, lauv-xplore-1, Power Supply, 14.000
+1516839970.343, lauv-xplore-1, Power Supply, 14.000
+1516839970.361, lauv-xplore-1, Depth Sensor, 10.447
+1516839970.461, lauv-xplore-1, Depth Sensor, 10.447
+1516839970.513, lauv-xplore-1, Power Supply, 14.000
+1516839970.561, lauv-xplore-1, Depth Sensor, 10.447
+1516839970.661, lauv-xplore-1, Depth Sensor, 10.464
+1516839970.714, lauv-xplore-1, Power Supply, 14.000
+1516839970.761, lauv-xplore-1, Depth Sensor, 10.464
+1516839970.811, lauv-xplore-1, Water Quality Sensor, 14.045
+1516839970.861, lauv-xplore-1, Depth Sensor, 10.464
+1516839970.913, lauv-xplore-1, Power Supply, 14.000
+1516839970.962, lauv-xplore-1, Depth Sensor, 10.464
+1516839970.973, lauv-xplore-1, Mainboard (Core), 26.000
+1516839970.974, lauv-xplore-1, Mainboard (SuperIO), 23.437
+1516839970.974, lauv-xplore-1, Mainboard (Board), 21.812
+1516839971.062, lauv-xplore-1, Depth Sensor, 10.464
+1516839971.162, lauv-xplore-1, Depth Sensor, 10.464
+1516839971.262, lauv-xplore-1, Depth Sensor, 10.464
