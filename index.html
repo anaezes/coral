@@ -8,10 +8,13 @@
         <script src="https://cdn.rawgit.com/mrdoob/three.js/82bd697ef06acf5c4173775abe053d7a499a6722/examples/js/Mirror.js"></script>
         <script src="https://cdn.rawgit.com/mrdoob/three.js/82bd697ef06acf5c4173775abe053d7a499a6722/examples/js/WaterShader.js"></script>
         <script src="https://d3js.org/d3.v3.min.js"></script>
-        <script src="index.js"></script>
+        <script type="text/javascript" src="scripts/datGUI/dat.gui.min.js"></script>
+        <script type="text/javascript" src="scripts/index.js"></script>
+
     </head>
 
     <body>
+            <!--a-scene stats-->
             <a-scene>
                 <a-assets>
                     <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
@@ -21,7 +24,6 @@
                     <a-asset-item id="auv-obj" src="img/AUVorange.obj"></a-asset-item>
                     <a-asset-item id="auv-mtl" src="img/AUVorange.mtl"></a-asset-item>
                 </a-assets>
-
                 <a-sky src="#skyTexture" theta-length="90" radius="30" position="0 -1 0"></a-sky>
                 <a-obj-model id="target" src="#rocks-obj" mtl="#rocks-mtl" position="-5 -1 -15" scale="0.5 0.5 0.5"></a-obj-model>
                 <a-entity id="ground" 
@@ -49,8 +51,9 @@
                     </a-animation>
                     <a-obj-model id="target" src="#auv-obj" mtl="#auv-mtl" position="0.25 -2 -6.5" scale="0.5 0.5 0.5" rotation="0 180 0"></a-obj-model>
                     <a-ocean-plane material="normalMap: #water-normal;" position="0 -5 -0.5" opacity="0.6" ></a-ocean> 
-                    </a-entity>    
+                    </a-entity>
             </a-scene>
+
         </body>
 </html>
 
