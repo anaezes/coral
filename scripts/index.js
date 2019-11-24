@@ -4,27 +4,32 @@ let index = 0;
 var fizzyText; 
 
 window.onload = function() {
-	var FizzyText = function() {
-		this.value = values[index];
-		this.color = color[index];
-		this.show = false;
-	};
+	class FizzyText {
+		constructor() {
+			this.value = values[index];
+			this.color = color[index];
+		}
+	}
 
 	fizzyText = new FizzyText();
 	var gui = new dat.GUI();
-	gui.add(fizzyText, 'value', -2, 30).listen();
-	gui.addColor(fizzyText, 'color').listen();
-	gui.add(fizzyText, 'show');
+
+	var f1 = gui.addFolder('temperature');
+	f1.open();
+
+	f1.add(fizzyText, 'value', -2, 30).listen();
+	f1.addColor(fizzyText, 'color').listen();
 
 	var update = function() {
 		requestAnimationFrame(update);
-		fizzyText.value =values[index];
-		fizzyText.color =color[index];
-	  };
-	  
+		fizzyText.value = values[index];
+		fizzyText.color = color[index];
+	};
+	
 	update();
-
 }
+
+
 
   
 AFRAME.registerComponent('wobble-normal', {
@@ -35,10 +40,11 @@ AFRAME.registerComponent('wobble-normal', {
 		this.el.components.material.material.normalScale.x = 0.5 + 0.5 * Math.cos(t/1000);
 		this.el.components.material.material.normalScale.x = 0.5 + 0.5 * Math.sin(t/1200);
 
-		if(fizzyText.show && index < color.length ){
+		if(index < values.length-1){
 			this.el.setAttribute('material', 'color', color[index]);
 			index++;
 		}
+
 	}
 })
 
@@ -76,12 +82,25 @@ d3.csv("data/Temperature.csv", function(data) {
 	data.forEach(function(d) {
 		if(d.entity === " Depth Sensor") {
 			values.push(d.value);
-			if(d.value < 10.3)
-				color.push('#8ab3b3');
-			else if(d.value > 10.3 & d.value < 10.4)
-				color.push('#04B431');
+			
+			if(d.value < -2.2)
+				color.push('#cc04ae');
+			else if(d.value < 2.2)
+				color.push('#8f06ea');	
+			else if(d.value < 6.5)
+				color.push('#486afa');
+			else if(d.value < 10.7)
+				color.push('#00ffff');
+			else if(d.value < 15)
+				color.push('#00d34a');
+			else if(d.value < 19.2)
+				color.push('#0059d8');
+			else if(d.value < 23.5)
+				color.push('#f2fc00');
+			else if(d.value < 27.7)
+				color.push('#ff8a00');				
 			else
-				color.push('#FF0000');
+				color.push('#ff1500');
 		}
 	});
 });
