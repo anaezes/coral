@@ -8,12 +8,16 @@
     "@testing-library/user-event": "^7.2.1",
     "@types/cesium": "^1.66.5",
     "awesome-typescript-loader": "^5.2.1",
+    "axios": "^0.19.2",
     "cesium": "^1.67.0",
+    "glslify-loader": "^2.0.0",
+    "raw-loader": "^4.0.0",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-scripts": "3.4.0",
     "shebang-loader": "^0.0.1",
     "source-map-loader": "^0.2.4",
+    "static-file-loader": "^0.6.0",
     "typescript": "^3.8.3",
     "yarn": "^1.22.4"
   },
@@ -39,6 +43,7 @@
     ]
   },
   "devDependencies": {
+    "json-loader": "^0.5.7",
     "three": "^0.114.0"
   }
 }

@@ -26,7 +26,7 @@ module.exports = {
   },
   resolve: {
     fallback: paths.nodePaths,
-    extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
+    extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js", ".glb"],
     //extensions: ['.js', '.json', '.jsx', ''],
     alias: {
       'react-native': 'react-native-web'
@@ -80,8 +80,9 @@ module.exports = {
         loader: 'style!css?importLoaders=1!postcss'
       },
       {
-        test: /\.json$/,
-        loader: 'json'
+        test: /\.(glsl|vs|fs|vert|frag|glb)$/,
+        exclude: /node_modules/,
+        use: ['raw-loader', 'glslify-loader']
       },
       {
         test: /\.svg$/,
@@ -133,7 +134,8 @@ module.exports = {
     // to restart the development server for Webpack to discover it. This plugin
     // makes the discovery automatic so you don't have to restart.
     // See https://github.com/facebookincubator/create-react-app/issues/186
-    new WatchMissingNodeModulesPlugin(paths.appNodeModules)
+    new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+    new CopyWebpackPlugin([ { from: path.join('./static', 'model'), to: 'model3D'}]),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
