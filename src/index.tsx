@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import App from './app/App';
 import AUV from './app/components/AUV';
 
-import './index.css';
 import "cesium/Source/Widgets/widgets.css";
+import './index.css';
 
 let Cesium = require('cesium');
 
