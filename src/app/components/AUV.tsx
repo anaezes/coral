@@ -1,44 +1,8 @@
     import React, { Component } from 'react';
+    import { AuvJSON } from '../utils/AUVUtils';
     const Cesium = require('cesium');
 
     const url =  'https://ripples.lsts.pt/soi';
-
-    interface AuvJSON {
-        name:    string;
-        imcid:     number;
-        lastState: string;
-        plan: string;
-    }
-
-    interface Auv {
-        name:    string;
-        imcid:     number;
-        lastState: LastStateJSON;
-        plan: PlanJSON;
-    }
-
-    interface PlanJSON {
-        id:    string;
-        waypoints:  WaypointJSON[];
-        description: string;
-        type: string;
-    }
-
-    interface LastStateJSON {
-        latitude:    number;
-        longitude:     number;
-        heading: number;
-        fuel: number;
-        timestamp: number;
-    }
-
-    interface WaypointJSON {
-        latitude:    number;
-        longitude:     number;
-        heading: number;
-        fuel: number;
-        timestamp: number;
-    }
 
     class AUV extends React.Component {
         private first: boolean = true;
@@ -48,13 +12,14 @@
         private startTime: any;
         private stopTime: any;
         private scene: any;
-        private auv: any;
+        private auvs: any;
 
         state = {
             isLoading: true,
             data: [],
             error: null
         }
+
 
         async componentDidMount() {
              fetch(url)
@@ -72,6 +37,11 @@
         render () {
             const {isLoading, data, error} = this.state;
             if(!isLoading && this.first) {
+                var auvs: Array<AuvJSON> = JSON.parse(JSON.stringify(data));
+                this.auvs = auvs; //copy
+
+                //choose auv
+
                 this.getWaypoints();
                 this.getBoundsTime();
                 this.initCesium();
@@ -88,15 +58,12 @@
         }
 
         getWaypoints() {
-            this.waypoints = this.state.data[2]['plan']['waypoints'];
-
-            console.log("waypoints:");
-            console.log(this.waypoints);
+            this.waypoints = this.auvs[2].plan.waypoints;
         }
 
         getBoundsTime() {
-            let t1 = this.waypoints[0]['arrivalDate'];
-            let t2 = this.waypoints[4]['arrivalDate'];
+            let t1 = this.waypoints[0].arrivalDate;
+            let t2 = this.waypoints[4].arrivalDate;
 
             //Set bounds of our simulation time
             this.startTime = Cesium.JulianDate.fromDate(new Date(t1));
@@ -104,14 +71,10 @@
         }
 
        createModel(url: string, latitude: number, longitude: number, path: any) {
-
-          // TOP view
-          // pitch : ( rodar 90º -Cesium.Math.PI_OVER_TWO)
-
-           this.CesiumViewer.camera.setView({
+          this.CesiumViewer.camera.setView({
                orientation: {
                    heading : 0.03295948729686427+Cesium.Math.PI_OVER_TWO,
-                   pitch : 0.0,
+                   pitch : 0.0, //-Cesium.Math.PI_OVER_TWO (top view)
                    roll : 0.0
                },
                destination : Cesium.Cartesian3.fromDegrees(longitude-0.00015, latitude, 1.5)
@@ -144,11 +107,20 @@
                        glowPower : 0.1,
                        color : Cesium.Color.YELLOW
                    }),
-                   width : 3
+                   width : 1
                }
            });
 
-           this.CesiumViewer.trackedEntity = entity;
+           var viewer = this.CesiumViewer;
+           this.CesiumViewer.flyTo(entity).then(function(){
+               viewer.trackedEntity = entity;
+               viewer.camera.setView({
+                   orientation: entity.orientation,
+                   destination : Cesium.Cartesian3.fromDegrees(longitude, latitude-0.00015, 1.5)
+               });
+               viewer.scene.camera.lookAt(entity.position.getValue(viewer.clock.currentTime), entity.orientation.getValue(viewer.clock.currentTime));
+           });
+
        }
 
 
@@ -182,7 +154,7 @@
 
             var globe = new Cesium.Globe();
             globe.show = false;
-            //globe.baseColor = Cesium.Color.WHITE;
+
 
             this.CesiumViewer = new Cesium.Viewer('CesiumContainer',{
                 animation: true,
@@ -206,11 +178,19 @@
                 requestRenderMode: true
             });
 
-            this.CesiumViewer.scene.imageryLayers.removeAll();
+            this.CesiumViewer.scene.globe.enableLighting = true;
             this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
 
             //Set the random number seed for consistent results.
             Cesium.Math.setRandomNumberSeed(3);
+
+           /* viewer.scene.backgroundColor = Cesium.Color.BLACK;
+            viewer.scene.globe.baseColor = Cesium.Color.BLACK;
+            viewer.scene.fxaa = false;
+
+            viewer.scene.globe.depthTestAgainstTerrain = false;
+            viewer.scene.globe.enableLighting = false;
+            viewer.scene.globe.showWaterEffect = false;*/
         }
 
         initScene(latitude: number, longitude: number) {
@@ -224,9 +204,10 @@
             //Set timeline to simulation bounds
             this.CesiumViewer.timeline.zoomTo(this.startTime, this.stopTime);
 
-            var newLongitude = longitude+0.001;
+            var newLatitude = latitude-0.003;
+            var newLongitude = longitude-0.002;
             var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-                Cesium.Cartesian3.fromDegrees(newLongitude, latitude, 0.0));
+                Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude, 0.0));
             var model = this.CesiumViewer.scene.primitives.add(Cesium.Model.fromGltf({
                 url : '../models/rocks-3.glb',
                 modelMatrix : modelMatrix,
@@ -238,15 +219,14 @@
                 }
             }));
 
-            var dist = this.getDist(longitude, latitude, newLongitude, latitude);
-            console.log("DIST: " + dist);
+            var dist = this.getDist(longitude, latitude, newLongitude, newLatitude);
+            console.log("Distance: " + dist);
         }
 
         /*
         *  Haversine formula
         * */
-        getDist(longitude: number, latitude: number, longitudePto: number, latitudePto: number)
-        {
+        getDist(longitude: number, latitude: number, longitudePto: number, latitudePto: number) {
             const R = 6371e3; /* radius of the Earth in meters*/
 
             latitude = this.degrees_to_radians(latitude);
@@ -265,11 +245,9 @@
             return R * dist;
         }
 
-        degrees_to_radians(degrees: number)
-        {
+        degrees_to_radians(degrees: number) {
             return degrees * (Math.PI/180);
         }
-
     };
 
     export default AUV;

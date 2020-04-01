@@ -1,0 +1,27 @@
+{
+  "tilejson": "2.1.0",
+  "name": "zone_wgs",
+  "description": "",
+  "version": "1.1.0",
+  "format": "quantized-mesh-1.0",
+  "attribution": "",
+  "schema": "tms",
+  "tiles": [ "{z}/{x}/{y}.terrain?v={version}" ],
+  "projection": "EPSG:4326",
+  "bounds": [ -180.00, -90.00, 0.00, 90.00 ],
+  "available": [
+    [ { "startX": 0, "startY": 0, "endX": 1, "endY": 0 } ]
+   ,[ { "startX": 1, "startY": 1, "endX": 1, "endY": 1 } ]
+   ,[ { "startX": 3, "startY": 2, "endX": 3, "endY": 2 } ]
+   ,[ { "startX": 7, "startY": 5, "endX": 7, "endY": 5 } ]
+   ,[ { "startX": 15, "startY": 11, "endX": 15, "endY": 11 } ]
+   ,[ { "startX": 30, "startY": 23, "endX": 30, "endY": 23 } ]
+   ,[ { "startX": 60, "startY": 46, "endX": 60, "endY": 46 } ]
+   ,[ { "startX": 120, "startY": 93, "endX": 121, "endY": 93 } ]
+   ,[ { "startX": 241, "startY": 186, "endX": 243, "endY": 187 } ]
+   ,[ { "startX": 483, "startY": 372, "endX": 486, "endY": 375 } ]
+   ,[ { "startX": 967, "startY": 745, "endX": 973, "endY": 750 } ]
+   ,[ { "startX": 1934, "startY": 1490, "endX": 1946, "endY": 1501 } ]
+   ,[ { "startX": 3868, "startY": 2980, "endX": 3892, "endY": 3003 } ]
+  ]
+}

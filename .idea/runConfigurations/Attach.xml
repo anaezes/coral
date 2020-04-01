@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Attach" type="ChromiumRemoteDebugType" factoryName="Chromium Remote" host="ripples.lsts.pt" port="3000" isV8Legacy="true" restartOnDisconnect="true">
+    <option name="v8Legacy" value="true" />
+    <method v="2">
+      <option name="NpmBeforeRunTask" enabled="true">
+        <package-json value="$PROJECT_DIR$/package.json" />
+        <command value="run" />
+        <scripts>
+          <script value="start" />
+        </scripts>
+        <node-interpreter value="project" />
+        <envs />
+      </option>
+    </method>
+  </configuration>
+</component>
