@@ -1,12 +1,28 @@
     import React from 'react';
+    import DatGui, {DatSelect} from "react-dat-gui";
     import { AuvJSON } from './utils/AUVUtils';
     import Auv from "./components/Auv"
+    import {string} from "prop-types";
 
     const Cesium = require('cesium');
 
     const url =  'https://ripples.lsts.pt/soi';
 
-    class App extends React.Component {
+    interface state {
+        isLoading: Boolean,
+        data: Array<string>,
+        error: Boolean,
+        menu: Menu
+    }
+
+    interface Menu {
+        package: string,
+        power: number,
+        isAwesome: boolean,
+        feelsLike: string,
+    }
+
+    class App extends React.Component<{}, state> {
         private first: boolean = true;
         private CesiumContainer: any;
         private CesiumViewer: any;
@@ -18,8 +34,14 @@
         state = {
             isLoading: true,
             data: [],
-            error: null
-        }
+            error: false,
+            menu: {
+                package: 'react-dat-gui',
+                power: 9000,
+                isAwesome: true,
+                feelsLike: '#2FA1D6',
+            }
+        };
 
         async componentDidMount() {
             fetch(url)
@@ -34,13 +56,23 @@
                 .catch(error => this.setState({error, isLoading: false}));
         }
 
+        //Update current state with changes from controls
+        handleUpdate = newData =>
+             this.setState(prevState => ({
+                 menu: { ...prevState.menu, ...newData }
+        }));
+
         render() {
             const {isLoading, data} = this.state;
+            let options = Array<string>();
             if (!isLoading && this.first) {
                 let auvs: Array<AuvJSON> = JSON.parse(JSON.stringify(data));
                 this.auvs = auvs; //copy
 
-                //choose auv
+                for (let a of this.auvs) {
+                    options.push(a.name);
+                    console.log(a.name);
+                }
 
                 this.auv = new Auv(this.auvs[2]);
                 this.getBoundsTime();
@@ -53,6 +85,13 @@
             return (
                 <div>
                     <div id="CesiumContainer" ref={element => this.CesiumContainer = element}/>
+                    <DatGui data={this.state.data} onUpdate={this.handleUpdate}>
+                        <DatSelect
+                            label="Select"
+                            path="select"
+                            options={options}
+                        />
+                    </DatGui>
                 </div>
             );
         }
@@ -74,8 +113,8 @@
                 skyAtmosphere: false,
                 shadows: false,
                 baseLayerPicker: false,
-                geocoder: true,
-                homeButton: true,
+                geocoder: false,
+                homeButton: false,
                 fullscreenButton: true,
                 infoBox: false,
                 sceneModePicker: false,
