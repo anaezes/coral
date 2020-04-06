@@ -1,8 +1,7 @@
     import React from 'react';
-    import DatGui, {DatSelect} from "react-dat-gui";
+    import DatGui, {DatSelect, DatString} from "react-dat-gui";
     import { AuvJSON } from './utils/AUVUtils';
     import Auv from "./components/Auv"
-    import {string} from "prop-types";
 
     const Cesium = require('cesium');
 
@@ -12,34 +11,30 @@
         isLoading: Boolean,
         data: Array<string>,
         error: Boolean,
-        menu: Menu
+        options: MenuOptions
     }
 
-    interface Menu {
-        package: string,
-        power: number,
-        isAwesome: boolean,
-        feelsLike: string,
+    interface MenuOptions {
+        auvActive: string
     }
 
     class App extends React.Component<{}, state> {
         private first: boolean = true;
+        private options: Array<string> = [];
+        private auvs: Array<AuvJSON> = [];
         private CesiumContainer: any;
         private CesiumViewer: any;
         private startTime: any;
         private stopTime: any;
-        private auvs: any;
+
         private auv: any;
 
         state = {
             isLoading: true,
             data: [],
             error: false,
-            menu: {
-                package: 'react-dat-gui',
-                power: 9000,
-                isAwesome: true,
-                feelsLike: '#2FA1D6',
+            options: {
+                auvActive: ''
             }
         };
 
@@ -56,45 +51,52 @@
                 .catch(error => this.setState({error, isLoading: false}));
         }
 
-        //Update current state with changes from controls
+        // Update current state with changes from controls
         handleUpdate = newData =>
-             this.setState(prevState => ({
-                 menu: { ...prevState.menu, ...newData }
-        }));
+            this.updateRender(newData.auvActive);
+
+
+      /*  handleUpdate(event: MouseEvent) {
+            //event.preventDefault();
+
+            console.log(event.target);
+
+            this.auv = new Auv(this.auvs[2]);
+            this.getBoundsTime();
+            this.initCesium();
+            this.initEnvironment();
+            this.createAuvModel();
+
+        }*/
 
         render() {
             const {isLoading, data} = this.state;
-            let options = Array<string>();
-            if (!isLoading && this.first) {
-                let auvs: Array<AuvJSON> = JSON.parse(JSON.stringify(data));
+
+            if (!isLoading) {
+                let auvs : Array<AuvJSON> = JSON.parse(JSON.stringify(data));
                 this.auvs = auvs; //copy
 
-                for (let a of this.auvs) {
-                    options.push(a.name);
-                    console.log(a.name);
-                }
+                 for (let i = 0; i < this.auvs.length; i++) {
+                     this.options.push(this.auvs[i].name);
+                 }
 
-                this.auv = new Auv(this.auvs[2]);
-                this.getBoundsTime();
-                this.initCesium();
-                this.initEnvironment();
-                this.createAuvModel();
-
-                this.first = false;
+                if(this.CesiumViewer == null)
+                    this.initCesium();
             }
+
             return (
                 <div>
                     <div id="CesiumContainer" ref={element => this.CesiumContainer = element}/>
-                    <DatGui data={this.state.data} onUpdate={this.handleUpdate}>
+                    <DatGui data={data} onUpdate={this.handleUpdate}>
                         <DatSelect
-                            label="Select"
-                            path="select"
-                            options={options}
-                        />
+                            label="Available AUV's"
+                            path="auvActive"
+                            options={this.options}/>
                     </DatGui>
                 </div>
             );
         }
+
 
         initCesium() {
             Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkOGVmYTBmMC1jMDJjLTQ5' +
@@ -127,7 +129,7 @@
             });
 
             this.CesiumViewer.scene.globe.enableLighting = true;
-            this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
+           // this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
 
             //Set the random number seed for consistent results.
             Cesium.Math.setRandomNumberSeed(3);
@@ -139,6 +141,12 @@
              viewer.scene.globe.depthTestAgainstTerrain = false;
              viewer.scene.globe.enableLighting = false;
              viewer.scene.globe.showWaterEffect = false;*/
+        }
+
+        getBoundsTime() {
+            //Set bounds of our simulation time
+            this.startTime = Cesium.JulianDate.fromDate(new Date(this.auv.startTime));
+            this.stopTime = Cesium.JulianDate.fromDate(new Date(this.auv.stopTime));
 
             //Make sure viewer is at the desired time.
             this.CesiumViewer.clock.startTime = this.startTime.clone();
@@ -149,12 +157,6 @@
 
             //Set timeline to simulation bounds
             this.CesiumViewer.timeline.zoomTo(this.startTime, this.stopTime);
-        }
-
-        getBoundsTime() {
-            //Set bounds of our simulation time
-            this.startTime = Cesium.JulianDate.fromDate(new Date(this.auv.startTime));
-            this.stopTime = Cesium.JulianDate.fromDate(new Date(this.auv.stopTime));
         }
 
         createAuvModel() {
@@ -233,6 +235,31 @@
             // Debug
             let dist = this.auv.getDist(this.auv.longitude, this.auv.latitude, newLongitude, newLatitude);
             console.log("Distance: " + dist);
+        }
+
+        private updateRender(auvActive) {
+            let i = 0;
+            let found = false;
+            while(i < this.auvs.length){
+                if(auvActive === this.auvs[i].name) {
+                    this.auv = new Auv(this.auvs[i]);
+                    found = true;
+                    break;
+                }
+                i++;
+            }
+
+            if(!found || this.auv.waypoints.length === 0) {
+                console.log("Option not available: waypoints not defined.");
+                return;
+            }
+
+            // todo change to "this.setStat"
+            this.state.options.auvActive = auvActive;
+
+            this.getBoundsTime();
+            this.initEnvironment();
+            this.createAuvModel();
         }
     };
     export default App;

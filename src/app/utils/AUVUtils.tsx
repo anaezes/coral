@@ -21,9 +21,9 @@ export interface LastStateJSON {
 }
 
 export interface WaypointJSON {
+    arrivalDate: string;
+    duration: number;
+    eta: number;
     latitude:    number;
-    longitude:     number;
-    heading: number;
-    fuel: number;
-    timestamp: number;
+    longitude:     number
 }
