@@ -37,39 +37,13 @@ class Auv extends React.Component   {
         this.path = this.generatePath();
     }
 
-    /*
-    *  Haversine formula
-    * */
-    getDist(longitude: number, latitude: number, longitudePto: number, latitudePto: number) {
-        const R = 6371e3; /* radius of the Earth in meters*/
-
-        latitude = this.degrees_to_radians(latitude);
-        latitudePto = this.degrees_to_radians(latitudePto);
-        longitude = this.degrees_to_radians(longitude);
-        longitudePto = this.degrees_to_radians(longitudePto);
-
-        let dlon = longitudePto - longitude;
-        let dlat = latitudePto - latitude;
-
-        let a = Math.sin(dlat/2) * Math.sin(dlat/2) +
-            Math.cos(latitude) * Math.cos(latitudePto) *
-            Math.sin(dlon/2) * Math.sin(dlon/2);
-        let dist = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-        return R * dist;
-    }
-
-    degrees_to_radians(degrees: number) {
-        return degrees * (Math.PI/180);
-    }
-
     generatePath() {
         var property = new Cesium.SampledPositionProperty();
 
         for (let i = 0; i < this.waypoints.length; i += 1) {
 
             let time = Cesium.JulianDate.fromDate(new Date(this.waypoints[i]['arrivalDate']));
-            var position = Cesium.Cartesian3.fromDegrees(this.waypoints[i].longitude, this.waypoints[i].latitude, i);
+            var position = Cesium.Cartesian3.fromDegrees(this.waypoints[i].longitude, this.waypoints[i].latitude, 0);
             property.addSample(time, position);
 
             // debug
