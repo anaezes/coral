@@ -1,13 +1,17 @@
     import React from 'react';
     import DatGui, {DatSelect, DatString} from "react-dat-gui";
     import {AuvJSON, WaypointJSON} from './utils/AUVUtils';
-    import { coordTileJSON } from './utils/TilesUtils';
+    import { TileJSON } from './utils/TilesUtils';
     import Auv from "./components/Auv"
-    import data from './../data/coordTiles.json';
+    import tiles from './../data/coordTiles2.json';
+    import {number} from "prop-types";
 
     const Cesium = require('cesium');
-
-
+    const HEIGHT =  5280.0;
+    const WIDTH = 3770.0;
+    const DECIMAL_DEGREES_FACTOR = 111.29;
+    const WGS_84_A = 6378137.0;
+    const WGS_84_E2 = 0.00669437999013;
     const url =  'https://ripples.lsts.pt/soi';
 
     interface state {
@@ -25,8 +29,9 @@
         private first: boolean = true;
         private options: Array<string> = [];
         private auvs: Array<AuvJSON> = [];
-        //private coorTiles: coordTileJSON[] = [];
-        //private coorTiles: Array<coordTileJSON> = new Array<coordTileJSON>();
+        private mainTile: any;
+        private tiles: Array<TileJSON> = new Array<TileJSON>();
+
         private activeTiles: Map<number, Cesium.Primitive> = new Map<number, Cesium.Primitive>();
         private CesiumContainer: any;
         private CesiumViewer: any;
@@ -44,6 +49,7 @@
                 auvActive: ''
             }
         };
+        private ENU: Cesium.Matrix4 = new Cesium.Matrix4();
 
         async componentDidMount() {
             fetch(url)
@@ -76,6 +82,9 @@
 
                 if(this.CesiumViewer == null)
                     this.initCesium();
+
+                let t : Array<TileJSON> = JSON.parse(JSON.stringify(tiles.tiles));
+                this.tiles = t;
 
                 this.first = false;
             }
@@ -126,11 +135,15 @@
             });
 
             this.CesiumViewer.scene.globe.enableLighting = true;
-            this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
+            //this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
+            this.CesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+
             this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
 
             //Set the random number seed for consistent results.
             Cesium.Math.setRandomNumberSeed(3);
+
+            this.ENU = new Cesium.Matrix4();
         }
 
         getBoundsTime() {
@@ -271,39 +284,143 @@
             let dist, assetId;
             let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
 
-            data.tiles.forEach(tile => {
-                assetId = tile.assetId;
-                dist = Cesium.Cartesian3.distance(auvPosition, new Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude));
+            let minDist = Number.MAX_VALUE;
 
-                if(dist <= 3500){
-                    //render tile
-                    this.renderTile(assetId)
+            // Find main tile
+            this.tiles.forEach(tile => {
+                assetId = tile.assetId;
+                dist = Cesium.Cartesian3.distance(auvPosition, new Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude))/1000;
+
+                if(dist < minDist) {
+                    minDist = dist;
+                    this.mainTile = tile;
                 }
-                else if(dist > 3500){
-                    //remove tile
-                    this.removeTile(assetId)
+            });
+
+
+
+            if(!this.activeTiles.has(this.mainTile.assetId)) {
+                this.renderTile(this.mainTile.latitude, this.mainTile.longitude, this.mainTile.assetId);
+            }
+
+            var position = Cesium.Cartesian3.fromDegrees(this.mainTile.longitude,this.mainTile.latitude,0);
+            Cesium.Transforms.eastNorthUpToFixedFrame(position,this.CesiumViewer.scene.globe.ellipsoid, this.ENU);
+
+            // Render neighbors
+            this.tiles.forEach(tile => {
+                if(tile.assetId !== this.mainTile.assetId) {
+                    assetId = tile.assetId;
+                    dist = Cesium.Cartesian3.distance(auvPosition, new Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude)) / 1000;
+
+                    if (dist <= 5.0) {
+                        this.processTile(assetId, tile, position)
+                    } else {
+                        this.removeTile(assetId)
+                    }
                 }
             });
 
             this.forceUpdate();
         }
 
-        renderTile(assetId: number){
+        renderTile(lat: number, lon: number, assetId:number) {
+            let modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
+                Cesium.Cartesian3.fromDegrees(lon, lat, -255));
+
+            //Cesium.Transforms.eastNorthUpToFixedFrame(Cesium.Cartesian3.fromElements(position.x, position.y, -250.0));
+
+            //position.coords[1], coords[0], -255));
+
+            let p = new Cesium.Cesium3DTileset({
+                url: Cesium.IonResource.fromAssetId(assetId),
+                modelMatrix: modelMatrix
+            })
+            this.CesiumViewer.scene.primitives.add(p);
+            this.activeTiles.set(assetId, p);
+            console.log("Render: " + assetId);
+        }
+
+        processTile(assetId: number, tile: TileJSON, position: Cesium.Cartesian3){
             let primitive = this.activeTiles.get(assetId);
             if(primitive === undefined) {
-                let p = new Cesium.Cesium3DTileset({
-                    url: Cesium.IonResource.fromAssetId(assetId)
-                })
-                this.CesiumViewer.scene.primitives.add(p);
-                this.activeTiles.set(assetId, p);
-                console.log("Render: " + assetId);
+
+
+
+                let lat = tile.latitude;
+                let lon = tile.longitude;
+
+            /*    if(this.mainTile.latitude === lat) // left or right neighbor
+                    lon = this.getLongitudeGivenDistance(lon);
+                else if(this.mainTile.longitude === lon) // top or down neighbor
+                    lat = this.getLatitudeGivenDistance(lat);
+                else { // top or down neighbor
+                    lon = this.getLongitudeGivenDistance(lon);
+                    lat = this.getLatitudeGivenDistance(lat);
+                }*/
+
+                let offsetN = HEIGHT;
+                let offsetE = WIDTH;
+                //var position = Cesium.Cartesian3.fromDegrees(this.mainTile.longitude, this.mainTile.latitude);
+                var offset;
+
+                if(this.mainTile.latitude === lat){
+                    if(this.mainTile.longitude < lon){
+                        offsetE = offsetE * 1;
+                    }
+                    else if(this.mainTile.longitude > lon) {
+                        offsetE = offsetE * -1;
+                    }
+                    offset = new Cesium.Cartesian3(offsetE, 0);
+                }
+                else if(this.mainTile.longitude === lon){
+                    if(this.mainTile.latitude < lat){
+                        offsetN = offsetN * 1;
+                    }
+                    else if(this.mainTile.latitude > lat) {
+                        offsetN = offsetN * -1;
+                    }
+                    offset = new Cesium.Cartesian3(0, offsetN);
+                }
+                else {
+                    if(this.mainTile.latitude < lat){
+                        offsetN = offsetN * 1;
+                    }
+                    else if(this.mainTile.latitude > lat) {
+                        offsetN = offsetN * -1;
+                    }
+                    if(this.mainTile.longitude < lon){
+                        offsetE = offsetE * 1;
+                    }
+                    else if(this.mainTile.longitude > lon) {
+                        offsetE = offsetE * -1;
+                    }
+                    offset = new Cesium.Cartesian3(offsetE, offsetN);
+                }
+
+                console.log("offset: " + offset);
+
+                var finalPos = Cesium.Matrix4.multiplyByPoint(this.ENU, offset, new Cesium.Cartesian3());
+                console.log(finalPos);
+
+                console.log("position 1 : " + position);
+                console.log("position 2 : " + finalPos);
+
+                let result = new Cesium.Cartographic();
+                Cesium.Cartographic.fromCartesian(finalPos, Cesium.Ellipsoid.WGS84, result);
+                lon = Cesium.Math.toDegrees(result.longitude);
+                lat = Cesium.Math.toDegrees(result.latitude);
+
+                console.log("lon : " + lon);
+                console.log("lat : " + lat);
+
+                this.renderTile(lat, lon, assetId);
             }
         }
 
         removeTile(assetId: number){
             let primitive = this.activeTiles.get(assetId);
             if(primitive !== undefined) {
-                console.log("remove: " + assetId);
+               // console.log("remove: " + assetId);
                 this.CesiumViewer.scene.primitives.remove(primitive);
                 this.activeTiles.delete(assetId);
             }
@@ -334,6 +451,148 @@
         degrees_to_radians(degrees: number) {
             return degrees * (Math.PI/180);
         }
+
+
+        getLongitudeGivenDistance(lon: number) {
+            let c = 40075.0 * Math.cos(this.mainTile.latitude) / 3600.0;
+            //0.13
+            if(this.mainTile.longitude < lon)
+                lon = this.mainTile.longitude - ( WIDTH / c) * 0.13;
+            else if(this.mainTile.longitude > lon)
+                lon = this.mainTile.longitude + ( WIDTH / c) * 0.13 ;
+
+            return lon;
+        }
+
+        getLatitudeGivenDistance(lat: number) {
+            //1.33
+            if(this.mainTile.latitude < lat)
+                lat = this.mainTile.latitude + (HEIGHT / DECIMAL_DEGREES_FACTOR)*1.33;
+            else if(this.mainTile.latitude > lat) {
+                lat = this.mainTile.latitude - (HEIGHT / DECIMAL_DEGREES_FACTOR)*1.33;
+            }
+            return lat;
+        }
+
+       toECEF(latDegrees:number, lonDegrees:number, depth:number) {
+
+           let lld: number[] = [latDegrees, lonDegrees, depth];
+           lld[0] = this.degrees_to_radians(lld[0]);
+           lld[1] = this.degrees_to_radians(lld[1]);
+
+           let  cos_lat = Math.cos(lld[0]);
+           let  sin_lat = Math.sin(lld[0]);
+           let  cos_lon = Math.cos(lld[1]);
+           let  sin_lon = Math.sin(lld[1]);
+           let  rn = WGS_84_A / Math.sqrt(1.0 - WGS_84_E2 * sin_lat * sin_lat);
+
+           let n = (rn - lld[2]) * cos_lat * cos_lon;
+           let e = (rn - lld[2]) * cos_lat * sin_lon;
+           let d = (((1.0 - WGS_84_E2) * rn) - lld[2]) * sin_lat;
+
+           //let ned: number[] = ;
+           let ned: number[] = [n, e, d];
+
+           return ned;
+        }
+
+        toGeodetic(x : number, y:number, z:number) {
+
+            console.log("toGeodetic");
+            let lat, lon, d;
+
+            let p = Math.sqrt(x * x + y * y);
+            lon = Math.atan2(y, x);
+            lat = Math.atan2(z / p, 0.01);
+            let n = this.n_rad(lat);
+            d = p / Math.cos(lat) - n;
+            let old_hae = -1e-9;
+            let num = z / p;
+
+            while (Math.abs(d - old_hae) > 1e-4) {
+                old_hae = d;
+                let den = 1 - WGS_84_E2 * n / (n + d);
+                lat = Math.atan2(num, den);
+                n = this.n_rad(lat);
+                d = p / Math.cos(lat) - n;
+            }
+
+            console.log("toGeodetic");
+
+            let lld: number[] = [lat, lon, d];
+            console.log(lld.toString());
+
+            lld[0] = this.degrees_to_radians(lld[0]);
+            lld[1] = this.degrees_to_radians(lld[1]);
+
+            console.log(lld);
+
+            return lld;
+        }
+
+        n_rad(lat:number) {
+            let lat_sin = Math.sin(lat);
+            return WGS_84_A / Math.sqrt(1 - WGS_84_E2 * (lat_sin * lat_sin));
+        }
+
+
+        WGS84displace(latDegrees:number, lonDegrees:number, depth:number, n:number, e:number, d:number) {
+
+            console.log("WGS84displace: " );
+            //console.log(latDegrees, lonDegrees, depth);
+
+            // Convert reference to ECEF coordinates
+            let xyz = this.toECEF(latDegrees, lonDegrees, depth);
+
+            //console.log("WGS84displace xyz: " );
+            //console.log(xyz);
+
+            let lld = [latDegrees, lonDegrees, depth];
+
+            // Compute Geocentric latitude
+            let phi = Math.atan2(xyz[2], Math.sqrt(xyz[0] * xyz[0] + xyz[1] * xyz[1]));
+
+            console.log("phi: " + phi);
+
+            // Compute all needed sine and cosine terms for conversion.
+            let slon = Math.sin(this.degrees_to_radians(lld[1]));
+            let clon = Math.cos(this.degrees_to_radians(lld[1]));
+            let sphi = Math.sin(phi);
+            let cphi = Math.cos(phi);
+
+            console.log("slon: " + slon);
+            console.log("clon: " + clon);
+            console.log("sphi: " + sphi);
+            console.log("cphi: " + cphi);
+
+            console.log("antes xyz: " + xyz.toString());
+
+            // Obtain ECEF coordinates of displaced point
+            // Note: some signs from standard ENU formula
+            // are inverted - we are working with NED (= END) coordinates
+            xyz[0] += -slon * e - clon * sphi * n - clon * cphi * d;
+            xyz[1] += clon * e - slon * sphi * n - slon * cphi * d;
+            xyz[2] += cphi * n - sphi * d;
+
+            console.log("depois xyz: " + xyz.toString());
+
+            return xyz;
+
+            // Convert back to WGS-84 coordinates
+           // let lld2 = this.toGeodetic(xyz[0], xyz[1], xyz[2]);
+
+         /*   console.log("WGS84displace lld2: " );
+            console.log(lld2);
+
+            if (d != 0.0)
+                lld2[2] = depth + d;
+            else
+                lld2[2] = depth;
+
+            return lld2;*/
+    }
+
+
 
     };
     export default App;

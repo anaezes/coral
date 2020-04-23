@@ -1,0 +1,40 @@
+{
+  "constants": [
+    {
+      "height": 5280,
+      "width": 3770
+    }
+  ],
+  "tiles": [
+    {
+      "longitude": -8.8444746,
+      "latitude": 41.5872135,
+      "assetId": 91074
+    },
+    {
+      "longitude": -8.7991357,
+      "latitude": 41.5872135,
+      "assetId": 91075
+    },
+    {
+      "longitude": -8.8444746,
+      "latitude": 41.5397344,
+      "assetId": 91076
+    },
+    {
+      "longitude": -8.7991357,
+      "latitude": 41.5397344,
+      "assetId": 91077
+    },
+    {
+      "longitude": -8.8444746,
+      "latitude": 41.4923581,
+      "assetId": 91078
+    },
+    {
+      "longitude": -8.7991357,
+      "latitude": 41.4923581,
+      "assetId": 91079
+    }
+  ]
+}
