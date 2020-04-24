@@ -1,5 +1,6 @@
 import React from 'react';
 import {AuvJSON, WaypointJSON} from '../utils/AUVUtils';
+const HEIGHT = 40.0;
 
 
 const Cesium = require('cesium');
@@ -43,7 +44,7 @@ class Auv extends React.Component   {
         for (let i = 0; i < this.waypoints.length; i += 1) {
 
             let time = Cesium.JulianDate.fromDate(new Date(this.waypoints[i]['arrivalDate']));
-            var position = Cesium.Cartesian3.fromDegrees(this.waypoints[i].longitude, this.waypoints[i].latitude, 0);
+            var position = Cesium.Cartesian3.fromDegrees(this.waypoints[i].longitude, this.waypoints[i].latitude, HEIGHT);
             property.addSample(time, position);
 
             // debug
