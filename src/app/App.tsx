@@ -8,7 +8,8 @@ import tiles from './../data/coordTiles2.json';
 
 const Cesium = require('cesium');
 const DEPTH = 0.0;
-const HEIGHT = 40.0;
+const HEIGHT = 10.0;
+const TERRAIN_EXAGGERATION = 4.0;
 const url =  'https://ripples.lsts.pt/soi';
 
 interface state {
@@ -140,19 +141,16 @@ class App extends React.Component<{}, state> {
 
         this.CesiumViewer.scene.globe.enableLighting = true;
         //this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
-        this.CesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+        //this.CesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
         this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
 
         //Set the random number seed for consistent results.
         Cesium.Math.setRandomNumberSeed(3);
-
         this.ENU = new Cesium.Matrix4();
 
         this.CesiumViewer.scene.fog.enabled = true;
         this.CesiumViewer.scene.fog.density = 2.0e-4;
-
-
     }
 
     getBoundsTime() {
@@ -176,6 +174,7 @@ class App extends React.Component<{}, state> {
         let latitude = this.auv.latitude;
 
         this.CesiumViewer.scene.globe.show = false;
+        this.CesiumViewer.scene.backgroundColor = Cesium.Color.AQUAMARINE;
 
         this.CesiumViewer.camera.setView({
             orientation: {
@@ -233,7 +232,7 @@ class App extends React.Component<{}, state> {
         let newLatitude = this.auv.latitude-0.0005;
         let newLongitude = this.auv.longitude-0.0003;
         let modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-            Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude, HEIGHT + 1.0));
+            Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude, DEPTH+47.5));
 
         // naufrago
         var viewer = this.CesiumViewer;
@@ -271,14 +270,16 @@ class App extends React.Component<{}, state> {
         this.state.options.auvActive = auvActive;
 
         this.getBoundsTime();
-        this.initEnvironment();
+
         this.createAuvModel();
+        this.findMainTile();
+        this.initEnvironment();
 
         setInterval(this.updateTiles.bind(this), 500);
     }
 
-    private updateTiles() {
-        //let auvPosition;
+    private findMainTile(){
+
         let dist, assetId;
         let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
 
@@ -295,8 +296,16 @@ class App extends React.Component<{}, state> {
             }
         });
 
-        var position = Cesium.Cartesian3.fromDegrees(this.mainTile.longitude,this.mainTile.latitude,DEPTH);
+        var position = Cesium.Cartesian3.fromDegrees(this.mainTile.longitude,this.mainTile.latitude, DEPTH);
         Cesium.Transforms.eastNorthUpToFixedFrame(position,this.CesiumViewer.scene.globe.ellipsoid, this.ENU);
+    }
+
+    private updateTiles() {
+        this.findMainTile();
+
+        //let auvPosition;
+        let dist, assetId;
+        let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
 
         // Render neighbors
         this.tiles.forEach(tile => {
@@ -334,7 +343,12 @@ class App extends React.Component<{}, state> {
             tile.latitude = Cesium.Math.toDegrees(result.latitude);
         }
 
-        let translation = Cesium.Transforms.headingPitchRollToFixedFrame(cartesian, new Cesium.HeadingPitchRoll());
+        var transform = new Cesium.Matrix4();
+        var translation = Cesium.Transforms.eastNorthUpToFixedFrame(cartesian);
+        var scale = Cesium.Matrix4.fromScale(new Cesium.Cartesian3(1,1, TERRAIN_EXAGGERATION), undefined);
+        Cesium.Matrix4.multiply(translation, scale, transform);
+        var rotation = Cesium.Matrix4.fromRotationTranslation(Cesium.Matrix3.IDENTITY, undefined, undefined);
+        Cesium.Matrix4.multiply(transform, rotation, transform);
 
         var tileset = new Cesium.Cesium3DTileset({
             url: Cesium.IonResource.fromAssetId(tile.assetId),
@@ -344,12 +358,11 @@ class App extends React.Component<{}, state> {
             dynamicScreenSpaceErrorHeightFalloff : 0.25
         });
 
-
         this.CesiumViewer.scene.primitives.add(tileset);
 
         tileset.readyPromise.then(function(){
             tileset._root.transform = Cesium.Matrix4.IDENTITY;
-            tileset.modelMatrix = translation;
+            tileset.modelMatrix = transform;
         });
 
         tile.active = true;

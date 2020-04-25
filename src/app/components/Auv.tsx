@@ -1,6 +1,6 @@
 import React from 'react';
 import {AuvJSON, WaypointJSON} from '../utils/AUVUtils';
-const HEIGHT = 40.0;
+const HEIGHT = 150.0;
 
 
 const Cesium = require('cesium');

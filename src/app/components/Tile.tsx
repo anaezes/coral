@@ -1,8 +1,8 @@
 import React from 'react';
 import {TileJSON} from "../utils/TilesUtils";
 
-
 const Cesium = require('cesium');
+const CORRECTION_FACTOR = 1.3;
 const HEIGHT =  5280.0;
 const WIDTH = 3768.0;
 
@@ -20,8 +20,6 @@ class Tile extends React.Component{
 
     constructor(tile: TileJSON) {
         super(tile)
-
-        //this.coords = new Cesium.Cartesian3(tile.longitude, tile.latitude, 0);
         this.longitude = tile.longitude;
         this.latitude = tile.latitude;
         this.assetId = tile.assetId;
@@ -31,27 +29,15 @@ class Tile extends React.Component{
     }
 
     getOffset(mainTile: Tile){
-    /*    if(this.assetId === mainTile.assetId || this.coordsFixed) {
-            this.coordsFixed = true;
-            //console.log("getOffset: " + this.assetId + " ;; " + mainTile.assetId + " ;; fixed:" + this.coordsFixed);
-            return new Cesium.Cartesian3(0, 0);
-        }*/
-
         let lat = this.latitude;
         let lon = this.longitude;
-
-        let offsetN = HEIGHT*1;
-        let offsetE = WIDTH*1;
-
+        let offsetN = HEIGHT * CORRECTION_FACTOR;
+        let offsetE = WIDTH * CORRECTION_FACTOR;
         var offset;
-
 
         if(Cesium.Math.equalsEpsilon(mainTile.latitude, lat, epsilon)) // west or east
         {
-            if(mainTile.longitude < lon) {
-                offsetE = offsetE * 1;
-            }
-            else if(mainTile.longitude > lon) {
+            if(mainTile.longitude > lon) {
                 offsetE = offsetE * -1;
             }
             offset = new Cesium.Cartesian3(offsetE, 0);
@@ -60,10 +46,7 @@ class Tile extends React.Component{
         }
         else if(Cesium.Math.equalsEpsilon(mainTile.longitude, lon, epsilon)) // north or south
         {
-            if(mainTile.latitude < lat) {
-                offsetN = offsetN * 1;
-            }
-            else if(mainTile.latitude > lat) {
+            if(mainTile.latitude > lat) {
                 offsetN = offsetN * -1;
             }
             offset = new Cesium.Cartesian3(0, offsetN);
