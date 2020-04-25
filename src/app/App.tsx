@@ -118,7 +118,6 @@ class App extends React.Component<{}, state> {
         skyAtmosphere.show = true;
         skyAtmosphere.brightnessShift = -1;
 
-
         this.CesiumViewer = new Cesium.Viewer('CesiumContainer', {
             animation: true,
             scene3DOnly: true,
@@ -126,7 +125,7 @@ class App extends React.Component<{}, state> {
             skyBox: false,
             vrButton: false,
             shadows: true,
-            skyAtmosphere: skyAtmosphere,
+            skyAtmosphere: false,
             baseLayerPicker: false,
             geocoder: false,
             homeButton: false,
@@ -146,13 +145,16 @@ class App extends React.Component<{}, state> {
         //this.CesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
         this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
+        //this.CesiumViewer.scene.backgroundColor = Cesium.Color.AQUAMARINE;
 
         //Set the random number seed for consistent results.
         Cesium.Math.setRandomNumberSeed(3);
         this.ENU = new Cesium.Matrix4();
 
-        this.CesiumViewer.scene.fog.enabled = true;
-        this.CesiumViewer.scene.fog.density = 2.0e-4;
+        //this.CesiumViewer.scene.fog.enabled = true;
+        //this.CesiumViewer.scene.fog.density = 2.0e-4;
+
+        this.CesiumViewer.animation.viewModel.setShuttleRingTicks([0, 1500]);
     }
 
     getBoundsTime() {
@@ -175,8 +177,10 @@ class App extends React.Component<{}, state> {
         let longitude = this.auv.longitude;
         let latitude = this.auv.latitude;
 
-        this.CesiumViewer.scene.globe.show = false;
-        this.CesiumViewer.scene.backgroundColor = Cesium.Color.AQUAMARINE;
+        this.CesiumViewer.scene.globe = new Cesium.Globe(Cesium.Ellipsoid.WGS84);
+        this.CesiumViewer.scene.globe.baseColor = Cesium.Color.GRAY;
+        this.CesiumViewer.scene.globe.fillHighlightColor = Cesium.Color.GRAY;
+        this.CesiumViewer.scene.backgroundColor = Cesium.Color.CADETBLUE;
 
         this.CesiumViewer.camera.setView({
             orientation: {
