@@ -33,41 +33,28 @@ class Tile extends React.Component{
         let lon = this.longitude;
         let offsetN = HEIGHT * CORRECTION_FACTOR;
         let offsetE = WIDTH * CORRECTION_FACTOR;
-        var offset;
+        let offset;
 
-        if(Cesium.Math.equalsEpsilon(mainTile.latitude, lat, epsilon)) // west or east
-        {
-            if(mainTile.longitude > lon) {
+        if(Cesium.Math.equalsEpsilon(mainTile.latitude, lat, epsilon)) {// west or east
+            if(mainTile.longitude > lon)
                 offsetE = offsetE * -1;
-            }
             offset = new Cesium.Cartesian3(offsetE, 0);
-
-            console.log("W/E: " + this.assetId + " ;; " + mainTile.longitude + " ;; " + offset);
         }
-        else if(Cesium.Math.equalsEpsilon(mainTile.longitude, lon, epsilon)) // north or south
-        {
-            if(mainTile.latitude > lat) {
-                offsetN = offsetN * -1;
-            }
-            offset = new Cesium.Cartesian3(0, offsetN);
+        else if(Cesium.Math.equalsEpsilon(mainTile.longitude, lon, epsilon)) {// north or south
 
-            console.log( "N/S: " + this.assetId + " ;; " + mainTile.latitude + " ;; " + offset);
+            if(mainTile.latitude > lat)
+                offsetN = offsetN * -1;
+            offset = new Cesium.Cartesian3(0, offsetN);
         }
         else { // sw, se. nw or ne
-
-            if(mainTile.latitude > lat) {
+            if(mainTile.latitude > lat)
                 offsetN = offsetN * -1;
-            }
-            if(mainTile.longitude > lon) {
+            if(mainTile.longitude > lon)
                 offsetE = offsetE * -1;
-            }
             offset = new Cesium.Cartesian3(offsetE, offsetN);
-
-            console.log("D: " + this.assetId + " ;; " + mainTile.assetId + " ;; " + offset);
         }
 
         this.coordsFixed = true;
-
         return offset;
     }
 }

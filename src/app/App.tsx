@@ -1,5 +1,5 @@
 import React from 'react';
-import DatGui, {DatSelect, DatString} from "react-dat-gui";
+import DatGui, {DatSelect, DatNumber} from "react-dat-gui";
 import {AuvJSON, WaypointJSON} from './utils/AUVUtils';
 import { TileJSON } from './utils/TilesUtils';
 import Auv from "./components/Auv";
@@ -9,7 +9,7 @@ import tiles from './../data/coordTiles2.json';
 const Cesium = require('cesium');
 const DEPTH = 0.0;
 const HEIGHT = 10.0;
-const TERRAIN_EXAGGERATION = 4.0;
+
 const url =  'https://ripples.lsts.pt/soi';
 
 interface state {
@@ -20,7 +20,8 @@ interface state {
 }
 
 interface MenuOptions {
-    auvActive: string
+    auvActive: string,
+    terrainExaggeration: number
 }
 
 class App extends React.Component<{}, state> {
@@ -29,13 +30,11 @@ class App extends React.Component<{}, state> {
     private auvs: Array<AuvJSON> = [];
     private mainTile: any;
     private tiles: Array<Tile> = new Array<Tile>();
-
-    //private activeTiles: Map<number, Cesium.Primitive> = new Map<number, Cesium.Primitive>();
     private CesiumContainer: any;
     private CesiumViewer: any;
     private startTime: any;
     private stopTime: any;
-
+    private ENU: Cesium.Matrix4 = new Cesium.Matrix4();
     private entityAUV: Cesium.Entity = new Cesium.Entity();
     private auv: any;
 
@@ -44,10 +43,11 @@ class App extends React.Component<{}, state> {
         data: [],
         error: false,
         options: {
-            auvActive: ''
+            auvActive: '',
+            terrainExaggeration: 4
         }
     };
-    private ENU: Cesium.Matrix4 = new Cesium.Matrix4();
+
 
     async componentDidMount() {
         fetch(url)
@@ -64,11 +64,12 @@ class App extends React.Component<{}, state> {
 
     // Update current state with changes from controls
     handleUpdate = newData =>
-        this.updateRender(newData.auvActive);
+        this.updateRender(newData);
+
 
 
     render() {
-        const {isLoading, data} = this.state;
+        const {isLoading, data, options} = this.state;
 
         if (!isLoading && this.first) {
             let auvs : Array<AuvJSON> = JSON.parse(JSON.stringify(data));
@@ -92,7 +93,8 @@ class App extends React.Component<{}, state> {
         return (
             <div>
                 <div id="CesiumContainer" ref={element => this.CesiumContainer = element}/>
-                <DatGui data={data} onUpdate={this.handleUpdate}>
+                <DatGui data={options} onUpdate={this.handleUpdate}>
+                    <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
                     <DatSelect
                         label="Available AUV's"
                         path="auvActive"
@@ -249,33 +251,48 @@ class App extends React.Component<{}, state> {
         console.log("Distance: " + dist);
     }
 
-    private updateRender(auvActive) {
-        let i = 0;
-        let found = false;
-        while(i < this.auvs.length){
-            if(auvActive === this.auvs[i].name) {
-                this.auv = new Auv(this.auvs[i]);
-                found = true;
-                break;
-            }
-            i++;
-        }
+    private updateRender(data) {
 
-        if(!found || this.auv.waypoints.length === 0) {
-            console.log("Option not available: waypoints not defined.");
-            return;
-        }
+        this.setState(prevState => ({
+            data: { ...prevState.data, ...data }
+        }));
 
         // todo change to "this.setStat"
-        this.state.options.auvActive = auvActive;
+        if(data.terrainExaggeration !== this.state.options.terrainExaggeration)
+            this.state.options.terrainExaggeration = data.terrainExaggeration;
 
-        this.getBoundsTime();
+        if(data.auvActive !== this.state.options.auvActive){
 
-        this.createAuvModel();
-        this.findMainTile();
-        this.initEnvironment();
+            this.CesiumViewer.entities.removeAll();
+            //this.CesiumViewer.scene.primitives.removeAll();
 
-        setInterval(this.updateTiles.bind(this), 500);
+            let i = 0;
+            let found = false;
+            while(i < this.auvs.length){
+                if(data.auvActive === this.auvs[i].name) {
+                    this.auv = new Auv(this.auvs[i]);
+                    found = true;
+                    break;
+                }
+                i++;
+            }
+
+            if(!found || this.auv.waypoints.length === 0) {
+                console.log("Option not available: waypoints not defined.");
+                return;
+            }
+
+            // todo change to "this.setStat"
+            // this.state.options.auvActive = data.auvActive;
+
+            this.getBoundsTime();
+            this.createAuvModel();
+            this.findMainTile();
+            this.initEnvironment();
+            setInterval(this.updateTiles.bind(this), 500);
+        }
+
+
     }
 
     private findMainTile(){
@@ -345,7 +362,7 @@ class App extends React.Component<{}, state> {
 
         var transform = new Cesium.Matrix4();
         var translation = Cesium.Transforms.eastNorthUpToFixedFrame(cartesian);
-        var scale = Cesium.Matrix4.fromScale(new Cesium.Cartesian3(1,1, TERRAIN_EXAGGERATION), undefined);
+        var scale = Cesium.Matrix4.fromScale(new Cesium.Cartesian3(1,1, this.state.options.terrainExaggeration), undefined);
         Cesium.Matrix4.multiply(translation, scale, transform);
         var rotation = Cesium.Matrix4.fromRotationTranslation(Cesium.Matrix3.IDENTITY, undefined, undefined);
         Cesium.Matrix4.multiply(transform, rotation, transform);
@@ -372,10 +389,11 @@ class App extends React.Component<{}, state> {
     }
 
     removeTile(tile: Tile){
-            console.log("remove: " + tile.assetId);
+        console.log("remove: " + tile.assetId);
+        if(this.CesiumViewer.scene.primitives.contains(tile.primitive))
             this.CesiumViewer.scene.primitives.remove(tile.primitive);
-            tile.active = false;
-            tile.primitive = undefined;
+        tile.active = false;
+        tile.primitive = undefined;
     }
 };
 export default App;
