@@ -111,14 +111,19 @@ class App extends React.Component<{}, state> {
         let globe = new Cesium.Globe();
         globe.show = true;
 
+        let skyAtmosphere = new Cesium.SkyAtmosphere();
+        skyAtmosphere.show = true;
+        skyAtmosphere.brightnessShift = -1;
+
+
         this.CesiumViewer = new Cesium.Viewer('CesiumContainer', {
             animation: true,
             scene3DOnly: true,
             globe: globe,
             skyBox: false,
             vrButton: false,
-            skyAtmosphere: false,
             shadows: true,
+            skyAtmosphere: skyAtmosphere,
             baseLayerPicker: false,
             geocoder: false,
             homeButton: false,
@@ -135,7 +140,7 @@ class App extends React.Component<{}, state> {
 
         this.CesiumViewer.scene.globe.enableLighting = true;
         //this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
-        //this.CesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+        this.CesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
         this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
 
@@ -143,6 +148,11 @@ class App extends React.Component<{}, state> {
         Cesium.Math.setRandomNumberSeed(3);
 
         this.ENU = new Cesium.Matrix4();
+
+        this.CesiumViewer.scene.fog.enabled = true;
+        this.CesiumViewer.scene.fog.density = 2.0e-4;
+
+
     }
 
     getBoundsTime() {
@@ -295,8 +305,7 @@ class App extends React.Component<{}, state> {
 
             if (dist <= 5.0) {
                 if(tile.primitive === undefined) {
-                    let offset = tile.getOffset(this.mainTile);
-                    this.renderTile(tile, offset);
+                    this.renderTile(tile);
                 }
             } else {
                 if(tile.active)
@@ -307,29 +316,25 @@ class App extends React.Component<{}, state> {
         this.forceUpdate();
     }
 
-    getEastNorthUpTransform(tileset, relativeHeight) {
-        var origin = tileset.boundingSphere.center;
-        var cartographic = Cesium.Cartographic.fromCartesian(origin);
-        cartographic.height = relativeHeight;
-        origin = Cesium.Cartographic.toCartesian(cartographic);
-        var enu = Cesium.Transforms.eastNorthUpToFixedFrame(origin);
-        return enu;
-    }
 
-    getScaleTransform(tileset, scale, relativeHeight) {
-        var toGlobal = this.getEastNorthUpTransform(tileset, relativeHeight);
-        var toLocal = Cesium.Matrix4.inverse(toGlobal, new Cesium.Matrix4());
-        var localScale = new Cesium.Cartesian3(1.0, 1.0, scale);
-        var localScaleMatrix = Cesium.Matrix4.fromScale(localScale);
-        var transform = Cesium.Matrix4.multiply(toGlobal, Cesium.Matrix4.multiply(localScaleMatrix, toLocal, new Cesium.Matrix4()), new Cesium.Matrix4());
-        return transform;
-    }
+    renderTile(tile: Tile){
+        let cartesian;
+        let offset;
 
-    renderTile(tile: Tile, offset: Cesium.Cartesian3){
-        let finalPos = Cesium.Matrix4.multiplyByPoint(this.ENU, offset, new Cesium.Cartesian3());
-        let result = Cesium.Cartographic.fromCartesian(finalPos, Cesium.Ellipsoid.WGS84);
-        var cartesian = Cesium.Cartesian3.fromDegrees(Cesium.Math.toDegrees(result.longitude),
-            Cesium.Math.toDegrees(result.latitude), DEPTH);
+        if(tile.coordsFixed || tile.assetId === this.mainTile.assetId){
+            cartesian = Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude, DEPTH);
+        }
+        else {
+            offset = tile.getOffset(this.mainTile);
+            let finalPos = Cesium.Matrix4.multiplyByPoint(this.ENU, offset, new Cesium.Cartesian3());
+            let result = Cesium.Cartographic.fromCartesian(finalPos, Cesium.Ellipsoid.WGS84);
+            cartesian = Cesium.Cartesian3.fromDegrees(Cesium.Math.toDegrees(result.longitude),
+                Cesium.Math.toDegrees(result.latitude), DEPTH);
+            tile.longitude = Cesium.Math.toDegrees(result.longitude);
+            tile.latitude = Cesium.Math.toDegrees(result.latitude);
+        }
+
+        let translation = Cesium.Transforms.headingPitchRollToFixedFrame(cartesian, new Cesium.HeadingPitchRoll());
 
         var tileset = new Cesium.Cesium3DTileset({
             url: Cesium.IonResource.fromAssetId(tile.assetId),
@@ -339,10 +344,10 @@ class App extends React.Component<{}, state> {
             dynamicScreenSpaceErrorHeightFalloff : 0.25
         });
 
+
         this.CesiumViewer.scene.primitives.add(tileset);
 
         tileset.readyPromise.then(function(){
-            var translation = Cesium.Transforms.headingPitchRollToFixedFrame(cartesian, new Cesium.HeadingPitchRoll());
             tileset._root.transform = Cesium.Matrix4.IDENTITY;
             tileset.modelMatrix = translation;
         });
