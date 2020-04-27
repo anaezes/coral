@@ -8,6 +8,7 @@
       <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="adfb917f-59f2-4870-aa2c-a7346ddf22a2" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
       <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="59416a52-65a9-4257-9043-b3a303b4e337" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
       <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="f2f81226-41be-455c-8300-db66646ddf6e" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="9212b1ae-6920-486d-ae0a-3c7373bdef1e" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
     </configs>
   </component>
 </project>

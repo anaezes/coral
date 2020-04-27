@@ -17,6 +17,7 @@
     "react-dat-gui": "^4.0.0",
     "react-dom": "^16.13.0",
     "react-scripts": "3.4.0",
+    "react-three-renderer": "^3.2.4",
     "resium": "^1.11.0",
     "shebang-loader": "^0.0.1",
     "source-map-loader": "^0.2.4",

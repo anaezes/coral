@@ -4,6 +4,7 @@ import {AuvJSON, WaypointJSON} from './utils/AUVUtils';
 import { TileJSON } from './utils/TilesUtils';
 import Auv from "./components/Auv";
 import Tile from "./components/Tile";
+import Water from "./components/Water"
 import tiles from './../data/coordTiles2.json';
 
 const Cesium = require('cesium');
@@ -47,6 +48,7 @@ class App extends React.Component<{}, state> {
             terrainExaggeration: 4
         }
     };
+    private isReady: boolean = false;
 
 
     async componentDidMount() {
@@ -65,7 +67,6 @@ class App extends React.Component<{}, state> {
     // Update current state with changes from controls
     handleUpdate = newData =>
         this.updateRender(newData);
-
 
 
     render() {
@@ -103,6 +104,8 @@ class App extends React.Component<{}, state> {
             </div>
         );
     }
+
+    //<!--div id="ThreeContainer" ref={element => this.water = element}/-->
 
 
     initCesium() {
@@ -219,7 +222,17 @@ class App extends React.Component<{}, state> {
                     color: Cesium.Color.YELLOW
                 }),
                 width: 1
-            }
+            },
+
+            // Color the model slightly blue when the eyepoint is underwater.
+            color : new Cesium.Color(0.0, 0.0, 1.0, 1.0),
+            colorBlendMode : Cesium.ColorBlendMode.MIX,
+            colorBlendAmount : new Cesium.CallbackProperty(function(time, result) {
+                var underwater = viewer.camera.positionCartographic.height < 0;
+
+                console.log("underwater!!!");
+                return !underwater ? 1.0 : 0.0;
+            }, false)
         });
 
         let viewer = this.CesiumViewer;
@@ -257,16 +270,7 @@ class App extends React.Component<{}, state> {
 
     private updateRender(data) {
 
-        this.setState(prevState => ({
-            data: { ...prevState.data, ...data }
-        }));
-
-        // todo change to "this.setStat"
-        if(data.terrainExaggeration !== this.state.options.terrainExaggeration)
-            this.state.options.terrainExaggeration = data.terrainExaggeration;
-
         if(data.auvActive !== this.state.options.auvActive){
-
             this.CesiumViewer.entities.removeAll();
             //this.CesiumViewer.scene.primitives.removeAll();
 
@@ -287,15 +291,33 @@ class App extends React.Component<{}, state> {
             }
 
             // todo change to "this.setStat"
-            // this.state.options.auvActive = data.auvActive;
+            this.state.options.auvActive = data.auvActive;
 
             this.getBoundsTime();
             this.createAuvModel();
             this.findMainTile();
             this.initEnvironment();
             setInterval(this.updateTiles.bind(this), 500);
+
+            this.isReady = true;
         }
 
+        // todo change to "this.setStat"
+        if(data.terrainExaggeration !== this.state.options.terrainExaggeration) {
+            this.state.options.terrainExaggeration = data.terrainExaggeration;
+            if(this.isReady){
+                this.tiles.forEach(tile => {
+                    if(tile.active) {
+                        this.removeTile(tile);
+                        this.renderTile(tile);
+                    }
+                });
+            }
+        }
+
+        this.setState(prevState => ({
+            data: { ...prevState.data, ...data }
+        }));
 
     }
 
