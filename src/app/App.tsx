@@ -4,7 +4,7 @@ import {AuvJSON, WaypointJSON} from './utils/AUVUtils';
 import { TileJSON } from './utils/TilesUtils';
 import Auv from "./components/Auv";
 import Tile from "./components/Tile";
-import Water from "./components/Water"
+import WaterEffect from "./components/WaterEffect"
 import * as THREE from "three";
 import tiles from './../data/coordTiles2.json';
 
@@ -103,7 +103,7 @@ class App extends React.Component<{}, state> {
 
             this.first = false;
 
-            this.water = new Water(this);
+            //this.water = new Water(this);
 
             //this.initThree();
             //this.initObject()

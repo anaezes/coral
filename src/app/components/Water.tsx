@@ -1,44 +1,86 @@
-import React, { Component } from "react";
+import React from 'react';
+//import {Renderer} from "react-three";
 import * as THREE from "three";
+//import Shader from "./Shader"
 
-class Water extends Component {
+let renderer = new THREE.WebGLRenderer({ alpha: true });
+
+class Water extends React.Component {
+
+    state = {
+        time: 1.0,
+        width: window.innerWidth,
+        height: window.innerHeight
+    };
+
+    private frameId: any;
     private container: any;
-    componentDidMount() {
+    renderer: any;
+
+    constructor(props) {
+        super(props);
+
+        var camera = new THREE.Camera();
+        camera.position.z = 1;
         var scene = new THREE.Scene();
-     /*   var camera = new THREE.PerspectiveCamera(
-            75,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            1000
-        );*/
 
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
-
-        var renderer = new THREE.WebGLRenderer({ alpha: true });
+        //renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         this.container.appendChild(renderer.domElement);
 
-        var geometry = new THREE.BoxGeometry(1, 1, 1);
-        var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        var cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-
-        camera.position.z = 5;
-
         var animate = function() {
             requestAnimationFrame(animate);
-
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-
             renderer.render(scene, camera);
         };
 
-        animate();
+        this.animate();
     }
+
+    animate = () => {
+        this.setState({
+            time: this.state.time + 0.05
+        })
+
+        this.frameId = requestAnimationFrame(this.animate)
+    }
+
+    componentDidMount() {
+        this.animate()
+
+        window.addEventListener( 'resize', this.onWindowResize.bind(this), false )
+    }
+
+    componentWillUnmount() {
+        cancelAnimationFrame(this.frameId)
+        window.removeEventListener('resize', this.onWindowResize)
+    }
+
+    onWindowResize() {
+        this.setState({
+            width: window.innerWidth,
+            height: window.innerHeight
+        })
+    }
+
     render() {
-        return <div id="ThreeContainer" ref={ref => (this.container = ref)} />;
+        var cameraprops = {position:{z: 1}};
+
+        return <div>
+
+        </div>
     }
 }
+
+//<Shader time={this.state.time} width={this.state.width} height={this.state.height} />
+
+var time = 1.0;
+
+function shaderstart() { // eslint-disable-line no-unused-vars
+    var renderelement = document.getElementById("ThreeContainer");
+    //renderer.render(<Water />, renderelement);
+    //Renderer.render(<Water />, renderelement);
+}
+
+window.onload = shaderstart;
 
 export default Water;
