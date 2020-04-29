@@ -8,6 +8,7 @@ import Tile from "./components/Tile";
 import * as THREE from "three";
 import tiles from './../data/coordTiles2.json';
 import WaterEffect1 from "./components/WaterEffect1";
+import WaterEffect2 from "./components/WaterEffect2";
 
 const Cesium = require('cesium');
 const DEPTH = 0.0;
@@ -93,14 +94,6 @@ class App extends React.Component<{}, state> {
             }
 
             this.first = false;
-
-            //this.water = new Water(this);
-
-            //this.initThree();
-            //this.initObject()
-            //this.renderThreeObj();
-
-            //this.CesiumViewer.render();
         }
 
 
@@ -108,6 +101,7 @@ class App extends React.Component<{}, state> {
             <div>
                 <div id="Container" ref={element => this.container = element}/>
                 <WaterEffect1 />
+                <WaterEffect2/>
                 <DatGui data={options} onUpdate={this.handleUpdate}>
                     <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
                     <DatSelect

@@ -8,8 +8,6 @@ import './index.css';
 //https://github.com/claus/react-dat-gui/issues/43
 import 'react-dat-gui/dist/index.css';
 
-import WaterEffect1 from "./app/components/WaterEffect1";
-
 let Cesium = require('cesium');
 
 Cesium.buildModuleUrl.setBaseUrl('./cesium/');

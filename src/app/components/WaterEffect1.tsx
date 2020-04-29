@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 import * as THREE from "three";
 
+// Shader from : http://glslsandbox.com/e#10009.0
+
 class WaterEffect1 extends Component {
     private container: any;
-    private start: any;
-    private fov: any;
-
 
     componentDidMount() {
         var scene = new THREE.Scene();
@@ -13,10 +12,7 @@ class WaterEffect1 extends Component {
         var renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         this.container.appendChild(renderer.domElement);
-        camera.position.z = 5;
-
-        this.start = Date.now();
-        this.fov = 30;
+        //camera.position.z = 5;
 
         var clock = new THREE.Clock();
 
