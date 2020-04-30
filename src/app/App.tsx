@@ -1,6 +1,6 @@
 import React from 'react';
-import DatGui, {DatSelect, DatNumber} from "react-dat-gui";
-import {AuvJSON, WaypointJSON} from './utils/AUVUtils';
+import DatGui, {DatSelect, DatNumber, DatBoolean} from "react-dat-gui";
+import {AuvJSON} from './utils/AUVUtils';
 import { TileJSON } from './utils/TilesUtils';
 import Auv from "./components/Auv";
 import Tile from "./components/Tile";
@@ -25,7 +25,8 @@ interface state {
 
 interface MenuOptions {
     auvActive: string,
-    terrainExaggeration: number
+    terrainExaggeration: number,
+    waterEffects: boolean
 }
 
 
@@ -50,7 +51,8 @@ class App extends React.Component<{}, state> {
         error: false,
         options: {
             auvActive: '',
-            terrainExaggeration: 4
+            terrainExaggeration: 4,
+            waterEffects: false
         }
     };
     private topView: any;
@@ -102,13 +104,14 @@ class App extends React.Component<{}, state> {
         return (
             <div>
                 <div id="Container" ref={element => this.container = element}/>
-                {this.isReady? <WaterEffect2/> : <div/>}
+                {this.isReady && options.waterEffects? <div> <WaterEffect1/> <WaterEffect2/> </div> : <div/>}
                 <DatGui data={options} onUpdate={this.handleUpdate}>
                     <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
                     <DatSelect
                         label="Available AUV's"
                         path="auvActive"
                         options={this.options}/>
+                    <DatBoolean path='waterEffects' label='Water effects' />
                 </DatGui>
                 <TopView ref={element => this.topView = element}/>/>
             </div>
@@ -282,7 +285,6 @@ class App extends React.Component<{}, state> {
 
         if(data.auvActive !== this.state.options.auvActive){
             this.CesiumViewer.entities.removeAll();
-            //this.CesiumViewer.scene.primitives.removeAll();
 
             let i = 0;
             let found = false;
@@ -300,7 +302,6 @@ class App extends React.Component<{}, state> {
                 return;
             }
 
-            // todo change to "this.setStat"
             this.state.options.auvActive = data.auvActive;
 
             this.getBoundsTime();
@@ -313,7 +314,6 @@ class App extends React.Component<{}, state> {
             this.isReady = true;
         }
 
-        // todo change to "this.setStat"
         if(data.terrainExaggeration !== this.state.options.terrainExaggeration) {
             this.state.options.terrainExaggeration = data.terrainExaggeration;
             if(this.isReady){
@@ -326,6 +326,11 @@ class App extends React.Component<{}, state> {
             }
         }
 
+        if(data.waterEffects !== this.state.options.waterEffects)
+            this.state.options.waterEffects = data.waterEffects;
+
+
+        // todo: dont't work -> why?
         this.setState(prevState => ({
             data: { ...prevState.data, ...data }
         }));
