@@ -4,13 +4,13 @@ import {AuvJSON, WaypointJSON} from './utils/AUVUtils';
 import { TileJSON } from './utils/TilesUtils';
 import Auv from "./components/Auv";
 import Tile from "./components/Tile";
-
-import * as THREE from "three";
 import tiles from './../data/coordTiles2.json';
 import WaterEffect1 from "./components/WaterEffect1";
 import WaterEffect2 from "./components/WaterEffect2";
+import TopView from "./components/TopView";
 
 const Cesium = require('cesium');
+
 const DEPTH = 0.0;
 const HEIGHT = 10.0;
 const url =  'https://ripples.lsts.pt/soi';
@@ -42,6 +42,7 @@ class App extends React.Component<{}, state> {
     private ENU: Cesium.Matrix4 = new Cesium.Matrix4();
     private entityAUV: Cesium.Entity = new Cesium.Entity();
     private auv: any;
+    private isReady: boolean = false;
 
     state = {
         isLoading: true,
@@ -52,8 +53,7 @@ class App extends React.Component<{}, state> {
             terrainExaggeration: 4
         }
     };
-    private isReady: boolean = false;
-    private water: any;
+    private topView: any;
 
 
     async componentDidMount() {
@@ -94,6 +94,8 @@ class App extends React.Component<{}, state> {
             }
 
             this.first = false;
+
+            this.topView = new TopView(this.props);
         }
 
 
@@ -109,7 +111,7 @@ class App extends React.Component<{}, state> {
                         path="auvActive"
                         options={this.options}/>
                 </DatGui>
-
+                <TopView ref={element => this.topView = element}/>/>
             </div>
         );
     }
@@ -190,9 +192,9 @@ class App extends React.Component<{}, state> {
         let latitude = this.auv.latitude;
 
         this.CesiumViewer.scene.globe = new Cesium.Globe(Cesium.Ellipsoid.WGS84);
-        this.CesiumViewer.scene.globe.baseColor = Cesium.Color.GRAY;
-        this.CesiumViewer.scene.globe.fillHighlightColor = Cesium.Color.GRAY;
-        this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
+        this.CesiumViewer.scene.globe.baseColor =  new Cesium.Color(0.24,0.24,0.24,1);
+        this.CesiumViewer.scene.globe.fillHighlightColor =  new Cesium.Color(0.24,0.24,0.24,1);
+        this.CesiumViewer.scene.backgroundColor = new Cesium.Color(0.043,0.18,0.24,1);
 
         this.CesiumViewer.camera.setView({
             orientation: {
@@ -357,6 +359,7 @@ class App extends React.Component<{}, state> {
         //let auvPosition;
         let dist, assetId;
         let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
+        this.topView.setCameraView(auvPosition);
 
         // Render neighbors
         this.tiles.forEach(tile => {
@@ -372,6 +375,8 @@ class App extends React.Component<{}, state> {
                     this.removeTile(tile)
             }
         });
+
+
 
         this.forceUpdate();
     }
@@ -406,7 +411,8 @@ class App extends React.Component<{}, state> {
             dynamicScreenSpaceError : true,
             dynamicScreenSpaceErrorDensity : 0.00278,
             dynamicScreenSpaceErrorFactor : 4.0,
-            dynamicScreenSpaceErrorHeightFalloff : 0.25
+            dynamicScreenSpaceErrorHeightFalloff : 0.25,
+
         });
 
         this.CesiumViewer.scene.primitives.add(tileset);
@@ -414,6 +420,9 @@ class App extends React.Component<{}, state> {
         tileset.readyPromise.then(function(){
             tileset._root.transform = Cesium.Matrix4.IDENTITY;
             tileset.modelMatrix = transform;
+            tileset.style = new Cesium.Cesium3DTileStyle({
+                color : "color('#3e3e3e', 1)"
+            });
         });
 
         tile.active = true;

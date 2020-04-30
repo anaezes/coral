@@ -10,8 +10,8 @@ class WaterEffect1 extends Component {
         var renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         this.container.appendChild(renderer.domElement);
-        this.getEffect1(renderer, camera, scene);
-        this.getEffect2(renderer, camera, scene);
+        //this.getEffect1(renderer, camera, scene);
+        //this.getEffect2(renderer, camera, scene);
     }
 
     render() {
