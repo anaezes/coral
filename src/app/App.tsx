@@ -93,8 +93,8 @@ class App extends React.Component<{}, state> {
                 this.tiles.push( new Tile(t[i]));
             }
 
+            this.createPins();
             this.first = false;
-
             this.topView = new TopView(this.props);
         }
 
@@ -102,8 +102,7 @@ class App extends React.Component<{}, state> {
         return (
             <div>
                 <div id="Container" ref={element => this.container = element}/>
-                <WaterEffect1 />
-                <WaterEffect2/>
+                {this.isReady? <WaterEffect2/> : <div/>}
                 <DatGui data={options} onUpdate={this.handleUpdate}>
                     <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
                     <DatSelect
@@ -307,6 +306,7 @@ class App extends React.Component<{}, state> {
             this.getBoundsTime();
             this.createAuvModel();
             this.findMainTile();
+
             this.initEnvironment();
             setInterval(this.updateTiles.bind(this), 500);
 
@@ -437,6 +437,30 @@ class App extends React.Component<{}, state> {
             this.CesiumViewer.scene.primitives.remove(tile.primitive);
         tile.active = false;
         tile.primitive = undefined;
+    }
+
+    /**
+     * TODO obter localização de cada àrea a colocar um pin
+     * (lista de localizaçeõs possiveis)
+     */
+    createPins() {
+        var pinBuilder = new Cesium.PinBuilder();
+        var bluePin = this.CesiumViewer.entities.add({
+            name : 'Blank blue pin',
+            position : Cesium.Cartesian3.fromDegrees(this.tiles[0].longitude, this.tiles[0].latitude, 1000),
+            billboard : {
+                image : pinBuilder.fromColor(Cesium.Color.ROYALBLUE, 20).toDataURL(),
+                verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+            }
+        });
+
+     /* console.log("create pin!");
+        var t = this.CesiumViewer;
+
+        //Since some of the pins are created asynchronously, wait for them all to load before zooming/
+        Cesium.when.all([bluePin], function(pins){
+            t.zoomTo(pins);
+        });*/
     }
 };
 export default App;
