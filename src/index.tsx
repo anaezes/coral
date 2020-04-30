@@ -7,6 +7,7 @@ import './index.css';
 
 //https://github.com/claus/react-dat-gui/issues/43
 import 'react-dat-gui/dist/index.css';
+import WaterEffect2 from "./app/components/WaterEffect2";
 
 let Cesium = require('cesium');
 
