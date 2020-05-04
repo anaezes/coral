@@ -4,62 +4,72 @@ import {AuvJSON} from './utils/AUVUtils';
 import { TileJSON } from './utils/TilesUtils';
 import Auv from "./components/Auv";
 import Tile from "./components/Tile";
+import WaterEffect from "./components/WaterEffect";
+import WaterParticles from "./components/WaterParticles";
+import TopView from "./views/TopView";
+
+// Data
 import tiles from './../data/coordTiles2.json';
-import WaterEffect1 from "./components/WaterEffect1";
-import WaterEffect2 from "./components/WaterEffect2";
-import TopView from "./components/TopView";
+import {AisJSON} from "./utils/AisUtils";
+
 
 const Cesium = require('cesium');
 
 const DEPTH = 0.0;
 const HEIGHT = 10.0;
-const url =  'https://ripples.lsts.pt/soi';
+const urlAuvs =  'https://ripples.lsts.pt/soi';
+const dummyCredit = document.createElement("div");
 
 
 interface state {
-    isLoading: Boolean,
     data: Array<string>,
-    error: Boolean,
-    options: MenuOptions
+    options: MenuOptions,
+    isLoading: Boolean,
+    error: Boolean
 }
 
 interface MenuOptions {
     auvActive: string,
     terrainExaggeration: number,
-    waterEffects: boolean
+    waterEffects: boolean,
+    ais: boolean
 }
 
 
 class App extends React.Component<{}, state> {
-    private first: boolean = true;
+    private entityAUV: Cesium.Entity = new Cesium.Entity();
+    private ENU: Cesium.Matrix4 = new Cesium.Matrix4();
+    private tiles: Array<Tile> = new Array<Tile>();
+    private isSystemInit: boolean = false;
     private options: Array<string> = [];
     private auvs: Array<AuvJSON> = [];
-    private mainTile: any;
-    private tiles: Array<Tile> = new Array<Tile>();
-    private container: any;
+    private isReady: boolean = false;
     private CesiumViewer: any;
+    private mainTile: any;
+    private container: any;
     private startTime: any;
     private stopTime: any;
-    private ENU: Cesium.Matrix4 = new Cesium.Matrix4();
-    private entityAUV: Cesium.Entity = new Cesium.Entity();
+    private topView: any;
     private auv: any;
-    private isReady: boolean = false;
+
 
     state = {
-        isLoading: true,
         data: [],
-        error: false,
+        isLoading: true,
         options: {
             auvActive: '',
             terrainExaggeration: 4,
-            waterEffects: false
-        }
+            waterEffects: false,
+            ais: false
+        },
+        error: false,
     };
-    private topView: any;
+
+
 
 
     async componentDidMount() {
-        fetch(url)
+        fetch(urlAuvs)
             .then(response => response.json())
             .then(data =>
                 this.setState({
@@ -68,7 +78,7 @@ class App extends React.Component<{}, state> {
                     error: false
                 })
             )
-            .catch(error => this.setState({error, isLoading: false}));
+            .catch(error => this.setState({error: error, isLoading: false}));
     }
 
     // Update current state with changes from controls
@@ -79,32 +89,24 @@ class App extends React.Component<{}, state> {
     render() {
         const {isLoading, data, options} = this.state;
 
-        if (!isLoading && this.first) {
-            let auvs : Array<AuvJSON> = JSON.parse(JSON.stringify(data));
-            this.auvs = auvs; //copy
-
-            for (let i = 0; i < this.auvs.length; i++) {
-                this.options.push(this.auvs[i].name);
-            }
+        if (!isLoading && !this.isSystemInit) {
+            this.topView = new TopView(this.props);
 
             if(this.CesiumViewer == null)
                 this.initCesium();
 
-            let t : Array<TileJSON> = JSON.parse(JSON.stringify(tiles.tiles));
-            for (let i = 0; i < t.length; i++) {
-                this.tiles.push( new Tile(t[i]));
-            }
-
+            this.getAuvs();
+            this.getTiles();
             this.createPins();
-            this.first = false;
-            this.topView = new TopView(this.props);
+
+            this.isSystemInit = true;
         }
 
 
         return (
             <div>
                 <div id="Container" ref={element => this.container = element}/>
-                {this.isReady && options.waterEffects? <div> <WaterEffect1/> <WaterEffect2/> </div> : <div/>}
+                {this.isReady && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
                 <DatGui data={options} onUpdate={this.handleUpdate}>
                     <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
                     <DatSelect
@@ -112,6 +114,7 @@ class App extends React.Component<{}, state> {
                         path="auvActive"
                         options={this.options}/>
                     <DatBoolean path='waterEffects' label='Water effects' />
+                    <DatBoolean path='ais' label='AIS' />
                 </DatGui>
                 <TopView ref={element => this.topView = element}/>/>
             </div>
@@ -146,14 +149,15 @@ class App extends React.Component<{}, state> {
             geocoder: false,
             homeButton: false,
             fullscreenButton: true,
-            infoBox: false,
+            infoBox: true,
             sceneModePicker: false,
             selectionIndicator: false,
             timeline: true,
             navigationHelpButton: false,
             navigationInstructionsInitiallyVisible: false,
             shouldAnimate: false, // Enable animations
-            requestRenderMode: true
+            requestRenderMode: true,
+            creditContainer: dummyCredit
         });
 
         this.CesiumViewer.scene.globe.enableLighting = true;
@@ -329,11 +333,17 @@ class App extends React.Component<{}, state> {
         if(data.waterEffects !== this.state.options.waterEffects)
             this.state.options.waterEffects = data.waterEffects;
 
+        if(data.ais !== this.state.options.ais) {
+            this.state.options.ais = data.ais;
+            this.renderAis(this.topView.getAis(), data.ais);
+        }
 
         // todo: dont't work -> why?
         this.setState(prevState => ({
             data: { ...prevState.data, ...data }
         }));
+
+        this.forceUpdate();
     }
 
     private findMainTile(){
@@ -380,10 +390,6 @@ class App extends React.Component<{}, state> {
                     this.removeTile(tile)
             }
         });
-
-
-
-        this.forceUpdate();
     }
 
 
@@ -445,27 +451,99 @@ class App extends React.Component<{}, state> {
     }
 
     /**
-     * TODO obter localização de cada àrea a colocar um pin
-     * (lista de localizaçeõs possiveis)
+     * Icon: Designed by Freepik from www.flaticon.com
      */
     createPins() {
+
         var pinBuilder = new Cesium.PinBuilder();
-        var bluePin = this.CesiumViewer.entities.add({
-            name : 'Blank blue pin',
-            position : Cesium.Cartesian3.fromDegrees(this.tiles[0].longitude, this.tiles[0].latitude, 1000),
-            billboard : {
-                image : pinBuilder.fromColor(Cesium.Color.ROYALBLUE, 20).toDataURL(),
-                verticalOrigin : Cesium.VerticalOrigin.BOTTOM
-            }
+        let viewer = this.CesiumViewer;
+        let scene = this.CesiumViewer.scene;
+
+        this.auvs.forEach(auv => {
+            Cesium.when(pinBuilder.fromUrl("../images/propeller.png", Cesium.Color.RED, 30), function(canvas) {
+                return viewer.entities.add({
+                    id: auv.name,
+                    name : auv.name.toString(),
+                    position : Cesium.Cartesian3.fromDegrees(auv.lastState.longitude, auv.lastState.latitude, 10),
+                    billboard : {
+                        image : canvas.toDataURL(),
+                        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+                        horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+                    },
+                    label: {
+                        text: auv.name,
+                        font: "12px sans-serif",
+                        showBackground: true,
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                            0.0,
+                            20000000.0
+                        )
+
+                    }
+                });
+            });
         });
 
-     /* console.log("create pin!");
-        var t = this.CesiumViewer;
+        var selectedEntity = new Cesium.Entity();
+        var p = this;
+        viewer.screenSpaceEventHandler.setInputAction(function onLeftClick(
+            movement
+                ) {
+                var pickedLabel = viewer.scene.pick(movement.position);
+                if (Cesium.defined(pickedLabel)) {
+                    let d: MenuOptions = {
+                        auvActive : pickedLabel.id.id,
+                        terrainExaggeration : p.state.options.terrainExaggeration,
+                        waterEffects : p.state.options.waterEffects,
+                        ais : p.state.options.ais
+                    };
+                    p.updateRender(d);
+                }
+            },
+            Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    }
 
-        //Since some of the pins are created asynchronously, wait for them all to load before zooming/
-        Cesium.when.all([bluePin], function(pins){
-            t.zoomTo(pins);
-        });*/
+    private getAuvs() {
+        let auvs : Array<AuvJSON> = JSON.parse(JSON.stringify(this.state.data));
+        this.auvs = auvs; //copy
+
+        for (let i = 0; i < this.auvs.length; i++) {
+            this.options.push(this.auvs[i].name);
+        }
+    }
+
+    private getTiles() {
+        let t : Array<TileJSON> = JSON.parse(JSON.stringify(tiles.tiles));
+        for (let i = 0; i < t.length; i++) {
+            this.tiles.push( new Tile(t[i]));
+        }
+    }
+
+    /**
+     * Icon: Designed by Pixel perfect from www.flaticon.com
+     */
+    private renderAis(ais: Array<AisJSON>, show: boolean) {
+        if(show) {
+            for (let i = 0; i < ais.length/4; i++) {
+                this.CesiumViewer.entities.add({
+                    position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
+                    billboard: {
+                        image: "../images/navigation-arrow-white-25perc.png",
+                        rotation: Cesium.Math.toRadians(ais[i].heading),
+                        color: Cesium.Color.RED,
+                        scale: 0.1,
+                    },
+                    name: ais[i].name,
+
+                });
+            }
+        }
+        else {
+            for (let i = 0; i < ais.length/4; i++) {
+                this.CesiumViewer.entities.removeById(ais[i].name);
+            }
+        }
+
     }
 };
 export default App;

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import * as THREE from "three";
 
-class WaterEffect1 extends Component {
+class WaterEffect extends Component {
     private container: any;
 
     componentDidMount() {
@@ -11,7 +11,7 @@ class WaterEffect1 extends Component {
         renderer.setSize(window.innerWidth, window.innerHeight);
         this.container.appendChild(renderer.domElement);
         //this.getEffect1(renderer, camera, scene);
-        //this.getEffect2(renderer, camera, scene);
+        this.getEffect2(renderer, camera, scene);
     }
 
     render() {
@@ -91,7 +91,7 @@ class WaterEffect1 extends Component {
     }
 }
 
-export default WaterEffect1;
+export default WaterEffect;
 
 // Shader from : http://glslsandbox.com/e#10009.0
 const WaterShader1 = {
@@ -245,15 +245,15 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
     // Distort uv coordinates
     float amplitude = .12;
-    float turbulence = .5;
+    float turbulence = .8;
     uv.xy += sin01(uv.x*turbulence + t) * amplitude;
     uv.xy -= sin01(uv.y*turbulence + t) * amplitude;
     
     // Apply two layers of voronoi, one smaller   
     float v;
     float sizeDistortion = abs(uv.x)/3.;
-    v += voronoi(uv, t * 2., 0.5, 2.5 - sizeDistortion);
-    v += voronoi(uv, t * 4., 0., 4. - sizeDistortion) / 2.;
+    v += voronoi(uv, t * 2., 0.5, 2.5 - sizeDistortion)/2.;
+    v += voronoi(uv, t * 4., 0., 4. - sizeDistortion) / 10.;
     
     // Foreground color
     vec3 col = v * vec3(.55, .75, 1.);
@@ -262,7 +262,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     col += (1.-v) * vec3(.0, .3, .5);
     
     // Output to screen
-    fragColor = vec4(col,0.2);
+    fragColor = vec4(col,0.15);
 }
 
 void main(void)

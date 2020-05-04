@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import * as THREE from "three";
 
 
-class WaterEffect2 extends Component {
+class WaterParticles extends Component {
     private container: any;
 
     componentDidMount() {
@@ -63,7 +63,7 @@ class WaterEffect2 extends Component {
     }
 }
 
-export default WaterEffect2;
+export default WaterParticles;
 
 const WaterShader = {
 
@@ -183,113 +183,21 @@ float snoise(vec3 v) {
                                 dot(p2,x2), dot(p3,x3) ) );
 }
 
-//
-//
-//
-//
-
-float sphere(vec3 pos, float r)
-{
-\treturn length(pos) - r;
-}
-
-float cylinder(vec3 p, float c)
-{
-\treturn length(p.xz) - c;
-}
-
-float repeat(float pos, float c)
-{
-\treturn mod(pos, c) - c * 0.5;
-}
-
-vec2 rotate(vec2 pos, float angle)
-{
-\tfloat c = cos(angle), s = sin(angle);
-\treturn vec2(pos.x*c + pos.y*s, pos.y*c - pos.x*s);
-}
-
-float spikes(vec3 pos)
-{
-\tvec3 s1 = vec3(pos.xy, pos.z);
-\tvec3 s2 = vec3(rotate(pos.xy, 1.047), pos.z);
-\tvec3 s3 = vec3(rotate(pos.xy, 2.094), pos.z);
-\tvec3 s4 = vec3(rotate(s2.yz, -1.047), s2.x).zxy;
-\tvec3 s5 = vec3(rotate(s3.yz,  1.047), s3.x).zxy;
-\tvec3 s6 = vec3(rotate(pos.yz, 1.047), pos.x).zxy;
-\t
-\tfloat ss = 0.06;
-\t
-\tfloat c = min(
-\t\tmin(
-\t\t\tmin(cylinder(s1, ss), cylinder(s2, ss)),
-\t\t\tmin(cylinder(s3, ss), cylinder(s4, ss))
-\t\t),
-\t\tmin(cylinder(s5, ss), cylinder(s6, ss))
-\t);
-\t
-\tfloat s = sphere(pos, 1.3);
-\t
-\treturn min(max(c, s),max(c-0.1, s+0.2));
-}
-
-float chains(vec3 pos, float instance)
-{
-\tfloat t = iTime * 0.4 + instance * 10.0;
-\tfloat c = sqrt(1.0 - clamp(pos.y + 3.6, 0.0, 3.0) * 0.33);
-\tvec3 cp = pos + vec3(sin(pos.y*1.1+t) * c * 0.3, cos(pos.y*0.9) * 0.3, 0.0);
-\treturn max(cylinder(cp, 0.02 * pow(sin(pos.y*25.0),2.0) + 0.02), pos.y);
-}
-
-/*
-float map(vec3 pos)
-{
-\tfloat instance = floor(pos.z / 6.0 + 0.5);
-\t
-\tif (pos.x > 0.0) pos.z += 3.0; // Left vs Right
-\tpos.x -= 3.0 * sign(pos.x);
-\t
-\t// Repeat into distance
-\tvec3 rp = vec3(
-\t\tpos.x,
-\t\tpos.y,
-\t\trepeat(pos.z, 6.0)-2.0
-\t);
-\t
-\t// Make different heights
-\trp.x += sin(instance * 17.0 + iTime * 0.9) * 0.05;
-\trp.y += sin(instance * 10.0) * 0.4 + pow(cos(instance * 17.0 + iTime), 2.0) * 0.08;
-\t
-\tfloat minesSpikes = spikes(vec3(rotate(rp.xy, sin(instance)*0.2), rp.z));
-\tfloat minesMain = sphere(rp, 1.0);
-\t
-\treturn min(min(chains(rp, instance), minesMain), minesSpikes); }
-*/
-
-
-/*vec3 normal(vec3 pos)
-{
-\tvec2 eps = vec2(0.001, 0.0);
-\tfloat dx = map(pos+eps.xyy)-map(pos-eps.xyy);
-\tfloat dy = map(pos+eps.yxy)-map(pos-eps.yxy);
-\tfloat dz = map(pos+eps.yyx)-map(pos-eps.yyx);
-\treturn normalize(vec3(dx, dy, dz));
-}*/
 
 vec3 trace(vec3 rayPos, vec3 rayDir, vec2 pixel)
 {
-\tvec3 dustCol = vec3(0.2, 0.18, 0.15);
-\tvec3 fogCol = vec3(0.05, 0.1, 0.15) * pow(rayDir.z + 0.04, 8.0);
-\tvec3 lightPos = rayPos-vec3(0.0, 1.0, 0.0);
-\t
-\tfloat fog = 0.0;
-\tfloat t = 0.0;
-\t
-\tfloat spec = 0.0;
-\tvec4 col = vec4(0.0);
-\tvec2 uv = vec2(0.0);
-\t
-\tfor (int i = 0; i < 40; i++)
+vec3 dustCol = vec3(0.2, 0.18, 0.15);
+vec3 fogCol = vec3(0.05, 0.1, 0.15) * pow(rayDir.z + 0.04, 8.0);
+vec3 lightPos = rayPos-vec3(0.0, 1.0, 0.0);
+
+float fog = 0.0;
+float t = 0.0;
+
+float spec = 0.0;
+vec4 col = vec4(0.0);
+vec2 uv = vec2(0.0);
+
+for (int i = 0; i < 40; i++)
 {
     vec3 pos = rayPos+rayDir*t;
     vec3 v = normalize(pos-rayPos); // View
@@ -316,7 +224,7 @@ float scatter = 0.0;
 
     #ifdef PARTICLES
     float wt = snoise(vec3(pixel, iTime)) * 0.05 + 0.1;
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 25; i++)
     {
         vec3 pos = rayPos+rayDir*wt;
         
