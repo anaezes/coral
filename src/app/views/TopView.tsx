@@ -47,20 +47,80 @@ class TopView extends Component {
         });
     }
 
+    private getPoint(angle:number, origem_lon:number, origem_lat:number) {
+
+        if(angle > 360)
+            angle = angle % 360;
+
+        let dist = 500;
+        let teta = Cesium.Math.toRadians(angle);
+
+        //p0
+        let p0_lon = origem_lon;
+        let p0_lat = origem_lat + 0.005;
+        let p0 = new Cesium.Cartesian3.fromDegrees(p0_lon, p0_lat);
+
+        //distance
+        let x = dist * Math.cos(teta);
+        let y = dist * Math.sin(teta);
+        let offset = new Cesium.Cartesian3(x, y);
+
+        //New point
+        let result = new Cesium.Cartesian3();
+        Cesium.Cartesian3.add(p0, offset, result);
+
+        return Cesium.Cartographic.fromCartesian(result);
+    }
+
     private addAis() {
         let ais : Array<AisJSON> = JSON.parse(JSON.stringify(this.state.data));
         this.ais = ais; //copy
 
-        for (let i = 0; i < ais.length; i++) {
+        for (let i = 0; i < ais.length/4; i++) {
+
+            let origin = new Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude);
+            origin = Cesium.Cartographic.fromCartesian(origin);
+            let result = this.getPoint(ais[i].cog, ais[i].longitude, ais[i].latitude);
+
+            let heading = ais[i].heading;
+            if(heading > 360)
+                heading = heading % 360;
+
             this.viewer.entities.add({
-                position: Cesium.Cartesian3.fromDegrees(this.ais[i].longitude, this.ais[i].latitude),
+                position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
                 billboard: {
                     image: "../images/navigation-arrow-white-25perc.png",
-                    rotation: Cesium.Math.toRadians(ais[i].heading),
+                    rotation: Cesium.Math.toRadians(heading),
                     color: Cesium.Color.RED,
-                    scale: 0.1,
+                    scale: 0.2,
+                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                        0.0,
+                        200000.0
+                    ),
+
                 },
-                name: ais[i].name,
+                name: ais[i].name + "-heading"
+            });
+
+            this.viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
+                name: ais[i].name + "-cog",
+                polyline: {
+                    positions: Cesium.Cartesian3.fromRadiansArray([
+                        origin.longitude,
+                        origin.latitude,
+                        result.longitude,
+                        result.latitude
+                    ]),
+                    width: 5,
+                    material: new Cesium.PolylineDashMaterialProperty({
+                        color: Cesium.Color.BLACK,
+                    }),
+                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                        0.0,
+                        2000000.0
+                    ),
+                },
             });
         }
     }
