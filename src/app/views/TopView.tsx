@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import {AisJSON} from "../utils/AisUtils";
 import Utils from "../utils/Utils";
+import Auv from "../components/Auv";
 const Cesium = require('cesium');
 
 const urlAis =  'https://ripples.lsts.pt/ais';
@@ -59,28 +60,6 @@ class TopView extends Component {
 
             this.viewer.entities.add({
                 position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
-                billboard: {
-                        image: "../images/navigation-arrow-white-25perc.png",
-                        rotation: Cesium.Math.toRadians(ais[i].heading % 360),
-                        color: Cesium.Color.RED,
-                        scale: 0.2,
-                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
-                            0.0,
-                            2000000.0
-                        ),
-                        scaleByDistance : new Cesium.NearFarScalar(
-                            1.5e2,
-                            1,
-                            8.0e6,
-                            0.0
-                        )
-                },
-                name: ais[i].name + "-heading"
-            });
-
-            this.viewer.entities.add({
-                position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
-                name: ais[i].name + "-cog",
                 polyline: {
                     positions: Cesium.Cartesian3.fromRadiansArray([
                         origin.longitude,
@@ -97,6 +76,24 @@ class TopView extends Component {
                         2000000.0
                     )
                 },
+                billboard: {
+                    image: "../images/navigation-arrow-white-25perc.png",
+                    rotation: Cesium.Math.toRadians(ais[i].heading % 360),
+                    color: Cesium.Color.RED,
+                    scale: 0.2,
+                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                        0.0,
+                        2000000.0
+                    ),
+                    scaleByDistance : new Cesium.NearFarScalar(
+                        1.5e2,
+                        1,
+                        8.0e6,
+                        0.0
+                    )
+                },
+                name: ais[i].name,
+                id: ais[i].name
             });
         }
     }
@@ -143,6 +140,25 @@ class TopView extends Component {
 
     public getAis() {
         return this.ais;
+    }
+
+    public setAuvPosition(auv: Auv) {
+        this.viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(auv.longitude, auv.latitude),
+            billboard: {
+                //Icons made by photo3idea_studiofrom  www.flaticon.com<
+                image: "../images/auv.png",
+                rotation: Cesium.Math.toRadians(auv.heading % 360),
+                color: Cesium.Color.ORANGERED,
+                scale: 0.075,
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                    0.0,
+                    20000.0
+                )
+            },
+            name: auv.name,
+            id: auv.name
+        });
     }
 }
 

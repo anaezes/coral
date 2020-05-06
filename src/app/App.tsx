@@ -308,6 +308,7 @@ class App extends React.Component<{}, state> {
             }
 
             this.state.options.auvActive = data.auvActive;
+            this.topView.setAuvPosition(this.auv);
 
             this.getBoundsTime();
             this.createAuvModel();
@@ -475,18 +476,23 @@ class App extends React.Component<{}, state> {
             });
         });
 
-        var p = this;
+        var app = this;
         viewer.screenSpaceEventHandler.setInputAction(function onLeftClick(
             movement) {
                 var pickedLabel = viewer.scene.pick(movement.position);
+
+                //do nothing
+                if(app.auv !== undefined)
+                    return;
+
                 if (Cesium.defined(pickedLabel)) {
                     let d: MenuOptions = {
                         auvActive : pickedLabel.id.id,
-                        terrainExaggeration : p.state.options.terrainExaggeration,
-                        waterEffects : p.state.options.waterEffects,
-                        ais : p.state.options.ais
+                        terrainExaggeration : app.state.options.terrainExaggeration,
+                        waterEffects : app.state.options.waterEffects,
+                        ais : app.state.options.ais
                     };
-                    p.updateRender(d);
+                    app.updateRender(d);
                 }
             },
             Cesium.ScreenSpaceEventType.LEFT_CLICK);

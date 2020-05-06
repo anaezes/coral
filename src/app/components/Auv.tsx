@@ -7,13 +7,14 @@ const Cesium = require('cesium');
 
 
 class Auv extends React.Component   {
-    private name: string;
+    public name: string;
     public latitude: number = 0;
     public longitude: number = 0;
     public waypoints: Array<WaypointJSON> = [];
     public path : any;
     public startTime: any;
     public stopTime: any;
+    public heading: any;
 
 
     constructor(auv: AuvJSON) {
@@ -34,6 +35,8 @@ class Auv extends React.Component   {
 
         this.startTime = this.waypoints[0].arrivalDate;
         this.stopTime = this.waypoints[this.waypoints.length-1].arrivalDate;
+
+        this.heading = auv.lastState.heading;
 
         this.path = this.generatePath();
     }
