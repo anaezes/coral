@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {AisJSON} from "../utils/AisUtils";
+import Utils from "../utils/Utils";
 const Cesium = require('cesium');
 
 const urlAis =  'https://ripples.lsts.pt/ais';
@@ -47,57 +48,32 @@ class TopView extends Component {
         });
     }
 
-    private getPoint(angle:number, origem_lon:number, origem_lat:number) {
-
-        if(angle > 360)
-            angle = angle % 360;
-
-        let dist = 500;
-        let teta = Cesium.Math.toRadians(angle);
-
-        //p0
-        let p0_lon = origem_lon;
-        let p0_lat = origem_lat + 0.005;
-        let p0 = new Cesium.Cartesian3.fromDegrees(p0_lon, p0_lat);
-
-        //distance
-        let x = dist * Math.cos(teta);
-        let y = dist * Math.sin(teta);
-        let offset = new Cesium.Cartesian3(x, y);
-
-        //New point
-        let result = new Cesium.Cartesian3();
-        Cesium.Cartesian3.add(p0, offset, result);
-
-        return Cesium.Cartographic.fromCartesian(result);
-    }
-
     private addAis() {
         let ais : Array<AisJSON> = JSON.parse(JSON.stringify(this.state.data));
         this.ais = ais; //copy
 
         for (let i = 0; i < ais.length/4; i++) {
 
-            let origin = new Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude);
-            origin = Cesium.Cartographic.fromCartesian(origin);
-            let result = this.getPoint(ais[i].cog, ais[i].longitude, ais[i].latitude);
-
-            let heading = ais[i].heading;
-            if(heading > 360)
-                heading = heading % 360;
+            let origin = Cesium.Cartographic.fromDegrees(ais[i].longitude, ais[i].latitude);
+            let result = Utils.getPointFromAngleAndPoint(ais[i].cog, ais[i].longitude, ais[i].latitude);
 
             this.viewer.entities.add({
                 position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
                 billboard: {
-                    image: "../images/navigation-arrow-white-25perc.png",
-                    rotation: Cesium.Math.toRadians(heading),
-                    color: Cesium.Color.RED,
-                    scale: 0.2,
-                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
-                        0.0,
-                        200000.0
-                    ),
-
+                        image: "../images/navigation-arrow-white-25perc.png",
+                        rotation: Cesium.Math.toRadians(ais[i].heading % 360),
+                        color: Cesium.Color.RED,
+                        scale: 0.2,
+                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                            0.0,
+                            2000000.0
+                        ),
+                        scaleByDistance : new Cesium.NearFarScalar(
+                            1.5e2,
+                            1,
+                            8.0e6,
+                            0.0
+                        )
                 },
                 name: ais[i].name + "-heading"
             });
@@ -112,14 +88,14 @@ class TopView extends Component {
                         result.longitude,
                         result.latitude
                     ]),
-                    width: 5,
+                    width: 2,
                     material: new Cesium.PolylineDashMaterialProperty({
                         color: Cesium.Color.BLACK,
                     }),
                     distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
                         0.0,
                         2000000.0
-                    ),
+                    )
                 },
             });
         }

@@ -7,6 +7,7 @@ import Tile from "./components/Tile";
 import WaterEffect from "./components/WaterEffect";
 import WaterParticles from "./components/WaterParticles";
 import TopView from "./views/TopView";
+import Utils from "./utils/Utils";
 
 // Data
 import tiles from './../data/coordTiles2.json';
@@ -156,7 +157,7 @@ class App extends React.Component<{}, state> {
             navigationHelpButton: false,
             navigationInstructionsInitiallyVisible: false,
             shouldAnimate: false, // Enable animations
-            requestRenderMode: true,
+            requestRenderMode: false,
             creditContainer: dummyCredit
         });
 
@@ -319,7 +320,6 @@ class App extends React.Component<{}, state> {
         }
 
         if(data.terrainExaggeration !== this.state.options.terrainExaggeration) {
-            this.state.options.terrainExaggeration = data.terrainExaggeration;
             if(this.isReady){
                 this.tiles.forEach(tile => {
                     if(tile.active) {
@@ -330,20 +330,12 @@ class App extends React.Component<{}, state> {
             }
         }
 
-        if(data.waterEffects !== this.state.options.waterEffects)
-            this.state.options.waterEffects = data.waterEffects;
+        if(data.ais !== this.state.options.ais)
+            this.handleAis(this.topView.getAis(), data.ais);
 
-        if(data.ais !== this.state.options.ais) {
-            this.state.options.ais = data.ais;
-            this.renderAis(this.topView.getAis(), data.ais);
-        }
-
-        // todo: dont't work -> why?
         this.setState(prevState => ({
-            data: { ...prevState.data, ...data }
+            options: { ...prevState.options, ...data }
         }));
-
-        this.forceUpdate();
     }
 
     private findMainTile(){
@@ -457,7 +449,6 @@ class App extends React.Component<{}, state> {
 
         var pinBuilder = new Cesium.PinBuilder();
         let viewer = this.CesiumViewer;
-        let scene = this.CesiumViewer.scene;
 
         this.auvs.forEach(auv => {
             Cesium.when(pinBuilder.fromUrl("../images/propeller.png", Cesium.Color.RED, 30), function(canvas) {
@@ -484,11 +475,9 @@ class App extends React.Component<{}, state> {
             });
         });
 
-        var selectedEntity = new Cesium.Entity();
         var p = this;
         viewer.screenSpaceEventHandler.setInputAction(function onLeftClick(
-            movement
-                ) {
+            movement) {
                 var pickedLabel = viewer.scene.pick(movement.position);
                 if (Cesium.defined(pickedLabel)) {
                     let d: MenuOptions = {
@@ -519,88 +508,69 @@ class App extends React.Component<{}, state> {
         }
     }
 
-    private getPoint(angle:number, origem_lon:number, origem_lat:number) {
+    renderAis(ais: AisJSON){
+        let origin = Cesium.Cartographic.fromDegrees(ais.longitude, ais.latitude);
+        let result = Utils.getPointFromAngleAndPoint(ais.cog, ais.longitude, ais.latitude);
 
-        if(angle > 360)
-            angle = angle % 360;
-
-        let dist = 500;
-        let teta = Cesium.Math.toRadians(angle);
-
-        //p0
-        let p0_lon = origem_lon;
-        let p0_lat = origem_lat + 0.005;
-        let p0 = new Cesium.Cartesian3.fromDegrees(p0_lon, p0_lat);
-
-        //distance
-        let x = dist * Math.cos(teta);
-        let y = dist * Math.sin(teta);
-        let offset = new Cesium.Cartesian3(x, y);
-
-        //New point
-        let result = new Cesium.Cartesian3();
-        Cesium.Cartesian3.add(p0, offset, result);
-
-        return Cesium.Cartographic.fromCartesian(result);
+        this.CesiumViewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(ais.longitude, ais.latitude),
+            polyline: {
+                positions: Cesium.Cartesian3.fromRadiansArray([
+                    origin.longitude,
+                    origin.latitude,
+                    result.longitude,
+                    result.latitude
+                ]),
+                width: 2,
+                material: new Cesium.PolylineDashMaterialProperty({
+                    color: Cesium.Color.BLACK,
+                }),
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                    0.0,
+                    2000000.0
+                )
+            },
+            billboard: {
+                image: "../images/navigation-arrow-white-25perc.png",
+                rotation: Cesium.Math.toRadians(ais.heading % 360),
+                color: Cesium.Color.RED,
+                scale: 0.2,
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                    0.0,
+                    2000000.0
+                ),
+                scaleByDistance : new Cesium.NearFarScalar(
+                    1.5e2,
+                    1,
+                    8.0e6,
+                    0.0
+                )
+            },
+            name: ais.name,
+            id: ais.name,
+            show: true
+        });
     }
 
     /**
      * Icon: Designed by Pixel perfect from www.flaticon.com
      */
-    private renderAis(ais: Array<AisJSON>, show: boolean) {
+    private handleAis(ais: Array<AisJSON>, show: boolean) {
         if(show) {
             for (let i = 0; i < ais.length/4; i++) {
-
-                let origin = new Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude);
-                origin = Cesium.Cartographic.fromCartesian(origin);
-                let result = this.getPoint(ais[i].cog, ais[i].longitude, ais[i].latitude);
-
-                let heading = ais[i].heading;
-                if(heading > 360)
-                    heading = heading % 360;
-
-                this.CesiumViewer.entities.add({
-                    position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
-                    billboard: {
-                        image: "../images/navigation-arrow-white-25perc.png",
-                        rotation: Cesium.Math.toRadians(heading),
-                        color: Cesium.Color.RED,
-                        scale: 0.2,
-                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
-                            0.0,
-                            200000.0
-                        ),
-
-                    },
-                    name: ais[i].name + "-heading"
-                });
-
-                this.CesiumViewer.entities.add({
-                    position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
-                    name: ais[i].name + "-cog",
-                    polyline: {
-                        positions: Cesium.Cartesian3.fromRadiansArray([
-                            origin.longitude,
-                            origin.latitude,
-                            result.longitude,
-                            result.latitude
-                        ]),
-                        width: 5,
-                        material: new Cesium.PolylineDashMaterialProperty({
-                            color: Cesium.Color.BLACK,
-                        }),
-                        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
-                            0.0,
-                            2000000.0
-                        ),
-                    },
-                });
+                let entity = this.CesiumViewer.entities.getById(ais[i].name);
+                if(entity !== undefined)
+                    entity.show = true;
+                else
+                    this.renderAis(ais[i]);
             }
         }
         else {
+            console.log("remover");
             for (let i = 0; i < ais.length/4; i++) {
-                this.CesiumViewer.entities.removeById(ais[i].name+"-heading");
-                this.CesiumViewer.entities.removeById(ais[i].name+"-cog");
+                let entity = this.CesiumViewer.entities.getById(ais[i].name);
+                if(entity !== undefined)
+                    entity.show = false;
             }
         }
 
