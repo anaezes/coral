@@ -13,8 +13,8 @@ import Utils from "./utils/Utils";
 import tiles from './../data/coordTiles2.json';
 import {AisJSON} from "./utils/AisUtils";
 
-
 const Cesium = require('cesium');
+
 
 const DEPTH = 0.0;
 const HEIGHT = 10.0;
@@ -52,6 +52,7 @@ class App extends React.Component<{}, state> {
     private stopTime: any;
     private topView: any;
     private auv: any;
+    _isMounted = false;
 
 
     state = {
@@ -66,10 +67,9 @@ class App extends React.Component<{}, state> {
         error: false,
     };
 
+    componentDidMount() {
+        this._isMounted = true;
 
-
-
-    async componentDidMount() {
         fetch(urlAuvs)
             .then(response => response.json())
             .then(data =>
@@ -80,6 +80,28 @@ class App extends React.Component<{}, state> {
                 })
             )
             .catch(error => this.setState({error: error, isLoading: false}));
+
+        try {
+            if(this.CesiumViewer == null)
+                this.initCesium();
+        } catch (error) {
+            this.setState({ error });
+        }
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+        const {isLoading, data, options} = this.state;
+
+        if (!isLoading && !this.isSystemInit) {
+            this.topView = new TopView(this.props);
+
+            this.getAuvs();
+            this.getTiles();
+            this.createPins();
+
+            this.isSystemInit = true;
+        }
     }
 
     // Update current state with changes from controls
@@ -162,18 +184,19 @@ class App extends React.Component<{}, state> {
         });
 
         this.CesiumViewer.scene.globe.enableLighting = true;
+
+        // Debug
         //this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
         //this.CesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
         this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
-        //this.CesiumViewer.scene.backgroundColor = Cesium.Color.AQUAMARINE;
 
         //Set the random number seed for consistent results.
         Cesium.Math.setRandomNumberSeed(3);
         this.ENU = new Cesium.Matrix4();
 
-        //this.CesiumViewer.scene.fog.enabled = true;
-        //this.CesiumViewer.scene.fog.density = 2.0e-4;
+        this.CesiumViewer.scene.fog.enabled = true;
+        this.CesiumViewer.scene.fog.density = 2.0e-4;
 
         this.CesiumViewer.animation.viewModel.setShuttleRingTicks([0, 1500]);
     }
@@ -285,6 +308,8 @@ class App extends React.Component<{}, state> {
             new Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude));
         console.log("Distance: " + dist);
     }
+
+
 
     private updateRender(data) {
 

@@ -1,13 +1,13 @@
 import React, { Component } from "react";
+import {ButtonGroup, Button} from '@material-ui/core';
 import {AisJSON} from "../utils/AisUtils";
 import Utils from "../utils/Utils";
 import Auv from "../components/Auv";
+import MenuView from "../utils/MenuTopView";
+
 const Cesium = require('cesium');
-
 const urlAis =  'https://ripples.lsts.pt/ais';
-
 const dummyCredit = document.createElement("div");
-
 
 class TopView extends Component {
     private container: any;
@@ -33,6 +33,9 @@ class TopView extends Component {
             )
             .catch(error => this.setState({
                 error: error, isLoading: false}));
+
+        if(this.viewer == null)
+            this.initCesium();
     }
 
     public setCameraView(pos) {
@@ -98,22 +101,39 @@ class TopView extends Component {
         }
     }
 
+    handleClick = (event) => {
+        //setAnchorEl(event.currentTarget);
+    };
+
     render() {
         const {isLoading, data} = this.state;
 
         if (!isLoading && !this.isSystemInit) {
-
-            if(this.viewer == null)
-                this.initCesium();
-
             this.addAis();
             this.isSystemInit = true;
+
+            //this.addButton("test", onclick, "toolbar")
         }
-
-
-        return <div id="TopView" ref={ref => (this.container = ref)} />;
+        return (
+        <div>
+            <div>
+                <MenuView/>
+            </div>
+            <div id="TopView"/>
+        </div>);
     }
 
+    /*
+    <ButtonGroup
+                    color="primary"
+                    size="small"
+                    aria-label="contained primary button group"
+                    variant="contained">
+                    <Button >Vessels</Button>
+                    <Button>Waves</Button>
+                    <Button>Combined</Button>
+                </ButtonGroup>
+    */
 
     private initCesium() {
         this.viewer = new Cesium.Viewer('TopView', {
