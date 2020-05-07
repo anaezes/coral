@@ -1,5 +1,6 @@
 
 export interface AisJSON {
+    id: string;
     mmsi: number;
     type: number;
     name: string;

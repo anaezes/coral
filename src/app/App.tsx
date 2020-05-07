@@ -297,7 +297,6 @@ class App extends React.Component<{}, state> {
 
 
     private updateRender(data) {
-
         if(data.auvActive !== this.state.options.auvActive){
             this.CesiumViewer.entities.removeAll();
 
@@ -325,10 +324,8 @@ class App extends React.Component<{}, state> {
 
             this.initEnvironment();
             setInterval(this.updateTiles.bind(this), 500);
-
-            let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
-            this.topView.setTopView(this.auv, auvPosition);
-            //this.topView.setAuvPosition(this.auv);
+            this.updateTopView();
+            setInterval(this.updateTopView.bind(this), 3000);
 
             this.isReady = true;
         }
@@ -355,6 +352,11 @@ class App extends React.Component<{}, state> {
         this.setState(prevState => ({
             options: { ...prevState.options, ...data }
         }));
+    }
+
+    updateTopView() {
+        this.auv.setPosition(this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime));
+        this.topView.setTopView(this.auv);
     }
 
     private findMainTile(){
@@ -385,7 +387,7 @@ class App extends React.Component<{}, state> {
         //let auvPosition;
         let dist, assetId;
         let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
-        this.topView.setCameraView(auvPosition);
+        //this.topView.setCameraView(auvPosition);
 
         // Render neighbors
         this.tiles.forEach(tile => {

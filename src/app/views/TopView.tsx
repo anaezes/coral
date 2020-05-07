@@ -38,20 +38,22 @@ class TopView extends Component {
 
 
         this.viewer.camera.flyTo({
-            destination : new Cesium.Cartesian3.fromDegrees(longitude,  latitude, 1000.0)
+            destination : new Cesium.Cartesian3.fromDegrees(longitude,  latitude, 5000.0)
         });
     }
 
     private addAis(ais) {
 
-        console.log();
-
         for (let i = 0; i < ais.length/14; i++) {
-
-            console.log(ais[i]);
 
             let origin = Cesium.Cartographic.fromDegrees(ais[i].longitude, ais[i].latitude);
             let result = Utils.getPointFromAngleAndPoint(ais[i].cog, ais[i].longitude, ais[i].latitude);
+
+            let e = this.viewer.entities.getById(ais[i].id);
+            if(e !== undefined){
+                e.position = Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude);
+                continue;
+            }
 
             this.viewer.entities.add({
                 position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
@@ -87,14 +89,11 @@ class TopView extends Component {
                         0.0
                     )
                 },
-                name: ais[i].name
+                name: ais[i].name,
+                id: ais[i].id
             });
         }
     }
-
-    handleClick = (event) => {
-        //setAnchorEl(event.currentTarget);
-    };
 
     render() {
 
@@ -133,7 +132,9 @@ class TopView extends Component {
         });
     }
 
-    public setTopView(auv, auvPostion) {
+    public setTopView(auv) {
+
+        //this.viewer.entities.removeAll();
 
         console.log(auv.longitude);
         console.log(auv.latitude);
@@ -152,11 +153,28 @@ class TopView extends Component {
         }).catch(error => this.setState({error: error}));
 
         this.setAuvPosition(auv);
+
+        this.setCameraView(auv.getPosition());
+
+        //setInterval(this.updateAis.bind(this), 3000);
     }
 
     public setAuvPosition(auv: Auv) {
+
+        let result = Cesium.Cartographic.fromCartesian(auv.getPosition(), Cesium.Ellipsoid.WGS84);
+
+        let longitude = Cesium.Math.toDegrees(result.longitude);
+        let latitude = Cesium.Math.toDegrees(result.latitude);
+
+        let e = this.viewer.entities.getById(auv.name);
+        if(e !== undefined){
+            e.position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
+            return;
+        }
+
+
         this.viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(auv.longitude, auv.latitude),
+            position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
             billboard: {
                 //Icons made by photo3idea_studiofrom  www.flaticon.com<
                 image: "../images/auv.png",
@@ -171,6 +189,12 @@ class TopView extends Component {
             name: auv.name,
             id: auv.name
         });
+    }
+
+    updateAis(){
+       console.log("update!!!");
+
+       //this.viewer.entities.removeAll();
     }
 }
 

@@ -1,12 +1,9 @@
-import React from 'react';
 import {AuvJSON, WaypointJSON} from '../utils/AUVUtils';
 const HEIGHT = 150.0;
-
-
 const Cesium = require('cesium');
 
 
-class Auv extends React.Component   {
+class Auv {
     public name: string;
     public latitude: number = 0;
     public longitude: number = 0;
@@ -15,10 +12,10 @@ class Auv extends React.Component   {
     public startTime: any;
     public stopTime: any;
     public heading: any;
+    position: any;
 
 
     constructor(auv: AuvJSON) {
-        super(auv)
         this.name = auv.name;
 
         if(auv.plan.waypoints.length === 0) {
@@ -63,6 +60,13 @@ class Auv extends React.Component   {
             // });
         }
         return property;
+    }
+
+    public setPosition(position){
+        this.position = position;
+    }
+    public getPosition(){
+        return this.position;
     }
 };
 
