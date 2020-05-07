@@ -20,6 +20,8 @@ class AisProvider {
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         let urlArea = url.toString();
 
+        console.log(urlArea);
+
         return fetch(urlArea)
             .then(response => response.text())
             .then(text => {

@@ -44,7 +44,11 @@ class TopView extends Component {
 
     private addAis(ais) {
 
-        for (let i = 0; i < ais.length/4; i++) {
+        console.log();
+
+        for (let i = 0; i < ais.length/14; i++) {
+
+            console.log(ais[i]);
 
             let origin = Cesium.Cartographic.fromDegrees(ais[i].longitude, ais[i].latitude);
             let result = Utils.getPointFromAngleAndPoint(ais[i].cog, ais[i].longitude, ais[i].latitude);
@@ -58,7 +62,7 @@ class TopView extends Component {
                         result.longitude,
                         result.latitude
                     ]),
-                    width: 2,
+                    width: 1.5,
                     material: new Cesium.PolylineDashMaterialProperty({
                         color: Cesium.Color.BLACK,
                     }),
@@ -71,20 +75,19 @@ class TopView extends Component {
                     image: "../images/navigation-arrow-white-25perc.png",
                     rotation: Cesium.Math.toRadians(ais[i].heading % 360),
                     color: Cesium.Color.RED,
-                    scale: 0.2,
+                    scale: 0.1,
                     distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
                         0.0,
                         2000000.0
                     ),
                     scaleByDistance : new Cesium.NearFarScalar(
                         1.5e2,
-                        1,
+                        0.5,
                         8.0e6,
                         0.0
                     )
                 },
-                name: ais[i].name,
-                id: ais[i].name
+                name: ais[i].name
             });
         }
     }
@@ -132,16 +135,20 @@ class TopView extends Component {
 
     public setTopView(auv, auvPostion) {
 
-        let latMax = auvPostion.latitude + 0.03;
-        let latMin = auvPostion.latitude - 0.03;
-        let lonMax = auvPostion.longitude + 0.05;
-        let lonMin  = auvPostion.longitude - 0.05;
+        console.log(auv.longitude);
+        console.log(auv.latitude);
+
+        let latMax = auv.latitude + 0.03;
+        let latMin = auv.latitude - 0.03;
+        let lonMax = auv.longitude + 0.05;
+        let lonMin  = auv.longitude - 0.05;
 
         let aisProvider = new AisProvider();
         aisProvider.getAisFromArea(latMax, latMin, lonMax, lonMin ).then(response => {
             let ais: Array<AisJSON> = JSON.parse(response);
-            if(ais.length !== 0)
+            if(ais.length !== 0) {
                 this.addAis(ais);
+            }
         }).catch(error => this.setState({error: error}));
 
         this.setAuvPosition(auv);
