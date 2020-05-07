@@ -80,13 +80,6 @@ class App extends React.Component<{}, state> {
                 })
             )
             .catch(error => this.setState({error: error, isLoading: false}));
-
-        try {
-            if(this.CesiumViewer == null)
-                this.initCesium();
-        } catch (error) {
-            this.setState({ error });
-        }
     }
 
     // Update current state with changes from controls
@@ -387,7 +380,6 @@ class App extends React.Component<{}, state> {
         //let auvPosition;
         let dist, assetId;
         let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
-        //this.topView.setCameraView(auvPosition);
 
         // Render neighbors
         this.tiles.forEach(tile => {
