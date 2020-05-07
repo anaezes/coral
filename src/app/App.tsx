@@ -8,13 +8,13 @@ import WaterEffect from "./components/WaterEffect";
 import WaterParticles from "./components/WaterParticles";
 import TopView from "./views/TopView";
 import Utils from "./utils/Utils";
+import {AisJSON} from "./utils/AisUtils";
+import AisProvider from "./utils/AisProvider";
 
 // Data
 import tiles from './../data/coordTiles2.json';
-import {AisJSON} from "./utils/AisUtils";
 
 const Cesium = require('cesium');
-
 
 const DEPTH = 0.0;
 const HEIGHT = 10.0;
@@ -86,21 +86,6 @@ class App extends React.Component<{}, state> {
                 this.initCesium();
         } catch (error) {
             this.setState({ error });
-        }
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
-        const {isLoading, data, options} = this.state;
-
-        if (!isLoading && !this.isSystemInit) {
-            this.topView = new TopView(this.props);
-
-            this.getAuvs();
-            this.getTiles();
-            this.createPins();
-
-            this.isSystemInit = true;
         }
     }
 
@@ -333,7 +318,6 @@ class App extends React.Component<{}, state> {
             }
 
             this.state.options.auvActive = data.auvActive;
-            this.topView.setAuvPosition(this.auv);
 
             this.getBoundsTime();
             this.createAuvModel();
@@ -341,6 +325,10 @@ class App extends React.Component<{}, state> {
 
             this.initEnvironment();
             setInterval(this.updateTiles.bind(this), 500);
+
+            let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
+            this.topView.setTopView(this.auv, auvPosition);
+            //this.topView.setAuvPosition(this.auv);
 
             this.isReady = true;
         }
@@ -356,8 +344,13 @@ class App extends React.Component<{}, state> {
             }
         }
 
-        if(data.ais !== this.state.options.ais)
-            this.handleAis(this.topView.getAis(), data.ais);
+        if(data.ais !== this.state.options.ais) {
+            let aisProvider = new AisProvider();
+            aisProvider.getAllAis().then(response => {
+                let ais: Array<AisJSON> = JSON.parse(response);
+                this.handleAis(ais, data.ais);
+            });
+        }
 
         this.setState(prevState => ({
             options: { ...prevState.options, ...data }

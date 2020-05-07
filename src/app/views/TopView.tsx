@@ -4,6 +4,7 @@ import {AisJSON} from "../utils/AisUtils";
 import Utils from "../utils/Utils";
 import Auv from "../components/Auv";
 import MenuView from "../utils/MenuTopView";
+import AisProvider from "../utils/AisProvider";
 
 const Cesium = require('cesium');
 const urlAis =  'https://ripples.lsts.pt/ais';
@@ -22,17 +23,6 @@ class TopView extends Component {
     private isSystemInit: boolean = false;
 
     async componentDidMount() {
-        fetch(urlAis)
-            .then(response => response.json())
-            .then(data =>
-                this.setState({
-                    data: data,
-                    isLoading: false,
-                    error: false
-                })
-            )
-            .catch(error => this.setState({
-                error: error, isLoading: false}));
 
         if(this.viewer == null)
             this.initCesium();
@@ -52,9 +42,7 @@ class TopView extends Component {
         });
     }
 
-    private addAis() {
-        let ais : Array<AisJSON> = JSON.parse(JSON.stringify(this.state.data));
-        this.ais = ais; //copy
+    private addAis(ais) {
 
         for (let i = 0; i < ais.length/4; i++) {
 
@@ -106,34 +94,18 @@ class TopView extends Component {
     };
 
     render() {
-        const {isLoading, data} = this.state;
 
-        if (!isLoading && !this.isSystemInit) {
-            this.addAis();
-            this.isSystemInit = true;
-
-            //this.addButton("test", onclick, "toolbar")
+        if (this.state.error) {
+            return <h1>Something went wrong.</h1>;
         }
-        return (
+
+       return (
         <div>
-            <div>
-                <MenuView/>
-            </div>
+            <MenuView/>
             <div id="TopView"/>
         </div>);
     }
 
-    /*
-    <ButtonGroup
-                    color="primary"
-                    size="small"
-                    aria-label="contained primary button group"
-                    variant="contained">
-                    <Button >Vessels</Button>
-                    <Button>Waves</Button>
-                    <Button>Combined</Button>
-                </ButtonGroup>
-    */
 
     private initCesium() {
         this.viewer = new Cesium.Viewer('TopView', {
@@ -158,8 +130,21 @@ class TopView extends Component {
         });
     }
 
-    public getAis() {
-        return this.ais;
+    public setTopView(auv, auvPostion) {
+
+        let latMax = auvPostion.latitude + 0.03;
+        let latMin = auvPostion.latitude - 0.03;
+        let lonMax = auvPostion.longitude + 0.05;
+        let lonMin  = auvPostion.longitude - 0.05;
+
+        let aisProvider = new AisProvider();
+        aisProvider.getAisFromArea(latMax, latMin, lonMax, lonMin ).then(response => {
+            let ais: Array<AisJSON> = JSON.parse(response);
+            if(ais.length !== 0)
+                this.addAis(ais);
+        }).catch(error => this.setState({error: error}));
+
+        this.setAuvPosition(auv);
     }
 
     public setAuvPosition(auv: Auv) {
