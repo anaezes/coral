@@ -1,0 +1,181 @@
+
+/*
+import React, { Component } from "react";
+import {AisJSON} from "../utils/AisUtils";
+import Utils from "../utils/Utils";
+import Auv from "../components/Auv";
+import MenuView from "../utils/MenuTopView";
+import AisProvider from "../components/AisProvider";
+
+const Cesium = require('cesium');
+const dummyCredit = document.createElement("div");
+const urlAllAis =  'https://ripples.lsts.pt/ais';
+
+
+class TopView extends Component {
+    private container: any;
+    private viewer: any;
+    private ais: Array<AisJSON> = [];
+    private aisProvider = new AisProvider();
+
+    constructor(props) {
+        super(props);
+        //this.initCesium();
+    }
+
+    public setTopView(auvPos, auvHeading, name) {
+        let result = Cesium.Cartographic.fromCartesian(auvPos, Cesium.Ellipsoid.WGS84);
+        let longitude = Cesium.Math.toDegrees(result.longitude);
+        let latitude = Cesium.Math.toDegrees(result.latitude);
+
+        try {
+            console.log("");
+            /!*            this.addAis(longitude, latitude);
+                        this.addAuv(longitude, latitude, auvHeading, name);
+                        this.viewer.camera.flyTo({
+                            destination : new Cesium.Cartesian3.fromDegrees(longitude,  latitude, 1000.0)
+                        });*!/
+        } catch(err){ console.log(err.toString()); }
+
+        //this.forceUpdate();
+    }
+
+    private addAis(longitude, latitude) {
+
+        let latMax = latitude + 0.03;
+        let latMin = latitude - 0.03;
+        let lonMax = longitude + 0.05;
+        let lonMin = longitude - 0.05;
+
+
+        this.aisProvider.getAisFromArea(latMax, latMin, lonMax, lonMin).then(response => {
+            let ais: Array<AisJSON> = JSON.parse(response);
+
+            if(ais.length !== 0) {
+                console.log(ais);
+                this.renderAis(ais);
+            }
+
+            console.log("ais vazio!!!");
+        });
+
+    }
+
+    renderAis(ais){
+        for (let i = 0; i < ais.length / 4; i++) {
+
+            let origin = Cesium.Cartographic.fromDegrees(ais[i].longitude, ais[i].latitude);
+            let result = Utils.getPointFromAngleAndPoint(ais[i].cog, ais[i].longitude, ais[i].latitude);
+
+            this.viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
+                polyline: {
+                    positions: Cesium.Cartesian3.fromRadiansArray([
+                        origin.longitude,
+                        origin.latitude,
+                        result.longitude,
+                        result.latitude
+                    ]),
+                    width: 2,
+                    material: new Cesium.PolylineDashMaterialProperty({
+                        color: Cesium.Color.BLACK,
+                    }),
+                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                        0.0,
+                        2000000.0
+                    )
+                },
+                billboard: {
+                    image: "../images/navigation-arrow-white-25perc.png",
+                    rotation: Cesium.Math.toRadians(ais[i].heading % 360),
+                    color: Cesium.Color.RED,
+                    scale: 0.2,
+                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                        0.0,
+                        2000000.0
+                    ),
+                    scaleByDistance: new Cesium.NearFarScalar(
+                        1.5e2,
+                        1,
+                        8.0e6,
+                        0.0
+                    )
+                },
+                name: ais[i].name,
+                id: ais[i].name
+            });
+        }
+    }
+
+    public render() {
+
+        /!*  if(this.viewer == null)
+              this.initCesium();*!/
+
+        return (
+            <div id="TopView" ref={element => this.container = element}>
+                <MenuView/>
+            </div>);
+    }
+
+    initCesium() {
+        console.log("initCesium!!!");
+
+        this.viewer = new Cesium.Viewer('TopView', {
+            globe: new Cesium.Globe(),
+            timeline: false,
+            animation: false,
+            scene3DOnly: true,
+            skyBox: false,
+            vrButton: false,
+            skyAtmosphere: false,
+            baseLayerPicker: false,
+            geocoder: false,
+            homeButton: false,
+            fullscreenButton: true,
+            infoBox: false,
+            sceneModePicker: false,
+            selectionIndicator: false,
+            navigationHelpButton: false,
+            navigationInstructionsInitiallyVisible: false,
+            shouldAnimate: false,
+            creditContainer: dummyCredit
+        });
+    }
+
+    public getAis() {
+        return this.ais;
+    }
+
+    public addAuv(longitude, latitude, heading, name) {
+
+        /!*  if(this.viewer === null)
+              this.initCesium();*!/
+
+        this.viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
+            billboard: {
+                //Icons made by photo3idea_studiofrom  www.flaticon.com<
+                image: "../images/auv.png",
+                rotation: Cesium.Math.toRadians(heading % 360),
+                color: Cesium.Color.ORANGERED,
+                scale: 0.075,
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                    0.0,
+                    20000.0
+                )
+            },
+            name: name
+        });
+    }
+}
+
+        if (data.ais !== this.state.options.ais) {
+            let aisProvider = new AisProvider();
+            aisProvider.getAllAis().then(response => {
+                let ais: Array<AisJSON> = JSON.parse(response);
+                this.handleAis(ais, data.ais);
+            });
+        }
+
+export default TopView;*/

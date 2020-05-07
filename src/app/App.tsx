@@ -12,6 +12,7 @@ import Utils from "./utils/Utils";
 // Data
 import tiles from './../data/coordTiles2.json';
 import {AisJSON} from "./utils/AisUtils";
+import AisProvider from "./components/AisProvider";
 
 const Cesium = require('cesium');
 
@@ -139,7 +140,7 @@ class App extends React.Component<{}, state> {
                     <DatBoolean path='waterEffects' label='Water effects' />
                     <DatBoolean path='ais' label='AIS' />
                 </DatGui>
-                <TopView ref={element => this.topView = element}/>/>
+                {this.topView === undefined? <div/> :<TopView ref={element => this.topView = element} />}
             </div>
         );
     }
@@ -312,7 +313,6 @@ class App extends React.Component<{}, state> {
 
 
     private updateRender(data) {
-
         if(data.auvActive !== this.state.options.auvActive){
             this.CesiumViewer.entities.removeAll();
 
@@ -342,6 +342,10 @@ class App extends React.Component<{}, state> {
             this.initEnvironment();
             setInterval(this.updateTiles.bind(this), 500);
 
+            this.topView.addAis(this.auv);
+            console.log("updateRender")
+            this.topView.setState({})
+
             this.isReady = true;
         }
 
@@ -356,8 +360,13 @@ class App extends React.Component<{}, state> {
             }
         }
 
-        if(data.ais !== this.state.options.ais)
-            this.handleAis(this.topView.getAis(), data.ais);
+        if (data.ais !== this.state.options.ais) {
+            let aisProvider = new AisProvider();
+            aisProvider.getAllAis().then(response => {
+                let ais: Array<AisJSON> = JSON.parse(response);
+                this.handleAis(ais, data.ais);
+            });
+        }
 
         this.setState(prevState => ({
             options: { ...prevState.options, ...data }

@@ -4,38 +4,83 @@ import {AisJSON} from "../utils/AisUtils";
 import Utils from "../utils/Utils";
 import Auv from "../components/Auv";
 import MenuView from "../utils/MenuTopView";
+import AisProvider from "../components/AisProvider";
 
 const Cesium = require('cesium');
 const urlAis =  'https://ripples.lsts.pt/ais';
 const dummyCredit = document.createElement("div");
 
+interface viewState {
+    data: Array<string>,
+    viewer: Cesium.Viewer,
+    isLoading: Boolean,
+    error: Boolean
+}
+
 class TopView extends Component {
+    static object_count = 0;
+
     private container: any;
-    private viewer: any;
+    //private viewer: any;
     private ais: Array<AisJSON> = [];
 
-    state = {
-        data: [],
-        isLoading: true,
-        error: false
-    };
     private isSystemInit: boolean = false;
+    private vstate;
+
+    constructor(props) {
+        super(props);
+        TopView.object_count += 1;
+        this.handleChange = this.handleChange.bind(this);
+
+        console.log("object_count: " + TopView.object_count);
+
+        this.vstate = {
+            data: [],
+            isLoading: true,
+            error: false,
+            viewer: null
+        };
+    }
+
+    handleChange(e) {
+        console.log("state changed!!");
+    }
+
 
     async componentDidMount() {
-        fetch(urlAis)
-            .then(response => response.json())
-            .then(data =>
-                this.setState({
-                    data: data,
-                    isLoading: false,
-                    error: false
-                })
-            )
-            .catch(error => this.setState({
-                error: error, isLoading: false}));
+        console.log("did mount")
+  /*     if(this.viewer == null)
+            this.initCesium();*/
 
-        if(this.viewer == null)
-            this.initCesium();
+        this.vstate = {
+            data: [],
+            isLoading: true,
+            error: false,
+            viewer: this.initCesium()
+        };
+
+        this.setState(this.vstate);
+    }
+
+    public addAis(auv: Auv) {
+
+        let latMax = auv.latitude + 0.03;
+        let latMin = auv.latitude - 0.03;
+        let lonMax = auv.longitude + 0.05;
+        let lonMin = auv.longitude - 0.05;
+
+        let aisProvider = new AisProvider();
+        aisProvider.getAisFromArea(latMax, latMin, lonMax, lonMin).then(response => {
+            let ais: Array<AisJSON> = JSON.parse(response);
+
+            if(ais.length !== 0) {
+                console.log(ais);
+                this.renderAis(ais);
+            }
+
+            console.log("ais vazio!!!");
+        });
+
     }
 
     public setCameraView(pos) {
@@ -46,22 +91,24 @@ class TopView extends Component {
         let longitude = Cesium.Math.toDegrees(result.longitude);
         let latitude = Cesium.Math.toDegrees(result.latitude);
 
-
-        this.viewer.camera.flyTo({
+        let viewer = this.vstate.viewer;
+        viewer.camera.flyTo({
             destination : new Cesium.Cartesian3.fromDegrees(longitude,  latitude, 1000.0)
+        });
+
+        this.setState({
+            viewer: viewer
         });
     }
 
-    private addAis() {
-        let ais : Array<AisJSON> = JSON.parse(JSON.stringify(this.state.data));
-        this.ais = ais; //copy
-
+    private renderAis(ais) {
+        const viewer = this.vstate.viewer;
         for (let i = 0; i < ais.length/4; i++) {
 
             let origin = Cesium.Cartographic.fromDegrees(ais[i].longitude, ais[i].latitude);
             let result = Utils.getPointFromAngleAndPoint(ais[i].cog, ais[i].longitude, ais[i].latitude);
 
-            this.viewer.entities.add({
+            viewer.entities.add({
                 position: Cesium.Cartesian3.fromDegrees(ais[i].longitude, ais[i].latitude),
                 polyline: {
                     positions: Cesium.Cartesian3.fromRadiansArray([
@@ -99,17 +146,21 @@ class TopView extends Component {
                 id: ais[i].name
             });
         }
+
+        this.setState({
+            viewer: viewer
+        });
     }
 
     handleClick = (event) => {
         //setAnchorEl(event.currentTarget);
     };
 
-    render() {
-        const {isLoading, data} = this.state;
+    public render() {
+        const {isLoading, data} = this.vstate;
 
         if (!isLoading && !this.isSystemInit) {
-            this.addAis();
+            //this.addAis();
             this.isSystemInit = true;
 
             //this.addButton("test", onclick, "toolbar")
@@ -136,7 +187,9 @@ class TopView extends Component {
     */
 
     private initCesium() {
-        this.viewer = new Cesium.Viewer('TopView', {
+        console.log("init cesium");
+
+         let viewer = new Cesium.Viewer('TopView', {
             globe: new Cesium.Globe(),
             timeline: false,
             animation: false,
@@ -156,14 +209,21 @@ class TopView extends Component {
             shouldAnimate: false,
             creditContainer: dummyCredit
         });
+
+         this.setState({
+             viewer: viewer
+         });
+
     }
+
 
     public getAis() {
         return this.ais;
     }
 
     public setAuvPosition(auv: Auv) {
-        this.viewer.entities.add({
+        const viewer = this.vstate.viewer;
+        viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(auv.longitude, auv.latitude),
             billboard: {
                 //Icons made by photo3idea_studiofrom  www.flaticon.com<
@@ -178,6 +238,10 @@ class TopView extends Component {
             },
             name: auv.name,
             id: auv.name
+        });
+
+        this.setState({
+            viewer: viewer
         });
     }
 }
