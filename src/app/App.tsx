@@ -7,9 +7,7 @@ import Tile from "./components/Tile";
 import WaterEffect from "./components/WaterEffect";
 import WaterParticles from "./components/WaterParticles";
 import TopView from "./views/TopView";
-import Utils from "./utils/Utils";
-import {AisJSON} from "./utils/AisUtils";
-import AisProvider from "./utils/AisProvider";
+import AisComponent from "./components/AisComponent";
 
 // Data
 import tiles from './../data/coordTiles2.json';
@@ -53,6 +51,8 @@ class App extends React.Component<{}, state> {
     private topView: any;
     private auv: any;
     _isMounted = false;
+
+    private aisComponent: AisComponent = new AisComponent();
 
 
     state = {
@@ -334,13 +334,8 @@ class App extends React.Component<{}, state> {
             }
         }
 
-        if(data.ais !== this.state.options.ais) {
-            let aisProvider = new AisProvider();
-            aisProvider.getAllAis().then(response => {
-                let ais: Array<AisJSON> = JSON.parse(response);
-                this.handleAis(ais, data.ais);
-            });
-        }
+        if(data.ais !== this.state.options.ais)
+          this.aisComponent.update(this.CesiumViewer, data.ais);
 
         this.setState(prevState => ({
             options: { ...prevState.options, ...data }
@@ -524,74 +519,6 @@ class App extends React.Component<{}, state> {
         for (let i = 0; i < t.length; i++) {
             this.tiles.push( new Tile(t[i]));
         }
-    }
-
-    renderAis(ais: AisJSON){
-        let origin = Cesium.Cartographic.fromDegrees(ais.longitude, ais.latitude);
-        let result = Utils.getPointFromAngleAndPoint(ais.cog, ais.longitude, ais.latitude);
-
-        this.CesiumViewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(ais.longitude, ais.latitude),
-            polyline: {
-                positions: Cesium.Cartesian3.fromRadiansArray([
-                    origin.longitude,
-                    origin.latitude,
-                    result.longitude,
-                    result.latitude
-                ]),
-                width: 2,
-                material: new Cesium.PolylineDashMaterialProperty({
-                    color: Cesium.Color.BLACK,
-                }),
-                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
-                    0.0,
-                    2000000.0
-                )
-            },
-            billboard: {
-                image: "../images/navigation-arrow-white-25perc.png",
-                rotation: Cesium.Math.toRadians(ais.heading % 360),
-                color: Cesium.Color.RED,
-                scale: 0.2,
-                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
-                    0.0,
-                    2000000.0
-                ),
-                scaleByDistance : new Cesium.NearFarScalar(
-                    1.5e2,
-                    1,
-                    8.0e6,
-                    0.0
-                )
-            },
-            name: ais.name,
-            id: ais.name,
-            show: true
-        });
-    }
-
-    /**
-     * Icon: Designed by Pixel perfect from www.flaticon.com
-     */
-    private handleAis(ais: Array<AisJSON>, show: boolean) {
-        if(show) {
-            for (let i = 0; i < ais.length/4; i++) {
-                let entity = this.CesiumViewer.entities.getById(ais[i].name);
-                if(entity !== undefined)
-                    entity.show = true;
-                else
-                    this.renderAis(ais[i]);
-            }
-        }
-        else {
-            console.log("remover");
-            for (let i = 0; i < ais.length/4; i++) {
-                let entity = this.CesiumViewer.entities.getById(ais[i].name);
-                if(entity !== undefined)
-                    entity.show = false;
-            }
-        }
-
     }
 };
 export default App;
