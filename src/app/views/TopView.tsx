@@ -5,6 +5,7 @@ import Utils from "../utils/Utils";
 import Auv from "../components/Auv";
 import MenuView from "../utils/MenuTopView";
 import AisProvider from "../utils/AisProvider";
+import AisComponent from "../components/AisComponent";
 
 const Cesium = require('cesium');
 const urlAis =  'https://ripples.lsts.pt/ais';
@@ -14,6 +15,13 @@ class TopView extends Component {
     private container: any;
     private viewer: any;
     private ais: Array<AisJSON> = [];
+    private aisComponent: AisComponent = new AisComponent(0.1, 1.5,
+        new Cesium.NearFarScalar(
+        1.5e2,
+        0.5,
+        8.0e6,
+        0.0
+    ));
 
     state = {
         data: [],
@@ -139,7 +147,9 @@ class TopView extends Component {
         console.log(auv.longitude);
         console.log(auv.latitude);
 
-        let latMax = auv.latitude + 0.03;
+        this.aisComponent.update(this.viewer, true, auv);
+
+/*        let latMax = auv.latitude + 0.03;
         let latMin = auv.latitude - 0.03;
         let lonMax = auv.longitude + 0.05;
         let lonMin  = auv.longitude - 0.05;
@@ -150,7 +160,7 @@ class TopView extends Component {
             if(ais.length !== 0) {
                 this.addAis(ais);
             }
-        }).catch(error => this.setState({error: error}));
+        }).catch(error => this.setState({error: error}));*/
 
         this.setAuvPosition(auv);
 

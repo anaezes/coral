@@ -8,7 +8,17 @@ const Cesium = require('cesium');
 
 
 class AisComponent {
-    ais: Array<AisJSON> = [];
+    private ais: Array<AisJSON> = [];
+    private scale: any;
+    private scaleByDistance: any;
+    private width: any;
+
+    constructor(scale, width, scaleByDistance){
+        this.scale = scale;
+        this.scaleByDistance = scaleByDistance;
+        this.width = width;
+    }
+
 
     /**
      * Request data (http) and add to the given cesium viewer to render
@@ -16,22 +26,24 @@ class AisComponent {
     update(viewer: Cesium.Viewer, isVisible: boolean, auv?: Auv) {
         let aisProvider = new AisProvider();
 
-        let f :any;
-        if(auv == undefined)
-            f = aisProvider.getAllAis;
+        if(auv == undefined) {
+            aisProvider.getAllAis().then(response => {
+                this.ais = JSON.parse(response);
+                console.log(this.ais);
+                this.render(viewer, isVisible);
+            });
+        }
         else {
             let latMax = auv.latitude + 0.03;
             let latMin = auv.latitude - 0.03;
             let lonMax = auv.longitude + 0.05;
             let lonMin  = auv.longitude - 0.05;
-            f = aisProvider.getAisFromArea(latMax,latMin,lonMax,lonMin);
+            aisProvider.getAisFromArea(latMax,latMin,lonMax,lonMin).then(response => {
+                this.ais = JSON.parse(response);
+                console.log(this.ais);
+                this.render(viewer, isVisible);
+            });
         }
-
-        f().then(response => {
-            this.ais = JSON.parse(response);
-            console.log(this.ais);
-            this.render(viewer, isVisible);
-        });
     }
 
     private render(viewer: Cesium.Viewer, isVisible: boolean) {
@@ -69,7 +81,7 @@ class AisComponent {
                     result.longitude,
                     result.latitude
                 ]),
-                width: 2,
+                width: this.width,
                 material: new Cesium.PolylineDashMaterialProperty({
                     color: Cesium.Color.BLACK,
                 }),
@@ -82,17 +94,12 @@ class AisComponent {
                 image: "../images/navigation-arrow-white-25perc.png",
                 rotation: Cesium.Math.toRadians(ais.heading % 360),
                 color: Cesium.Color.RED,
-                scale: 0.2,
+                scale: this.scale,
                 distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
                     0.0,
                     2000000.0
                 ),
-                scaleByDistance : new Cesium.NearFarScalar(
-                    1.5e2,
-                    1,
-                    8.0e6,
-                    0.0
-                )
+                scaleByDistance : this.scaleByDistance
             },
             name: ais.name,
             id: ais.name,
