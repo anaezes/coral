@@ -5,13 +5,10 @@ import WaterEffect from "./components/WaterEffect";
 import WaterParticles from "./components/WaterParticles";
 import TopView from "./views/TopView";
 import AisComponent from "./components/AisComponent";
-
-// Data
 import BathymetryComponent from "./components/BathymetryComponent";
 import AuvComponent from "./components/AuvComponent";
 
 const Cesium = require('cesium');
-
 const DEPTH = 0.0;
 const urlAuvs =  'https://ripples.lsts.pt/soi';
 const dummyCredit = document.createElement("div");
@@ -31,9 +28,7 @@ interface MenuOptions {
     ais: boolean
 }
 
-
 class App extends React.Component<{}, state> {
-    //private entityAUV: Cesium.Entity = new Cesium.Entity();
     private isSystemInit: boolean = false;
     private options: Array<string> = [];
     private auvs: Array<AuvJSON> = [];
@@ -41,7 +36,6 @@ class App extends React.Component<{}, state> {
     private CesiumViewer: any;
     private container: any;
     private topView: any;
-    _isMounted = false;
     private auvComponent = new AuvComponent();
     private bathymetryComponent = new BathymetryComponent();
     private aisComponent: AisComponent = new AisComponent(0.2, 2,
@@ -64,9 +58,11 @@ class App extends React.Component<{}, state> {
         }
     };
 
-    componentDidMount() {
-        this._isMounted = true;
 
+    /**
+     * Get all available AUV's
+     */
+    componentDidMount() {
         fetch(urlAuvs)
             .then(response => response.json())
             .then(data =>
@@ -79,11 +75,16 @@ class App extends React.Component<{}, state> {
             .catch(error => this.setState({error: error, isLoading: false}));
     }
 
-    // Update current state with changes from controls
+
+    /**
+     * Update current state of app with changes from controls
+     */
     handleUpdate = newData =>
         this.updateRender(newData);
 
-
+    /**
+     * Main rendering loop
+     */
     render() {
         const {isLoading, data, options} = this.state;
 
@@ -94,12 +95,10 @@ class App extends React.Component<{}, state> {
                 this.initCesium();
 
             this.getAuvs();
-
             this.createPins();
 
             this.isSystemInit = true;
         }
-
 
         return (
             <div>
@@ -119,7 +118,10 @@ class App extends React.Component<{}, state> {
         );
     }
 
-    initCesium() {
+    /**
+     * Init and make the initial cesium viewer settings
+     */
+    initCesium() : void {
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkOGVmYTBmMC1jMDJjLTQ5' +
             'MTQtYTQwZi1jNjVkOTcyYTQ0MjEiLCJpZCI6MjMxNTksInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1ODI4MTE0NjB9.' +
             '8bD2ihWXbQPEjqO6CN79XDZ-oTrY7h1S5o8uiT_tvuU';
@@ -172,7 +174,10 @@ class App extends React.Component<{}, state> {
         this.CesiumViewer.animation.viewModel.setShuttleRingTicks([0, 1500]);
     }
 
-    initEnvironment() {
+    /**
+     * TODO: aplicar isto para vários modelos
+     */
+    initEnvironment() : void {
         let newLatitude = this.auvComponent.getAuvActive().latitude-0.0005;
         let newLongitude = this.auvComponent.getAuvActive().longitude-0.0003;
         let modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
@@ -193,8 +198,10 @@ class App extends React.Component<{}, state> {
         console.log("Distance: " + dist);
     }
 
-
-    private updateRender(data) {
+    /**
+     * Handles user input and updates components accordingly
+     */
+    private updateRender(data) : void {
         if(data.auvActive !== this.state.options.auvActive){
 
             this.CesiumViewer.entities.removeAll();
@@ -231,20 +238,27 @@ class App extends React.Component<{}, state> {
         }));
     }
 
+    /**
+     * Updates top view
+     */
     updateTopView() {
         this.auvComponent.getAuvActive().setPosition(this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime));
         this.topView.setTopView(this.auvComponent.getAuvActive());
     }
 
-    updateBathymetry() {
+    /**
+     * Updates bathymetry component
+     */
+    updateBathymetry() : void {
         let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
         this.bathymetryComponent.update(auvPosition, this.CesiumViewer, this.state.options.terrainExaggeration);
     }
 
     /**
-     * Icon: Designed by Freepik from www.flaticon.com
+     * Create pins to choose auv
+     * credits icon: Designed by Freepik from www.flaticon.com
      */
-    createPins() {
+    createPins() : void {
         var pinBuilder = new Cesium.PinBuilder();
         let viewer = this.CesiumViewer;
 
@@ -295,7 +309,10 @@ class App extends React.Component<{}, state> {
             Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }
 
-    private getAuvs() {
+    /**
+     * Processes the data of the auvs requested from the server
+     */
+    private getAuvs() : void {
         let auvs : Array<AuvJSON> = JSON.parse(JSON.stringify(this.state.data));
         this.auvs = auvs; //copy
 
