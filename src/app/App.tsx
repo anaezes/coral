@@ -57,6 +57,8 @@ class App extends React.Component<{}, state> {
             ais: false
         }
     };
+    private updateBathymetryIntervalId: any;
+    private updateTopViewIntervalId: any;
 
 
     /**
@@ -193,9 +195,9 @@ class App extends React.Component<{}, state> {
         );
 
         // Debug
-        let dist = Cesium.Cartesian3.distance(new Cesium.Cartesian3.fromDegrees(this.auvComponent.getAuvActive().longitude, this.auvComponent.getAuvActive().latitude),
+/*        let dist = Cesium.Cartesian3.distance(new Cesium.Cartesian3.fromDegrees(this.auvComponent.getAuvActive().longitude, this.auvComponent.getAuvActive().latitude),
             new Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude));
-        console.log("Distance: " + dist);
+        console.log("Distance: " + dist);*/
     }
 
     /**
@@ -205,6 +207,7 @@ class App extends React.Component<{}, state> {
         if(data.auvActive !== this.state.options.auvActive){
 
             this.CesiumViewer.entities.removeAll();
+            this.resetApp();
 
             // Auv Render
             this.auvComponent.update(this.auvs, data.auvActive, this.CesiumViewer);
@@ -214,11 +217,11 @@ class App extends React.Component<{}, state> {
             // Bathymetry update
             let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
             this.bathymetryComponent.update(auvPosition, this.CesiumViewer, this.state.options.terrainExaggeration);
-            setInterval(this.updateBathymetry.bind(this), 500);
+            this.updateBathymetryIntervalId = setInterval(this.updateBathymetry.bind(this), 500);
 
             // Top view
             this.updateTopView();
-            setInterval(this.updateTopView.bind(this), 3000);
+            this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 3000);
 
             this.isReady = true;
             this.state.options.auvActive = data.auvActive;
@@ -319,6 +322,22 @@ class App extends React.Component<{}, state> {
         for (let i = 0; i < this.auvs.length; i++) {
             this.options.push(this.auvs[i].name);
         }
+    }
+
+    resetApp(){
+        clearInterval(this.updateBathymetryIntervalId);
+        clearInterval(this.updateTopViewIntervalId);
+
+        this.topView.reset();
+        this.auvComponent = new AuvComponent();
+        this.bathymetryComponent = new BathymetryComponent();
+        this.aisComponent = new AisComponent(0.2, 2,
+            new Cesium.NearFarScalar(
+                1.5e2,
+                1,
+                8.0e6,
+                0.0
+            ));
     }
 };
 export default App;

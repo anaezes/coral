@@ -29,7 +29,7 @@ class AisComponent {
         if(auv == undefined) {
             aisProvider.getAllAis().then(response => {
                 this.ais = JSON.parse(response);
-                console.log(this.ais);
+                //console.log(this.ais);
                 this.render(viewer, isVisible);
             });
         }
@@ -41,31 +41,31 @@ class AisComponent {
             aisProvider.getAisFromArea(latMax,latMin,lonMax,lonMin).then(response => {
                 try{
                     this.ais = JSON.parse(response);
-                    console.log(this.ais);
+                    //console.log(this.ais);
                     this.render(viewer, isVisible);
                 }
                 catch (e) {
-                    console.log(e.toString());
+                    console.error(e.toString());
                 }
             });
         }
     }
 
     private render(viewer: Cesium.Viewer, isVisible: boolean) {
-        console.log("antes");
         if(isVisible) {
-            console.log("here");
-            for (let i = 0; i < this.ais.length/4; i++) {
+            for (let i = 0; i < this.ais.length; i++) {
                 let entity = viewer.entities.getById(this.ais[i].name);
-                if(entity !== undefined)
+                if(entity !== undefined) {
+                    //Update ais position
+                    this.updateAisPosition(this.ais[i], entity);
                     entity.show = true;
+                }
                 else
                     this.renderAis(viewer, this.ais[i]);
             }
         }
         else {
-            console.log("remover");
-            for (let i = 0; i < this.ais.length/4; i++) {
+            for (let i = 0; i < this.ais.length; i++) {
                 let entity = viewer.entities.getById(this.ais[i].name);
                 if(entity !== undefined)
                     entity.show = false;
@@ -98,7 +98,7 @@ class AisComponent {
             billboard: {
                 image: "../images/navigation-arrow-white-25perc.png",
                 rotation: Cesium.Math.toRadians(ais.heading % 360),
-                color: Cesium.Color.RED,
+                color: Cesium.Color.GREEN,
                 scale: this.scale,
                 distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
                     0.0,
@@ -110,6 +110,12 @@ class AisComponent {
             id: ais.name,
             show: true
         });
+    }
+
+    private updateAisPosition(ais, entity) {
+        console.log("update position!!!");
+        entity.position = Cesium.Cartesian3.fromDegrees(ais.longitude, ais.latitude);
+        entity.billboard.rotation = Cesium.Math.toRadians(ais.heading % 360);
     }
 }
 
