@@ -39,9 +39,14 @@ class AisComponent {
             let lonMax = auv.longitude + 0.05;
             let lonMin  = auv.longitude - 0.05;
             aisProvider.getAisFromArea(latMax,latMin,lonMax,lonMin).then(response => {
-                this.ais = JSON.parse(response);
-                console.log(this.ais);
-                this.render(viewer, isVisible);
+                try{
+                    this.ais = JSON.parse(response);
+                    console.log(this.ais);
+                    this.render(viewer, isVisible);
+                }
+                catch (e) {
+                    console.log(e.toString());
+                }
             });
         }
     }
