@@ -1,22 +1,18 @@
 import React from 'react';
 import DatGui, {DatSelect, DatNumber, DatBoolean} from "react-dat-gui";
 import {AuvJSON} from './utils/AUVUtils';
-import { TileJSON } from './utils/TilesUtils';
-import Auv from "./components/Auv";
-import Tile from "./components/Tile";
 import WaterEffect from "./components/WaterEffect";
 import WaterParticles from "./components/WaterParticles";
 import TopView from "./views/TopView";
 import AisComponent from "./components/AisComponent";
 
 // Data
-import tiles from './../data/coordTiles2.json';
 import BathymetryComponent from "./components/BathymetryComponent";
+import AuvComponent from "./components/AuvComponent";
 
 const Cesium = require('cesium');
 
 const DEPTH = 0.0;
-const HEIGHT = 10.0;
 const urlAuvs =  'https://ripples.lsts.pt/soi';
 const dummyCredit = document.createElement("div");
 
@@ -37,21 +33,16 @@ interface MenuOptions {
 
 
 class App extends React.Component<{}, state> {
-    private entityAUV: Cesium.Entity = new Cesium.Entity();
-    private ENU: Cesium.Matrix4 = new Cesium.Matrix4();
-    private tiles: Array<Tile> = new Array<Tile>();
+    //private entityAUV: Cesium.Entity = new Cesium.Entity();
     private isSystemInit: boolean = false;
     private options: Array<string> = [];
     private auvs: Array<AuvJSON> = [];
     private isReady: boolean = false;
     private CesiumViewer: any;
-    private mainTile: any;
     private container: any;
-    private startTime: any;
-    private stopTime: any;
     private topView: any;
-    private auv: any;
     _isMounted = false;
+    private auvComponent = new AuvComponent();
     private bathymetryComponent = new BathymetryComponent();
     private aisComponent: AisComponent = new AisComponent(0.2, 2,
         new Cesium.NearFarScalar(
@@ -61,19 +52,17 @@ class App extends React.Component<{}, state> {
         0.0
     ));
 
-
     state = {
         data: [],
         isLoading: true,
+        error: false,
         options: {
             auvActive: '',
             terrainExaggeration: 4,
             waterEffects: false,
             ais: false
-        },
-        error: false,
+        }
     };
-
 
     componentDidMount() {
         this._isMounted = true;
@@ -105,6 +94,7 @@ class App extends React.Component<{}, state> {
                 this.initCesium();
 
             this.getAuvs();
+
             this.createPins();
 
             this.isSystemInit = true;
@@ -128,9 +118,6 @@ class App extends React.Component<{}, state> {
             </div>
         );
     }
-
-    //<!--div id="ThreeContainer" ref={element => this.water = element}/-->
-
 
     initCesium() {
         Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkOGVmYTBmMC1jMDJjLTQ5' +
@@ -178,7 +165,6 @@ class App extends React.Component<{}, state> {
 
         //Set the random number seed for consistent results.
         Cesium.Math.setRandomNumberSeed(3);
-        this.ENU = new Cesium.Matrix4();
 
         this.CesiumViewer.scene.fog.enabled = true;
         this.CesiumViewer.scene.fog.density = 2.0e-4;
@@ -186,96 +172,9 @@ class App extends React.Component<{}, state> {
         this.CesiumViewer.animation.viewModel.setShuttleRingTicks([0, 1500]);
     }
 
-    getBoundsTime() {
-        //Set bounds of our simulation time
-        this.startTime = Cesium.JulianDate.fromDate(new Date(this.auv.startTime));
-        this.stopTime = Cesium.JulianDate.fromDate(new Date(this.auv.stopTime));
-
-        //Make sure viewer is at the desired time.
-        this.CesiumViewer.clock.startTime = this.startTime.clone();
-        this.CesiumViewer.clock.stopTime = this.stopTime.clone();
-        this.CesiumViewer.clock.currentTime = this.startTime.clone();
-        this.CesiumViewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP; //Loop at the end
-        this.CesiumViewer.clock.multiplier = 10;
-
-        //Set timeline to simulation bounds
-        this.CesiumViewer.timeline.zoomTo(this.startTime, this.stopTime);
-    }
-
-    createAuvModel() {
-        let longitude = this.auv.longitude;
-        let latitude = this.auv.latitude;
-
-        this.CesiumViewer.scene.globe = new Cesium.Globe(Cesium.Ellipsoid.WGS84);
-        this.CesiumViewer.scene.globe.baseColor =  new Cesium.Color(0.24,0.24,0.24,1);
-        this.CesiumViewer.scene.globe.fillHighlightColor =  new Cesium.Color(0.24,0.24,0.24,1);
-        this.CesiumViewer.scene.backgroundColor = new Cesium.Color(0.043,0.18,0.24,1);
-
-        this.CesiumViewer.camera.setView({
-            orientation: {
-                heading: 0.03295948729686427 + Cesium.Math.PI_OVER_TWO,
-                pitch: 0.0, //-Cesium.Math.PI_OVER_TWO (top view)
-                roll: 0.0
-            },
-            destination: Cesium.Cartesian3.fromDegrees(longitude - 0.00015, latitude, HEIGHT + 1.5)
-        });
-
-        this.entityAUV = this.CesiumViewer.entities.add({
-            //Set the entity availability to the same interval as the simulation time.
-            availability: new Cesium.TimeIntervalCollection([new Cesium.TimeInterval({
-                start: this.startTime,
-                stop: this.stopTime
-            })]),
-
-            //Use our computed positions
-            position: this.auv.path,
-
-            //Automatically compute orientation based on position movement.
-            orientation: new Cesium.VelocityOrientationProperty(this.auv.path),
-
-            //Load the Cesium plane model to represent the entity
-            model: {
-                uri: '../models/lauv-80.glb',
-                minimumPixelSize: 64
-            },
-            scale: 1.0,
-
-            //Show the path as a pink line sampled in 1 second increments.
-            path: {
-                resolution: 1,
-                material: new Cesium.PolylineGlowMaterialProperty({
-                    glowPower: 0.1,
-                    color: Cesium.Color.YELLOW
-                }),
-                width: 1
-            },
-
-            // Color the model slightly blue when the eyepoint is underwater.
-            color : new Cesium.Color(0.0, 0.0, 1.0, 1.0),
-            colorBlendMode : Cesium.ColorBlendMode.MIX,
-            colorBlendAmount : new Cesium.CallbackProperty(function(time, result) {
-                var underwater = viewer.camera.positionCartographic.height < 0;
-
-                console.log("underwater!!!");
-                return !underwater ? 1.0 : 0.0;
-            }, false)
-        });
-
-        let viewer = this.CesiumViewer;
-        let entity = this.entityAUV;
-        this.CesiumViewer.flyTo(entity).then(function () {
-            viewer.trackedEntity = entity;
-            viewer.camera.setView({
-                orientation: entity.orientation,
-                destination: Cesium.Cartesian3.fromDegrees(longitude, latitude - 0.00015, HEIGHT+ 1.5)
-            });
-            viewer.scene.camera.lookAt(entity.position.getValue(viewer.clock.currentTime), entity.orientation.getValue(viewer.clock.currentTime));
-        });
-    }
-
     initEnvironment() {
-        let newLatitude = this.auv.latitude-0.0005;
-        let newLongitude = this.auv.longitude-0.0003;
+        let newLatitude = this.auvComponent.getAuvActive().latitude-0.0005;
+        let newLongitude = this.auvComponent.getAuvActive().longitude-0.0003;
         let modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
             Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude, DEPTH+47.5));
 
@@ -289,41 +188,24 @@ class App extends React.Component<{}, state> {
         );
 
         // Debug
-        let dist = Cesium.Cartesian3.distance(new Cesium.Cartesian3.fromDegrees(this.auv.longitude, this.auv.latitude),
+        let dist = Cesium.Cartesian3.distance(new Cesium.Cartesian3.fromDegrees(this.auvComponent.getAuvActive().longitude, this.auvComponent.getAuvActive().latitude),
             new Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude));
         console.log("Distance: " + dist);
     }
 
 
-
     private updateRender(data) {
         if(data.auvActive !== this.state.options.auvActive){
+
             this.CesiumViewer.entities.removeAll();
 
-            let i = 0;
-            let found = false;
-            while(i < this.auvs.length){
-                if(data.auvActive === this.auvs[i].name) {
-                    this.auv = new Auv(this.auvs[i]);
-                    found = true;
-                    break;
-                }
-                i++;
-            }
+            // Auv Render
+            this.auvComponent.update(this.auvs, data.auvActive, this.CesiumViewer);
 
-            if(!found || this.auv.waypoints.length === 0) {
-                console.log("Option not available: waypoints not defined.");
-                return;
-            }
-
-            this.state.options.auvActive = data.auvActive;
-
-            this.getBoundsTime();
-            this.createAuvModel();
             this.initEnvironment();
 
             // Bathymetry update
-            let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
+            let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
             this.bathymetryComponent.update(auvPosition, this.CesiumViewer, this.state.options.terrainExaggeration);
             setInterval(this.updateBathymetry.bind(this), 500);
 
@@ -332,6 +214,7 @@ class App extends React.Component<{}, state> {
             setInterval(this.updateTopView.bind(this), 3000);
 
             this.isReady = true;
+            this.state.options.auvActive = data.auvActive;
         }
 
         if(data.terrainExaggeration !== this.state.options.terrainExaggeration) {
@@ -349,12 +232,12 @@ class App extends React.Component<{}, state> {
     }
 
     updateTopView() {
-        this.auv.setPosition(this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime));
-        this.topView.setTopView(this.auv);
+        this.auvComponent.getAuvActive().setPosition(this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime));
+        this.topView.setTopView(this.auvComponent.getAuvActive());
     }
 
     updateBathymetry() {
-        let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
+        let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
         this.bathymetryComponent.update(auvPosition, this.CesiumViewer, this.state.options.terrainExaggeration);
     }
 
@@ -362,7 +245,6 @@ class App extends React.Component<{}, state> {
      * Icon: Designed by Freepik from www.flaticon.com
      */
     createPins() {
-
         var pinBuilder = new Cesium.PinBuilder();
         let viewer = this.CesiumViewer;
 
@@ -397,7 +279,7 @@ class App extends React.Component<{}, state> {
                 var pickedLabel = viewer.scene.pick(movement.position);
 
                 //do nothing
-                if(app.auv !== undefined)
+                if(app.auvComponent.getAuvActive() !== undefined)
                     return;
 
                 if (Cesium.defined(pickedLabel)) {
