@@ -1,5 +1,5 @@
 import React from 'react';
-import DatGui, {DatSelect, DatNumber, DatBoolean} from "react-dat-gui";
+import DatGui, {DatSelect, DatNumber, DatBoolean, DatFolder} from "react-dat-gui";
 import {AuvJSON} from './utils/AUVUtils';
 import WaterEffect from "./components/WaterEffect";
 import WaterParticles from "./components/WaterParticles";
@@ -7,6 +7,7 @@ import TopView from "./views/TopView";
 import AisComponent from "./components/AisComponent";
 import BathymetryComponent from "./components/BathymetryComponent";
 import AuvComponent from "./components/AuvComponent";
+import WeatherComponent from "./components/WeatherComponent";
 
 const Cesium = require('cesium');
 const DEPTH = 0.0;
@@ -25,7 +26,8 @@ interface MenuOptions {
     auvActive: string,
     terrainExaggeration: number,
     waterEffects: boolean,
-    ais: boolean
+    ais: boolean,
+    waves: boolean,
 }
 
 class App extends React.Component<{}, state> {
@@ -54,11 +56,16 @@ class App extends React.Component<{}, state> {
             auvActive: '',
             terrainExaggeration: 4,
             waterEffects: false,
-            ais: false
+            ais: false,
+            waves: false,
+            world_temp: false,
+            water_temp: false
         }
     };
     private updateBathymetryIntervalId: any;
     private updateTopViewIntervalId: any;
+    weather = new WeatherComponent();
+
 
 
     /**
@@ -107,13 +114,21 @@ class App extends React.Component<{}, state> {
                 <div id="Container" ref={element => this.container = element}/>
                 {this.isReady && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
                 <DatGui data={options} onUpdate={this.handleUpdate}>
-                    <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
-                    <DatSelect
-                        label="Available AUV's"
-                        path="auvActive"
-                        options={this.options}/>
-                    <DatBoolean path='waterEffects' label='Water effects' />
+                    <DatFolder title="Global Weather">
+                        <DatBoolean path='waves' label='Waves'/>
+                        <DatBoolean path='water_temp' label='Water temperature'/>
+                        <DatBoolean path='world_temp' label='World temperature' />
+                    </DatFolder>
+                    <DatFolder title="AUV Tracking">
+                        <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
+                        <DatSelect
+                            label="Available AUV's"
+                            path="auvActive"
+                            options={this.options}/>
+                        <DatBoolean path='waterEffects' label='Water effects' />
+                    </DatFolder>
                     <DatBoolean path='ais' label='AIS' />
+
                 </DatGui>
                 <TopView ref={element => this.topView = element}/>/>
             </div>
@@ -156,7 +171,12 @@ class App extends React.Component<{}, state> {
             navigationInstructionsInitiallyVisible: false,
             shouldAnimate: false, // Enable animations
             requestRenderMode: false,
-            creditContainer: dummyCredit
+            creditContainer: dummyCredit,
+            showWaterEffect: true
+        });
+
+        this.CesiumViewer.terrainProvider = Cesium.createWorldTerrain({
+            requestWaterMask: true,
         });
 
         this.CesiumViewer.scene.globe.enableLighting = true;
@@ -236,6 +256,18 @@ class App extends React.Component<{}, state> {
         if(data.ais !== this.state.options.ais)
           this.aisComponent.update(this.CesiumViewer, data.ais);
 
+        if(data.waves !== this.state.options.waves){
+            this.weather.setWaves(this.CesiumViewer, data.waves);
+        }
+
+        if(data.water_temp !== this.state.options.water_temp){
+            this.weather.setWaterTemp(this.CesiumViewer, data.water_temp);
+        }
+
+        if(data.world_temp !== this.state.options.world_temp){
+            this.weather.setWorldTemp(this.CesiumViewer, data.world_temp);
+        }
+
         this.setState(prevState => ({
             options: { ...prevState.options, ...data }
         }));
@@ -304,7 +336,8 @@ class App extends React.Component<{}, state> {
                         auvActive : pickedLabel.id.id,
                         terrainExaggeration : app.state.options.terrainExaggeration,
                         waterEffects : app.state.options.waterEffects,
-                        ais : app.state.options.ais
+                        ais : app.state.options.ais,
+                        waves : app.state.options.waves
                     };
                     app.updateRender(d);
                 }

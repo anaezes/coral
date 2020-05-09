@@ -22,6 +22,7 @@ class TopView extends Component {
         isLoading: true,
         error: false
     };
+    private first: boolean = true;
 
     async componentDidMount() {
         if(this.viewer == null)
