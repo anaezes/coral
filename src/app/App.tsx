@@ -59,7 +59,8 @@ class App extends React.Component<{}, state> {
             ais: false,
             waves: false,
             world_temp: false,
-            water_temp: false
+            water_temp: false,
+            salinity: false
         }
     };
     private updateBathymetryIntervalId: any;
@@ -118,6 +119,7 @@ class App extends React.Component<{}, state> {
                         <DatBoolean path='waves' label='Waves'/>
                         <DatBoolean path='water_temp' label='Water temperature'/>
                         <DatBoolean path='world_temp' label='World temperature' />
+                        <DatBoolean path='salinity' label='Salinity' />
                     </DatFolder>
                     <DatFolder title="AUV Tracking">
                         <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
@@ -128,7 +130,6 @@ class App extends React.Component<{}, state> {
                         <DatBoolean path='waterEffects' label='Water effects' />
                     </DatFolder>
                     <DatBoolean path='ais' label='AIS' />
-
                 </DatGui>
                 <TopView ref={element => this.topView = element}/>/>
             </div>
@@ -240,6 +241,7 @@ class App extends React.Component<{}, state> {
             this.updateBathymetryIntervalId = setInterval(this.updateBathymetry.bind(this), 500);
 
             // Top view
+            this.topView.showTopView = true;
             this.updateTopView();
             this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 3000);
 
@@ -266,6 +268,10 @@ class App extends React.Component<{}, state> {
 
         if(data.world_temp !== this.state.options.world_temp){
             this.weather.setWorldTemp(this.CesiumViewer, data.world_temp);
+        }
+
+        if(data.salinity !== this.state.options.salinity){
+            this.weather.setSalinity(this.CesiumViewer, data.salinity);
         }
 
         this.setState(prevState => ({

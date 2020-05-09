@@ -6,16 +6,17 @@ import AisComponent from "../components/AisComponent";
 
 const Cesium = require('cesium');
 const dummyCredit = document.createElement("div");
+//const topView = document.createElement("TopView");
 
 class TopView extends Component {
     private viewer: any;
     private aisComponent: AisComponent = new AisComponent(0.1, 1.5,
         new Cesium.NearFarScalar(
-        1.5e2,
-        0.5,
-        8.0e6,
-        0.0
-    ));
+            1.5e2,
+            0.5,
+            8.0e6,
+            0.0
+        ));
 
     state = {
         data: [],
@@ -23,6 +24,7 @@ class TopView extends Component {
         error: false
     };
     private first: boolean = true;
+    public showTopView: Boolean = false;
 
     async componentDidMount() {
         if(this.viewer == null)
@@ -44,11 +46,11 @@ class TopView extends Component {
             return <h1>Something went wrong.</h1>;
         }
 
-       return (
-        <div>
-            <MenuView/>
-            <div id="TopView"/>
-        </div>);
+        return (
+            <div>
+                <MenuView/>
+                <div id="TopView"/>
+            </div>);
     }
 
 
