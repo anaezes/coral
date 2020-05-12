@@ -17,6 +17,7 @@ const dummyCredit = document.createElement("div");
 
 interface state {
     data: Array<string>,
+    wsMsg: Array<string>,
     options: MenuOptions,
     isLoading: Boolean,
     error: Boolean
@@ -50,6 +51,7 @@ class App extends React.Component<{}, state> {
 
     state = {
         data: [],
+        wsMsg: [],
         isLoading: true,
         error: false,
         options: {
@@ -83,6 +85,42 @@ class App extends React.Component<{}, state> {
                 })
             )
             .catch(error => this.setState({error: error, isLoading: false}));
+
+        const ws = new WebSocket('ws://localhost:9090/imcws');
+        ws.onmessage = (evt: MessageEvent) => {
+            const newData =  JSON.parse(evt.data);
+            this.setState((prevState: state) => {
+
+                return {
+                    wsMsg: newData
+                }
+            })
+            //console.log(this.state.data);
+        };
+    }
+
+    componentDidUpdate() {
+
+        // Process data samples
+        let msg = JSON.parse(JSON.stringify(this.state.wsMsg));
+
+       /* if('type' in msg && msg.type === "UUV"){
+            //last state
+            if(this.isReady && this.auvComponent.getAuvActive().name === msg.name){
+                // update
+                this.auvComponent.update(msg, this.CesiumViewer);
+            }
+            this.auvs.set(msg.name, msg);
+            if (!this.options.includes(msg.name)) {
+                this.options.push(msg.name);
+            }
+        }*/
+
+        if('sampleType' in msg) {
+            if(this.auvComponent.getAuvActive() !== undefined){
+                this.auvComponent.processSample(msg);
+            }
+        }
     }
 
 
@@ -166,7 +204,7 @@ class App extends React.Component<{}, state> {
             fullscreenButton: true,
             infoBox: true,
             sceneModePicker: false,
-            selectionIndicator: false,
+            selectionIndicator: true,
             timeline: true,
             navigationHelpButton: false,
             navigationInstructionsInitiallyVisible: false,

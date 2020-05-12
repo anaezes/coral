@@ -1,4 +1,4 @@
-import {AuvJSON} from "../utils/AUVUtils";
+import {AuvJSON, Sample} from "../utils/AUVUtils";
 import Auv from "./Auv";
 import {TileJSON} from "../utils/TilesUtils";
 import Tile from "./Tile";
@@ -14,6 +14,13 @@ class AuvComponent {
     private startTime;
     private stopTime;
 
+    state = {
+        data: [],
+        isLoading: true,
+        error: false,
+        auvActive: Auv
+    };
+
     getAuvActive(){
         return this.auvActive;
     }
@@ -28,6 +35,7 @@ class AuvComponent {
         while(i < auvsOptions.length){
             if(auvChoosed  === auvsOptions[i].name) {
                 this.auvActive = new Auv(auvsOptions[i]);
+
                 found = true;
                 break;
             }
@@ -115,7 +123,18 @@ class AuvComponent {
 
                 console.log("underwater!!!");
                 return !underwater ? 1.0 : 0.0;
-            }, false)
+            }, false),
+
+            label: {
+                text: new Cesium.CallbackProperty(this.updateSamplesLabel(this.auvActive), false),
+                font: "20px sans-serif",
+                showBackground: true,
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                    0.0,
+                    100.0
+                ),
+                eyeOffset: new Cesium.Cartesian3(0, 1.5, 0),
+            }
         });
 
 
@@ -129,6 +148,30 @@ class AuvComponent {
             viewer.scene.camera.lookAt(entity.position.getValue(viewer.clock.currentTime), entity.orientation.getValue(viewer.clock.currentTime));
         });
     }
+
+    updateSamplesLabel(auv) {
+        return function callbackFunction() {
+            let result = "";
+            if(auv !== undefined){
+                auv.getSamples().forEach((sample: Sample, name: string) => {
+                    result += name + ": " + sample.value;
+                    if(name === "Temperature")
+                        result += "º";
+                    result += "\n";
+                    console.log(result);
+                });
+            }
+            return result;
+        };
+    }
+
+
+
+    processSample(sample: Sample) {
+        this.auvActive.addSample(sample);
+        //show
+    }
+
 }
 
 export default AuvComponent

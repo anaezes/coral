@@ -1,4 +1,4 @@
-import {AuvJSON, WaypointJSON} from '../utils/AUVUtils';
+import {AuvJSON, Sample, WaypointJSON} from '../utils/AUVUtils';
 const HEIGHT = 150.0;
 const Cesium = require('cesium');
 
@@ -13,6 +13,7 @@ class Auv {
     public stopTime: any;
     public heading: any;
     position: any;
+    samples = new Map<string, Sample>();
 
 
     constructor(auv: AuvJSON) {
@@ -67,6 +68,14 @@ class Auv {
     }
     public getPosition(){
         return this.position;
+    }
+
+    public addSample(sample: Sample) {
+        console.log(this.samples)
+        this.samples.set(sample.sampleType, sample);
+    }
+    public getSamples() {
+        return this.samples;
     }
 };
 
