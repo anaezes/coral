@@ -22,10 +22,7 @@ class BathymetryComponent {
 
     update(auvPosition, viewer, terrainExaggeration){
         this.findMainTile(auvPosition, viewer);
-
-        //let auvPosition;
         let dist, assetId;
-        //let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
 
         // Render neighbors
         this.tiles.forEach(tile => {
@@ -38,7 +35,7 @@ class BathymetryComponent {
                 }
             } else {
                 if(tile.active)
-                    this.removeTile(tile, viewer)
+                    this.removeTile(tile, viewer);
             }
         });
     }

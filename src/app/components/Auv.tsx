@@ -25,7 +25,6 @@ class Auv {
         }
 
         let waypoints: Array<WaypointJSON> = JSON.parse(JSON.stringify(auv.plan.waypoints));
-
         this.setVariables(waypoints);
 
         this.heading = auv.lastState.heading;
@@ -80,14 +79,11 @@ class Auv {
     }
 
     setVariables(waypoints: Array<WaypointJSON>) {
-        console.log("set variables antes: "+ this.longitude + ", " +this.latitude);
-        console.log(waypoints);
         this.waypoints = waypoints;
         this.longitude = this.waypoints[0].longitude;
         this.latitude = this.waypoints[0].latitude;
         this.startTime = this.waypoints[0].arrivalDate;
         this.stopTime = this.waypoints[this.waypoints.length-1].arrivalDate;
-        console.log("set variables depois: "+ this.longitude + ", " +this.latitude);
     }
 };
 

@@ -14,13 +14,6 @@ class AuvComponent {
     private startTime;
     private stopTime;
 
-    state = {
-        data: [],
-        isLoading: true,
-        error: false,
-        auvActive: Auv
-    };
-
     getAuvActive(){
         return this.auvActive;
     }
@@ -164,15 +157,14 @@ class AuvComponent {
                 auv.getSamples().forEach((sample: Sample, name: string) => {
                     result += name + ": " + sample.value;
                     if(name === "Temperature")
-                        result += "c";
+                        result += " ºC";
                     result += "\n";
                 });
             }
             return result;
         };
     }
-
-
+    
     processSample(sample: Sample) {
         this.auvActive.addSample(sample);
     }
@@ -180,7 +172,6 @@ class AuvComponent {
     updatePath(newPlan: Array<WaypointJSON>, viewer) {
         if(this.auvActive === undefined)
             return;
-
         this.auvActive.updatePath(newPlan);
         this.getBoundsTime(viewer);
         viewer.entities.removeById(this.entityAUV.id);

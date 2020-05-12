@@ -8,8 +8,7 @@ import AisComponent from "./components/AisComponent";
 import BathymetryComponent from "./components/BathymetryComponent";
 import AuvComponent from "./components/AuvComponent";
 import WeatherComponent from "./components/WeatherComponent";
-import {TileJSON} from "./utils/TilesUtils";
-import Tile from "./components/Tile";
+
 // Data
 import waypoints from '../data/waypointsTest.json';
 
@@ -17,9 +16,6 @@ const Cesium = require('cesium');
 const DEPTH = 0.0;
 const urlAuvs =  'https://ripples.lsts.pt/soi';
 const dummyCredit = document.createElement("div");
-
-
-
 
 interface state {
     data: Array<string>,
@@ -46,8 +42,8 @@ class App extends React.Component<{}, state> {
     private CesiumViewer: any;
     private container: any;
     private topView: any;
-    private auvComponent = new AuvComponent();
-    private bathymetryComponent = new BathymetryComponent();
+    //private auvComponent = new AuvComponent();
+    //private bathymetryComponent = new BathymetryComponent();
     private updateBathymetryIntervalId: any;
     private updateTopViewIntervalId: any;
     private weather = new WeatherComponent();
@@ -58,6 +54,9 @@ class App extends React.Component<{}, state> {
         8.0e6,
         0.0
     ));
+    private auvComponent: any;
+    private bathymetryComponent : any;
+
 
     state = {
         data: [],
@@ -111,7 +110,7 @@ class App extends React.Component<{}, state> {
 
         if('sampleType' in msg) {
             //TODO verify is sample belongs to active auv!
-            if(this.auvComponent.getAuvActive() !== undefined){
+            if(this.auvComponent !== undefined && this.auvComponent.getAuvActive() !== undefined){
                 this.auvComponent.processSample(msg);
             }
         }
@@ -267,13 +266,9 @@ class App extends React.Component<{}, state> {
      */
     private updateRender(data) : void {
         if(data.auvActive !== this.state.options.auvActive){
-
             this.CesiumViewer.entities.removeAll();
-
-            //todo resolve bug -> Reset tiles
             this.resetApp();
 
-            // Auv Render
             this.auvComponent.update(this.auvs, data.auvActive, this.CesiumViewer);
 
             this.initEnvironment();
@@ -419,10 +414,14 @@ class App extends React.Component<{}, state> {
 
         this.topView.reset();
 
-        //update auv postion !!!
-        this.auvComponent = new AuvComponent();
+        if(this.bathymetryComponent !== undefined)
+            this.bathymetryComponent.tiles.forEach(tile => {
+                this.bathymetryComponent.removeTile(tile, this.CesiumViewer);
+            });
 
         this.bathymetryComponent = new BathymetryComponent();
+        this.auvComponent = new AuvComponent();
+
         this.aisComponent = new AisComponent(0.2, 2,
             new Cesium.NearFarScalar(
                 1.5e2,
