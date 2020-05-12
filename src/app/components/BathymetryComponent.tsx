@@ -2,14 +2,14 @@ import Tile from "./Tile";
 import {TileJSON} from "../utils/TilesUtils";
 
 // Data
-import tiles from '../../data/coordTiles2.json';
+import tiles from '../../data/coordTiles.json';
 
 const Cesium = require('cesium');
 const DEPTH = 0.0;
 
 
 class BathymetryComponent {
-    private tiles: Array<Tile> = new Array<Tile>();
+    public tiles: Array<Tile> = new Array<Tile>();
     private mainTile: any;
     private ENU = new Cesium.Matrix4();
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import DatGui, {DatSelect, DatNumber, DatBoolean, DatFolder} from "react-dat-gui";
-import {AuvJSON} from './utils/AUVUtils';
+import {AuvJSON, WaypointJSON} from './utils/AUVUtils';
 import WaterEffect from "./components/WaterEffect";
 import WaterParticles from "./components/WaterParticles";
 import TopView from "./views/TopView";
@@ -8,11 +8,17 @@ import AisComponent from "./components/AisComponent";
 import BathymetryComponent from "./components/BathymetryComponent";
 import AuvComponent from "./components/AuvComponent";
 import WeatherComponent from "./components/WeatherComponent";
+import {TileJSON} from "./utils/TilesUtils";
+import Tile from "./components/Tile";
+// Data
+import waypoints from '../data/waypointsTest.json';
 
 const Cesium = require('cesium');
 const DEPTH = 0.0;
 const urlAuvs =  'https://ripples.lsts.pt/soi';
 const dummyCredit = document.createElement("div");
+
+
 
 
 interface state {
@@ -29,6 +35,7 @@ interface MenuOptions {
     waterEffects: boolean,
     ais: boolean,
     waves: boolean,
+    updatePlan: boolean
 }
 
 class App extends React.Component<{}, state> {
@@ -41,6 +48,9 @@ class App extends React.Component<{}, state> {
     private topView: any;
     private auvComponent = new AuvComponent();
     private bathymetryComponent = new BathymetryComponent();
+    private updateBathymetryIntervalId: any;
+    private updateTopViewIntervalId: any;
+    private weather = new WeatherComponent();
     private aisComponent: AisComponent = new AisComponent(0.2, 2,
         new Cesium.NearFarScalar(
         1.5e2,
@@ -62,14 +72,10 @@ class App extends React.Component<{}, state> {
             waves: false,
             world_temp: false,
             water_temp: false,
-            salinity: false
+            salinity: false,
+            updatePlan: false
         }
     };
-    private updateBathymetryIntervalId: any;
-    private updateTopViewIntervalId: any;
-    weather = new WeatherComponent();
-
-
 
     /**
      * Get all available AUV's
@@ -100,27 +106,23 @@ class App extends React.Component<{}, state> {
     }
 
     componentDidUpdate() {
-
         // Process data samples
         let msg = JSON.parse(JSON.stringify(this.state.wsMsg));
 
-       /* if('type' in msg && msg.type === "UUV"){
-            //last state
-            if(this.isReady && this.auvComponent.getAuvActive().name === msg.name){
-                // update
-                this.auvComponent.update(msg, this.CesiumViewer);
-            }
-            this.auvs.set(msg.name, msg);
-            if (!this.options.includes(msg.name)) {
-                this.options.push(msg.name);
-            }
-        }*/
-
         if('sampleType' in msg) {
+            //TODO verify is sample belongs to active auv!
             if(this.auvComponent.getAuvActive() !== undefined){
                 this.auvComponent.processSample(msg);
             }
         }
+
+        //test change plan
+/*        if('plan' in msg) {
+            console.log("new plan");
+            let newPlan : Array<WaypointJSON> = JSON.parse(JSON.stringify(waypoints.waypoints));
+            this.auvComponent.updatePath(newPlan, this.CesiumViewer);
+        }*/
+
     }
 
 
@@ -166,6 +168,7 @@ class App extends React.Component<{}, state> {
                             path="auvActive"
                             options={this.options}/>
                         <DatBoolean path='waterEffects' label='Water effects' />
+                        <DatBoolean path='updatePlan' label='Test update plan' />
                     </DatFolder>
                     <DatBoolean path='ais' label='AIS' />
                 </DatGui>
@@ -266,6 +269,8 @@ class App extends React.Component<{}, state> {
         if(data.auvActive !== this.state.options.auvActive){
 
             this.CesiumViewer.entities.removeAll();
+
+            //todo resolve bug -> Reset tiles
             this.resetApp();
 
             // Auv Render
@@ -310,6 +315,12 @@ class App extends React.Component<{}, state> {
 
         if(data.salinity !== this.state.options.salinity){
             this.weather.setSalinity(this.CesiumViewer, data.salinity);
+        }
+
+        if(data.updatePlan !== this.state.options.updatePlan){
+            let newPlan : Array<WaypointJSON> = JSON.parse(JSON.stringify(waypoints.waypoints));
+            this.auvComponent.updatePath(newPlan, this.CesiumViewer);
+            //todo reset tiles!
         }
 
         this.setState(prevState => ({
@@ -381,7 +392,8 @@ class App extends React.Component<{}, state> {
                         terrainExaggeration : app.state.options.terrainExaggeration,
                         waterEffects : app.state.options.waterEffects,
                         ais : app.state.options.ais,
-                        waves : app.state.options.waves
+                        waves : app.state.options.waves,
+                        updatePlan : app.state.options.updatePlan
                     };
                     app.updateRender(d);
                 }
@@ -406,7 +418,10 @@ class App extends React.Component<{}, state> {
         clearInterval(this.updateTopViewIntervalId);
 
         this.topView.reset();
+
+        //update auv postion !!!
         this.auvComponent = new AuvComponent();
+
         this.bathymetryComponent = new BathymetryComponent();
         this.aisComponent = new AisComponent(0.2, 2,
             new Cesium.NearFarScalar(

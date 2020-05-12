@@ -24,18 +24,11 @@ class Auv {
             return;
         }
 
-        // @todo copy
-        let w: Array<WaypointJSON> = JSON.parse(JSON.stringify(auv.plan.waypoints));
-        this.waypoints = w;
+        let waypoints: Array<WaypointJSON> = JSON.parse(JSON.stringify(auv.plan.waypoints));
 
-        this.longitude = this.waypoints[0].longitude;
-        this.latitude = this.waypoints[0].latitude;
-
-        this.startTime = this.waypoints[0].arrivalDate;
-        this.stopTime = this.waypoints[this.waypoints.length-1].arrivalDate;
+        this.setVariables(waypoints);
 
         this.heading = auv.lastState.heading;
-
         this.path = this.generatePath();
     }
 
@@ -70,12 +63,31 @@ class Auv {
         return this.position;
     }
 
+    public getPath(){
+        return this.path;
+    }
+
     public addSample(sample: Sample) {
-        console.log(this.samples)
         this.samples.set(sample.sampleType, sample);
     }
     public getSamples() {
         return this.samples;
+    }
+
+    public updatePath(waypoints: Array<WaypointJSON>){
+        this.setVariables(waypoints);
+        this.path = this.generatePath();
+    }
+
+    setVariables(waypoints: Array<WaypointJSON>) {
+        console.log("set variables antes: "+ this.longitude + ", " +this.latitude);
+        console.log(waypoints);
+        this.waypoints = waypoints;
+        this.longitude = this.waypoints[0].longitude;
+        this.latitude = this.waypoints[0].latitude;
+        this.startTime = this.waypoints[0].arrivalDate;
+        this.stopTime = this.waypoints[this.waypoints.length-1].arrivalDate;
+        console.log("set variables depois: "+ this.longitude + ", " +this.latitude);
     }
 };
 

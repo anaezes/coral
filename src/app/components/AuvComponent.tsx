@@ -1,4 +1,4 @@
-import {AuvJSON, Sample} from "../utils/AUVUtils";
+import {AuvJSON, Sample, WaypointJSON} from "../utils/AUVUtils";
 import Auv from "./Auv";
 import {TileJSON} from "../utils/TilesUtils";
 import Tile from "./Tile";
@@ -68,24 +68,14 @@ class AuvComponent {
     }
 
     createAuvModel(viewer) {
-        let longitude = this.auvActive.longitude;
-        let latitude = this.auvActive.latitude;
-
         viewer.scene.globe = new Cesium.Globe(Cesium.Ellipsoid.WGS84);
         viewer.scene.globe.baseColor =  new Cesium.Color(0.24,0.24,0.24,1);
         viewer.scene.globe.fillHighlightColor =  new Cesium.Color(0.24,0.24,0.24,1);
         viewer.scene.backgroundColor = new Cesium.Color(0.043,0.18,0.24,1);
 
-        viewer.camera.setView({
-            orientation: {
-                heading: 0.03295948729686427 + Cesium.Math.PI_OVER_TWO,
-                pitch: 0.0, //-Cesium.Math.PI_OVER_TWO (top view)
-                roll: 0.0
-            },
-            destination: Cesium.Cartesian3.fromDegrees(longitude - 0.00015, latitude, HEIGHT + 1.5)
-        });
 
         this.entityAUV = viewer.entities.add({
+            id: this.auvActive.name,
             //Set the entity availability to the same interval as the simulation time.
             availability: new Cesium.TimeIntervalCollection([new Cesium.TimeInterval({
                 start: this.startTime,
@@ -138,6 +128,24 @@ class AuvComponent {
         });
 
 
+        this.updateCamera(viewer);
+    }
+
+    updateCamera(viewer) {
+
+        let longitude = this.auvActive.longitude;
+        let latitude = this.auvActive.latitude;
+
+        viewer.camera.setView({
+            orientation: {
+                heading: 0.03295948729686427 + Cesium.Math.PI_OVER_TWO,
+                pitch: 0.0, //-Cesium.Math.PI_OVER_TWO (top view)
+                roll: 0.0
+            },
+            destination: Cesium.Cartesian3.fromDegrees(longitude - 0.00015, latitude, HEIGHT + 1.5)
+        });
+
+
         let entity = this.entityAUV;
         viewer.flyTo(entity).then(function () {
             viewer.trackedEntity = entity;
@@ -156,9 +164,8 @@ class AuvComponent {
                 auv.getSamples().forEach((sample: Sample, name: string) => {
                     result += name + ": " + sample.value;
                     if(name === "Temperature")
-                        result += "º";
+                        result += "c";
                     result += "\n";
-                    console.log(result);
                 });
             }
             return result;
@@ -166,11 +173,20 @@ class AuvComponent {
     }
 
 
-
     processSample(sample: Sample) {
         this.auvActive.addSample(sample);
-        //show
     }
+
+    updatePath(newPlan: Array<WaypointJSON>, viewer) {
+        if(this.auvActive === undefined)
+            return;
+
+        this.auvActive.updatePath(newPlan);
+        this.getBoundsTime(viewer);
+        viewer.entities.removeById(this.entityAUV.id);
+        this.createAuvModel(viewer);
+    }
+
 
 }
 
