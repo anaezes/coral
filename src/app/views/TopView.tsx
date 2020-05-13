@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import DatGui, {DatSelect} from "react-dat-gui";
 import Utils from "../utils/Utils";
 import Auv from "../components/Auv";
 import MenuView from "../utils/MenuTopView";
@@ -21,13 +22,15 @@ class TopView extends Component {
     state = {
         data: [],
         isLoading: true,
-        error: false
+        error: false,
+        options: []
     };
     private first: boolean = true;
     public showTopView: Boolean = false;
+    private options = ["AIS", "WAVES", "Ais + Waves"];
 
     async componentDidMount() {
-        if(this.viewer == null)
+        if (this.viewer == null)
             this.initCesium();
     }
 
@@ -37,20 +40,33 @@ class TopView extends Component {
         let latitude = Cesium.Math.toDegrees(result.latitude);
 
         this.viewer.camera.flyTo({
-            destination : new Cesium.Cartesian3.fromDegrees(longitude,  latitude, 5000.0)
+            destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 5000.0)
         });
     }
+
+    handleUpdate = newData =>
+        this.updateRender(newData);
 
     render() {
         if (this.state.error) {
             return <h1>Something went wrong.</h1>;
         }
 
+        const {options} = this.state;
+
         return (
             <div>
-                <MenuView/>
                 <div id="TopView"/>
-            </div>);
+                <DatGui id='my-gui-container' data={options} onUpdate={this.handleUpdate} style={{position: "absolute",top: "2px",left: "2px"}}>
+                    <DatSelect
+                        label="Views"
+                        path="auvActive"
+                        options={this.options} />
+
+                </DatGui>
+            </div>
+
+    );
     }
 
 
@@ -89,7 +105,7 @@ class TopView extends Component {
         let latitude = Cesium.Math.toDegrees(result.latitude);
 
         let e = this.viewer.entities.getById(auv.name);
-        if(e !== undefined){
+        if (e !== undefined) {
             e.position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
             return;
         }
@@ -112,8 +128,12 @@ class TopView extends Component {
         });
     }
 
-    reset(){
+    reset() {
         this.viewer.entities.removeAll();
+    }
+
+    private updateRender(newData: any) {
+        
     }
 }
 

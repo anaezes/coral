@@ -30,7 +30,8 @@ interface MenuOptions {
     terrainExaggeration: number,
     waterEffects: boolean,
     ais: boolean,
-    waves: boolean,
+    wavesHeight: boolean,
+    wavesVelocity: boolean,
     updatePlan: boolean
 }
 
@@ -68,7 +69,8 @@ class App extends React.Component<{}, state> {
             terrainExaggeration: 4,
             waterEffects: false,
             ais: false,
-            waves: false,
+            wavesHeight: false,
+            wavesVelocity: false,
             world_temp: false,
             water_temp: false,
             salinity: false,
@@ -155,7 +157,8 @@ class App extends React.Component<{}, state> {
                 {this.isReady && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
                 <DatGui data={options} onUpdate={this.handleUpdate}>
                     <DatFolder title="Global Weather">
-                        <DatBoolean path='waves' label='Waves'/>
+                        <DatBoolean path='wavesHeight' label='Waves height'/>
+                        <DatBoolean path='wavesVelocity' label='Waves velocity'/>
                         <DatBoolean path='water_temp' label='Water temperature'/>
                         <DatBoolean path='world_temp' label='World temperature' />
                         <DatBoolean path='salinity' label='Salinity' />
@@ -296,8 +299,12 @@ class App extends React.Component<{}, state> {
         if(data.ais !== this.state.options.ais)
           this.aisComponent.update(this.CesiumViewer, data.ais);
 
-        if(data.waves !== this.state.options.waves){
-            this.weather.setWaves(this.CesiumViewer, data.waves);
+        if(data.wavesHeight !== this.state.options.wavesHeight){
+            this.weather.setWavesHeight(this.CesiumViewer, data.wavesHeight);
+        }
+
+        if(data.wavesVelocity !== this.state.options.wavesVelocity){
+            this.weather.setWavesVelocity(this.CesiumViewer, data.wavesVelocity);
         }
 
         if(data.water_temp !== this.state.options.water_temp){
@@ -387,7 +394,8 @@ class App extends React.Component<{}, state> {
                         terrainExaggeration : app.state.options.terrainExaggeration,
                         waterEffects : app.state.options.waterEffects,
                         ais : app.state.options.ais,
-                        waves : app.state.options.waves,
+                        wavesHeight : app.state.options.wavesHeight,
+                        wavesVelocity: app.state.options.wavesVelocity,
                         updatePlan : app.state.options.updatePlan
                     };
                     app.updateRender(d);
