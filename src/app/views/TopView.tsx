@@ -1,16 +1,16 @@
 import React, { Component } from "react";
 import DatGui, {DatSelect} from "react-dat-gui";
-import Utils from "../utils/Utils";
 import Auv from "../components/Auv";
-import MenuView from "../utils/MenuTopView";
 import AisComponent from "../components/AisComponent";
+import EnvironmentComponent from "../components/EnvironmentComponent";
 
 const Cesium = require('cesium');
 const dummyCredit = document.createElement("div");
-//const topView = document.createElement("TopView");
+const options = ["None", "AIS Density", "Waves Height", "Waves Velocity","Water temperature", "Salinity", "Bathymetry", "Wrecks" ];
 
 class TopView extends Component {
     private viewer: any;
+    private environment = new EnvironmentComponent();
     private aisComponent: AisComponent = new AisComponent(0.1, 1.5,
         new Cesium.NearFarScalar(
             1.5e2,
@@ -23,11 +23,10 @@ class TopView extends Component {
         data: [],
         isLoading: true,
         error: false,
-        options: []
+        layerActive: ''
     };
     private first: boolean = true;
     public showTopView: Boolean = false;
-    private options = ["AIS", "WAVES", "Ais + Waves"];
 
     async componentDidMount() {
         if (this.viewer == null)
@@ -52,21 +51,20 @@ class TopView extends Component {
             return <h1>Something went wrong.</h1>;
         }
 
-        const {options} = this.state;
-
         return (
             <div>
                 <div id="TopView"/>
-                <DatGui id='my-gui-container' data={options} onUpdate={this.handleUpdate} style={{position: "absolute",top: "2px",left: "2px"}}>
+                <DatGui id='my-gui-container' data={this.state} onUpdate={this.handleUpdate}
+                        style={{position: "absolute", top: "2px", left: "2px"}}>
                     <DatSelect
                         label="Views"
-                        path="auvActive"
-                        options={this.options} />
+                        path="layerActive"
+                        options={options}/>
 
                 </DatGui>
             </div>
 
-    );
+        );
     }
 
 
@@ -132,8 +130,48 @@ class TopView extends Component {
         this.viewer.entities.removeAll();
     }
 
-    private updateRender(newData: any) {
-        
+    private updateRender(data: any) {
+
+        if (data.layerActive !== this.state.layerActive) {
+            this.environment.clearAllLayer(this.viewer);
+
+            switch(data.layerActive.toString()) {
+                case "Waves Height": {
+                    this.environment.setWavesHeight(this.viewer);
+                    break;
+                }
+                case "Waves Velocity": {
+                    this.environment.setWavesVelocity(this.viewer);
+                    break;
+                }
+                case "Water temperature": {
+                    this.environment.setWaterTemp(this.viewer);
+                    break;
+                }
+                case "Salinity": {
+                    this.environment.setSalinity(this.viewer);
+                    break;
+                }
+                case "AIS Density": {
+                    this.environment.showAisDensity(this.viewer);
+                    break;
+                }
+                case "Bathymetry": {
+                    this.environment.showBathymetryGlobe(this.viewer);
+                    break;
+                }
+                case "Wrecks": {
+                    this.environment.showWrecks(this.viewer);
+                    break;
+                }
+            }
+
+            this.state.layerActive = data.layerActive;
+        }
+
+        this.setState(prevState => ({
+            state: {...prevState, ...data.layerActive}
+        }));
     }
 }
 

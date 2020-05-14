@@ -342,7 +342,7 @@ class App extends React.Component<{}, state> {
         }
 
         if(data.aisDensity !== this.state.options.aisDensity){
-            AisComponent.showAisDensity(this.CesiumViewer, data.aisDensity);
+            this.environment.showAisDensity(this.CesiumViewer, data.aisDensity);
         }
 
         if(data.updatePlan !== this.state.options.updatePlan){

@@ -11,7 +11,9 @@ class EnvironmentComponent {
     wrecksLayer = null;
     wrecksLayerWorldTerrain =  null;
     bathymetryLayer = null ;
+    aisDensityLayer = null;
     static legend;
+
 
     getImage(url, autentication?){
         return fetch(url,{
@@ -32,7 +34,7 @@ class EnvironmentComponent {
     * World temperature of a given date (daily)
     * TODO: pedir por wms se possivel + arrajnar + contas meteomatics -> random
     ***/
-    setWorldTemp(viewer: any, display: boolean, date? ) {
+    setWorldTemp(viewer: any, display?: boolean, date? ) {
         if (!display) {
             viewer.imageryLayers.remove(this.worldLayer);
             this.worldLayer = null;
@@ -63,10 +65,11 @@ class EnvironmentComponent {
     /*
     * Salinity of a given date (daily)
     * **/
-    setSalinity(viewer, display:boolean, date?){
+    setSalinity(viewer, display:boolean = true, date?){
         if (!display) {
             viewer.imageryLayers.remove(this.salinityLayer);
             this.salinityLayer = null;
+            EnvironmentComponent.legend = null;
         } else {
             let today;
             date === undefined ? today = new Date() : today = date;
@@ -105,7 +108,7 @@ class EnvironmentComponent {
     /*
     * Water temperature of a given date (daily)
     * **/
-    setWaterTemp(viewer: any, display: boolean, date?) {
+    setWaterTemp(viewer: any, display:boolean = true, date?) {
         if (!display) {
             viewer.imageryLayers.remove(this.waterTempLayer);
             this.waterTempLayer = null;
@@ -147,9 +150,8 @@ class EnvironmentComponent {
 
     /*
     * Mean waves velocity of a given date (hourly)
-    * TODO: MELHORAR
     ***/
-    setWavesVelocity(viewer: any, display: boolean, date?: any) {
+    setWavesVelocity(viewer: any, display:boolean = true, date?: any) {
         if (!display) {
             viewer.imageryLayers.remove(this.wavesVelocityLayer);
             this.wavesVelocityLayer = null;
@@ -202,11 +204,12 @@ class EnvironmentComponent {
     /*
     * Mean waves height of a given date (update every 3 hours)
     ***/
-    setWavesHeight(viewer: any, display: boolean, date?: any) {
+    setWavesHeight(viewer: any, display:boolean = true, date?: any) {
         if (!display) {
             viewer.imageryLayers.remove(this.wavesHeightLayer);
             this.wavesHeightLayer = null;
             EnvironmentComponent.legend = undefined;
+            return;
         } else {
             this.wavesHeightLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
@@ -239,11 +242,10 @@ class EnvironmentComponent {
     /*
      * Show wrecks
      * **/
-    showWrecks(viewer: any, display: boolean) {
+    showWrecks(viewer: any, display:boolean = true) {
         if (!display) {
             viewer.imageryLayers.remove(this.wrecksLayer);
             viewer.imageryLayers.remove(this.wrecksLayerWorldTerrain);
-            this.wrecksLayer = null;
             this.wrecksLayer = null;
             viewer.terrainProvider = Cesium.createWorldTerrain({
                 requestWaterMask: true,
@@ -267,6 +269,7 @@ class EnvironmentComponent {
                     }
                 })
             );
+
             viewer.terrainProvider = Cesium.createWorldTerrain({
                 requestWaterMask: false,
             });
@@ -280,7 +283,7 @@ class EnvironmentComponent {
         }
     }
 
-    showBathymetryGlobe(viewer, display:boolean){
+    showBathymetryGlobe(viewer, display:boolean = true){
         if (!display) {
             viewer.imageryLayers.remove(this.bathymetryLayer);
             this.bathymetryLayer = null;
@@ -309,6 +312,32 @@ class EnvironmentComponent {
             img.src = url;
             EnvironmentComponent.legend = img;
 
+            return this.bathymetryLayer;
+        }
+    }
+
+    showAisDensity(viewer, display:boolean = true){
+        if (!display) {
+            viewer.imageryLayers.remove(this.aisDensityLayer);
+            this.aisDensityLayer = null;
+        } else {
+            this.aisDensityLayer = viewer.imageryLayers.addImageryProvider(
+                new Cesium.WebMapServiceImageryProvider({
+                    url: "https://ows.emodnet-humanactivities.eu/wms",
+                    layers: "emodnet:2017_01_st_All",
+                    parameters: {
+                        service:"WMS",
+                        request: "GetMap",
+                        version: "1.3.0",
+                        format:"image/png",
+                        transparent: "true",
+                        isBaseLayer: 'false',
+                        singleTile: 'false',
+                        transitionEffect: 'resize',
+                        attribution:"EMODNET"
+                    },
+                })
+            );
         }
     }
 
@@ -333,5 +362,25 @@ class EnvironmentComponent {
     }
 
 
+    clearAllLayer(viewer: any) {
+        viewer.imageryLayers.remove(this.bathymetryLayer);
+        viewer.imageryLayers.remove(this.wrecksLayer);
+        viewer.imageryLayers.remove(this.wrecksLayerWorldTerrain);
+        viewer.imageryLayers.remove(this.wavesHeightLayer);
+        viewer.imageryLayers.remove(this.salinityLayer);
+        viewer.imageryLayers.remove(this.wavesVelocityLayer);
+        viewer.imageryLayers.remove(this.waterTempLayer);
+        viewer.imageryLayers.remove(this.aisDensityLayer);
+
+        this.aisDensityLayer = null;
+        this.waterTempLayer = null;
+        this.wavesVelocityLayer = null;
+        this.salinityLayer = null;
+        this.wavesHeightLayer = null;
+        this.wrecksLayer = null;
+        this.bathymetryLayer = null;
+
+        EnvironmentComponent.legend = undefined;
+    }
 }
 export default EnvironmentComponent
