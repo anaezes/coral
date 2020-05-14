@@ -12,6 +12,7 @@ class AisComponent {
     private scale: any;
     private scaleByDistance: any;
     private width: any;
+    private static aisDensityLayer: any = null;
 
     constructor(scale, width, scaleByDistance){
         this.scale = scale;
@@ -117,6 +118,44 @@ class AisComponent {
         entity.position = Cesium.Cartesian3.fromDegrees(ais.longitude, ais.latitude);
         entity.billboard.rotation = Cesium.Math.toRadians(ais.heading % 360);
     }
-}
 
+    /*
+    ar layer = new OpenLayers.Layer.WMS(
+        'Vessel Density', 'https://ows.emodnet-humanactivities.eu/wms?',
+        {
+        'format':'image/png',
+        'transparent': true,
+        'layers': ['emodnet:2017_01_st_All']
+        },
+        {isBaseLayer: false, singleTile: false, isBaseLayer: true, transitionEffect: 'resize' }
+        );
+    */
+
+    static showAisDensity(viewer, display:boolean){
+        if (!display) {
+            viewer.imageryLayers.remove(this.aisDensityLayer);
+            this.aisDensityLayer = null;
+        } else {
+            this.aisDensityLayer = viewer.imageryLayers.addImageryProvider(
+                new Cesium.WebMapServiceImageryProvider({
+                    url: "https://ows.emodnet-humanactivities.eu/wms",
+                    layers: "emodnet:2017_01_st_All",
+                    parameters: {
+                        service:"WMS",
+                        request: "GetMap",
+                        version: "1.3.0",
+                        format:"image/png",
+                        transparent: "true",
+                        isBaseLayer: 'false',
+                        singleTile: 'false',
+                        transitionEffect: 'resize',
+                        //opacity:"0.5",
+                        //maxNativeZoom:"10",
+                        attribution:"EMODNET"
+                    },
+                })
+            );
+        }
+    }
+}
 export default AisComponent;

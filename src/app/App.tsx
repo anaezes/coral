@@ -7,7 +7,7 @@ import TopView from "./views/TopView";
 import AisComponent from "./components/AisComponent";
 import BathymetryComponent from "./components/BathymetryComponent";
 import AuvComponent from "./components/AuvComponent";
-import WeatherComponent from "./components/WeatherComponent";
+import EnvironmentComponent from "./components/EnvironmentComponent";
 
 // Data
 import waypoints from '../data/waypointsTest.json';
@@ -47,7 +47,7 @@ class App extends React.Component<{}, state> {
     //private bathymetryComponent = new BathymetryComponent();
     private updateBathymetryIntervalId: any;
     private updateTopViewIntervalId: any;
-    private weather = new WeatherComponent();
+    private environment = new EnvironmentComponent();
     private aisComponent: AisComponent = new AisComponent(0.2, 2,
         new Cesium.NearFarScalar(
         1.5e2,
@@ -69,11 +69,14 @@ class App extends React.Component<{}, state> {
             terrainExaggeration: 4,
             waterEffects: false,
             ais: false,
+            aisDensity: false,
             wavesHeight: false,
             wavesVelocity: false,
             world_temp: false,
             water_temp: false,
             salinity: false,
+            bathymetry: false,
+            wrecks: false,
             updatePlan: false
         }
     };
@@ -156,12 +159,14 @@ class App extends React.Component<{}, state> {
                 <div id="Container" ref={element => this.container = element}/>
                 {this.isReady && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
                 <DatGui data={options} onUpdate={this.handleUpdate}>
-                    <DatFolder title="Global Weather">
+                    <DatFolder title="Environment">
                         <DatBoolean path='wavesHeight' label='Waves height'/>
                         <DatBoolean path='wavesVelocity' label='Waves velocity'/>
+                        <DatBoolean path='salinity' label='Salinity' />
                         <DatBoolean path='water_temp' label='Water temperature'/>
                         <DatBoolean path='world_temp' label='World temperature' />
-                        <DatBoolean path='salinity' label='Salinity' />
+                        <DatBoolean path='bathymetry' label='Bathymetry' />
+                        <DatBoolean path='wrecks' label='Wrecks' />
                     </DatFolder>
                     <DatFolder title="AUV Tracking">
                         <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
@@ -172,12 +177,21 @@ class App extends React.Component<{}, state> {
                         <DatBoolean path='waterEffects' label='Water effects' />
                         <DatBoolean path='updatePlan' label='Test update plan' />
                     </DatFolder>
-                    <DatBoolean path='ais' label='AIS' />
+                    <DatFolder title="AIS">
+                        <DatBoolean path='aisDensity' label='AIS density' />
+                        <DatBoolean path='ais' label='AIS' />
+                    </DatFolder>
+
                 </DatGui>
-                <TopView ref={element => this.topView = element}/>/>
+                <div id="legend-box">
+                    {EnvironmentComponent.legend !== undefined?  <img src={EnvironmentComponent.legend.src}/>  : <div/>}
+                </div>
+                <TopView ref={element => this.topView = element}/>
             </div>
         );
     }
+
+
 
     /**
      * Init and make the initial cesium viewer settings
@@ -300,23 +314,35 @@ class App extends React.Component<{}, state> {
           this.aisComponent.update(this.CesiumViewer, data.ais);
 
         if(data.wavesHeight !== this.state.options.wavesHeight){
-            this.weather.setWavesHeight(this.CesiumViewer, data.wavesHeight);
+            this.environment.setWavesHeight(this.CesiumViewer, data.wavesHeight);
         }
 
         if(data.wavesVelocity !== this.state.options.wavesVelocity){
-            this.weather.setWavesVelocity(this.CesiumViewer, data.wavesVelocity);
+            this.environment.setWavesVelocity(this.CesiumViewer, data.wavesVelocity);
         }
 
         if(data.water_temp !== this.state.options.water_temp){
-            this.weather.setWaterTemp(this.CesiumViewer, data.water_temp);
+            this.environment.setWaterTemp(this.CesiumViewer, data.water_temp);
         }
 
         if(data.world_temp !== this.state.options.world_temp){
-            this.weather.setWorldTemp(this.CesiumViewer, data.world_temp);
+            this.environment.setWorldTemp(this.CesiumViewer, data.world_temp);
+        }
+
+        if(data.wrecks !== this.state.options.wrecks){
+            this.environment.showWrecks(this.CesiumViewer, data.wrecks);
         }
 
         if(data.salinity !== this.state.options.salinity){
-            this.weather.setSalinity(this.CesiumViewer, data.salinity);
+            this.environment.setSalinity(this.CesiumViewer, data.salinity);
+        }
+
+        if(data.bathymetry !== this.state.options.bathymetry){
+            this.environment.showBathymetryGlobe(this.CesiumViewer, data.bathymetry);
+        }
+
+        if(data.aisDensity !== this.state.options.aisDensity){
+            AisComponent.showAisDensity(this.CesiumViewer, data.aisDensity);
         }
 
         if(data.updatePlan !== this.state.options.updatePlan){

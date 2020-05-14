@@ -2,20 +2,24 @@ import moment from "moment";
 
 const Cesium = require('cesium');
 
-class WeatherComponent {
+class EnvironmentComponent {
     wavesHeightLayer =  null;
     worldLayer = null;
     waterTempLayer = null;
     salinityLayer = null;
     wavesVelocityLayer = null;
+    wrecksLayer = null;
+    wrecksLayerWorldTerrain =  null;
+    bathymetryLayer = null ;
+    static legend;
 
-    getImage(url){
+    getImage(url, autentication?){
         return fetch(url,{
             method: 'GET',
             credentials: 'same-origin',
             headers: {
                 "Content-Type": "text/plain",
-                'Authorization': 'Basic ' + btoa('faculdadedeengenhariadoporto_santos:5xHPl1YW0gsUb')}
+                'Authorization': 'Basic ' + btoa(autentication)}
         }).then( r => r.blob() ) // consume as a Blob
             .then( blob => {
                 const url = URL.createObjectURL( blob );
@@ -32,12 +36,14 @@ class WeatherComponent {
         if (!display) {
             viewer.imageryLayers.remove(this.worldLayer);
             this.worldLayer = null;
+            EnvironmentComponent.legend = undefined;
         } else {
             let today;
             date === undefined ? today = new Date() : today = date;
             today.setHours(12);
             let url = 'https://api.meteomatics.com/' + this.formatDateForRequest(today) + '/t_0m:C/90,-180_-90,180:600x400/png';
-            this.getImage(url).then(image => {
+            let autentication = 'faculdadedeengenhariadoporto_santos:5xHPl1YW0gsUb';
+            this.getImage(url, autentication).then(image => {
                 this.worldLayer = viewer.imageryLayers.addImageryProvider(new Cesium.SingleTileImageryProvider({
                     url: image,
                     rectangle: Cesium.Rectangle.fromDegrees(
@@ -45,8 +51,13 @@ class WeatherComponent {
                         -90.0,
                         180.0,
                         90.0),
-                })); })
-            }
+                }));
+            });
+
+            let img = document.createElement('img');
+            img.src = "../images/worldTemp-legend.png";
+            EnvironmentComponent.legend = img;
+        }
     }
 
     /*
@@ -80,6 +91,14 @@ class WeatherComponent {
                     },
                 })
             );
+
+            let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
+                'request=GetLegendGraphic&layer=so&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
+                '&version=1.1.1&colorscalerange=31%2C39&belowmincolor=extend&belowmaxcolor=extend' +
+                '&width=256&height=256&srs=EPSG%3A3857&'
+            let img = document.createElement('img');
+            img.src = url;
+            EnvironmentComponent.legend = img;
         }
     }
 
@@ -90,12 +109,8 @@ class WeatherComponent {
         if (!display) {
             viewer.imageryLayers.remove(this.waterTempLayer);
             this.waterTempLayer = null;
+            EnvironmentComponent.legend = undefined;
         } else {
-            // TODO
-            //http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&request=GetLegendGraphic
-            // //&layer=thetao&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true&version=1.1.1&colorscalerange=0%2C36&
-            // belowmincolor=extend&belowmaxcolor=extend&width=256&height=256&srs=EPSG%3A3857&
-
             let today;
             date === undefined ? today = new Date() : today = date;
             today.setHours(12);
@@ -104,31 +119,46 @@ class WeatherComponent {
                     url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024",
                     layers: "thetao",
                     parameters: {
-                        service:"WMS",
+                        service: "WMS",
                         request: "GetMap",
                         version: "1.3.0",
-                        format:"image/png",
-                        styles:"boxfill/sst_36",
+                        format: "image/png",
+                        styles: "boxfill/sst_36",
                         transparent: "true",
-                        colorscalerange:"0,36",
-                        belowmincolor:"extend",
-                        belowmaxcolor:"extend",
-                        elevation:"-0.49402499198913574",
-                        attribution:"E.U. Copernicus Marine Service Information",
+                        colorscalerange: "0,36",
+                        belowmincolor: "extend",
+                        belowmaxcolor: "extend",
+                        elevation: "-0.49402499198913574",
+                        attribution: "E.U. Copernicus Marine Service Information",
                         time: encodeURI(this.formatDateForRequest(today)),
                     },
                 })
             );
+
+            let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
+                'request=GetLegendGraphic&layer=thetao&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
+                '&version=1.1.1&colorscalerange=0%2C36&belowmincolor=extend&belowmaxcolor=extend' +
+                '&width=256&height=256&srs=EPSG%3A3857&'
+            let img = document.createElement('img');
+                img.src = url;
+                EnvironmentComponent.legend = img;
         }
     }
 
     /*
     * Mean waves velocity of a given date (hourly)
+    * TODO: MELHORAR
     ***/
     setWavesVelocity(viewer: any, display: boolean, date?: any) {
         if (!display) {
             viewer.imageryLayers.remove(this.wavesVelocityLayer);
             this.wavesVelocityLayer = null;
+            EnvironmentComponent.legend = undefined;
+
+            viewer.terrainProvider = Cesium.createWorldTerrain({
+                requestWaterMask: true,
+            });
+
         } else {
             let today;
             date === undefined ? today = new Date() : today = date;
@@ -154,6 +184,18 @@ class WeatherComponent {
                     },
                 })
             );
+
+            viewer.terrainProvider = Cesium.createWorldTerrain({
+                requestWaterMask: false,
+            });
+
+            let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
+                'request=GetLegendGraphic&layer=sea_water_velocity&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
+                '&version=1.1.1&colorscalerange=0.00193016%2C1.9712055&belowmincolor=extend&belowmaxcolor=extend' +
+                '&width=256&height=256&srs=EPSG%3A3857&'
+            let img = document.createElement('img');
+            img.src = url;
+            EnvironmentComponent.legend = img;
         }
     }
 
@@ -164,6 +206,7 @@ class WeatherComponent {
         if (!display) {
             viewer.imageryLayers.remove(this.wavesHeightLayer);
             this.wavesHeightLayer = null;
+            EnvironmentComponent.legend = undefined;
         } else {
             this.wavesHeightLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
@@ -182,8 +225,93 @@ class WeatherComponent {
                     },
                 })
             );
+
+            let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027?service=WMS&' +
+                'request=GetLegendGraphic&layer=VHM0&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
+                '&version=1.1.1&colorscalerange=0.01%2C10&belowmincolor=extend&belowmaxcolor=extend' +
+                '&width=256&height=256&srs=EPSG%3A3857&'
+            let img = document.createElement('img');
+            img.src = url;
+            EnvironmentComponent.legend = img;
         }
     }
+
+    /*
+     * Show wrecks
+     * **/
+    showWrecks(viewer: any, display: boolean) {
+        if (!display) {
+            viewer.imageryLayers.remove(this.wrecksLayer);
+            viewer.imageryLayers.remove(this.wrecksLayerWorldTerrain);
+            this.wrecksLayer = null;
+            this.wrecksLayer = null;
+            viewer.terrainProvider = Cesium.createWorldTerrain({
+                requestWaterMask: true,
+            });
+            EnvironmentComponent.legend = undefined;
+        } else {
+            this.wrecksLayerWorldTerrain = viewer.imageryLayers.addImageryProvider(
+                new Cesium.IonImageryProvider({ assetId: 3813 })
+            );
+            this.wrecksLayer = viewer.imageryLayers.addImageryProvider(
+                new Cesium.WebMapServiceImageryProvider({
+                    url: "http://geoserver1.oceanwise.eu/wms",
+                    layers: "BASEMAP:wrecks_EMODNet",
+                    parameters: {
+                        service: "WMS",
+                        request: "GetMap",
+                        version: "1.3.0",
+                        format: "image/png",
+                        transparent: "true",
+                        attribution: "EMODNET"
+                    }
+                })
+            );
+            viewer.terrainProvider = Cesium.createWorldTerrain({
+                requestWaterMask: false,
+            });
+
+            let url = 'http://geoserver1.oceanwise.eu/ows?service=WMS&request=GetLegendGraphic&format=image%2Fpng&' +
+                'width=20&height=20&layer=wrecks_EMODNet'
+            let img = document.createElement('img');
+            img.src = url;
+            EnvironmentComponent.legend = img;
+
+        }
+    }
+
+    showBathymetryGlobe(viewer, display:boolean){
+        if (!display) {
+            viewer.imageryLayers.remove(this.bathymetryLayer);
+            this.bathymetryLayer = null;
+            EnvironmentComponent.legend = undefined;
+        } else {
+            this.bathymetryLayer = viewer.imageryLayers.addImageryProvider(
+                new Cesium.WebMapServiceImageryProvider({
+                    url: "https://ows.emodnet-bathymetry.eu/wms",
+                    layers: "mean_multicolour",
+                    parameters: {
+                        service:"WMS",
+                        request: "GetMap",
+                        version: "1.3.0",
+                        format:"image/png",
+                        opacity: "0.5",
+                        transparent: "true",
+                        belowmincolor:"extend",
+                        belowmaxcolor:"extend",
+                        attribution:"EMODNET"
+                    },
+                })
+            );
+
+            let url = 'https://ows.emodnet-bathymetry.eu/legends/legend_multicolour.png'
+            let img = document.createElement('img');
+            img.src = url;
+            EnvironmentComponent.legend = img;
+
+        }
+    }
+
 
     getTime(multiple: number, d?: any){
         let date;
@@ -206,4 +334,4 @@ class WeatherComponent {
 
 
 }
-export default WeatherComponent
+export default EnvironmentComponent

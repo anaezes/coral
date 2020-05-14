@@ -12,6 +12,7 @@ class BathymetryComponent {
     public tiles: Array<Tile> = new Array<Tile>();
     private mainTile: any;
     private ENU = new Cesium.Matrix4();
+    private static bathymetryLayer: any = null;
 
     constructor() {
         let t : Array<TileJSON> = JSON.parse(JSON.stringify(tiles.tiles));
