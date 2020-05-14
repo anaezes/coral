@@ -84,16 +84,6 @@ body {
   width: 75%;
 }
 
-.react-dat-gui .cr .label-text {
-  width: 80% !important;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
 .react-dat-gui .cr.boolean .checkbox-container {
   width: 10% !important;
 }

@@ -32,6 +32,13 @@ interface MenuOptions {
     ais: boolean,
     wavesHeight: boolean,
     wavesVelocity: boolean,
+    aisDensity: boolean,
+    world_temp: boolean,
+    water_temp: boolean,
+    salinity: boolean,
+    bathymetry: boolean,
+    wrecks: boolean,
+
     updatePlan: boolean
 }
 
@@ -39,7 +46,7 @@ class App extends React.Component<{}, state> {
     private isSystemInit: boolean = false;
     private options: Array<string> = ['None'];
     private auvs: Array<AuvJSON> = [];
-    private isReady: boolean = false;
+    private isUnderwater: boolean = false;
     private CesiumViewer: any;
     private container: any;
     private topView: any;
@@ -157,8 +164,8 @@ class App extends React.Component<{}, state> {
         return (
             <div>
                 <div id="Container" ref={element => this.container = element}/>
-                {this.isReady && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
-                <DatGui data={options} onUpdate={this.handleUpdate}>
+                {this.isUnderwater && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
+                <DatGui class="mainview" data={options} onUpdate={this.handleUpdate} labelWidth="60%">
                     <DatFolder title="Environment">
                         <DatBoolean path='wavesHeight' label='Waves height'/>
                         <DatBoolean path='wavesVelocity' label='Waves velocity'/>
@@ -243,7 +250,7 @@ class App extends React.Component<{}, state> {
         //this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
         //this.CesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
-        this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
+        //this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
 
         //Set the random number seed for consistent results.
         Cesium.Math.setRandomNumberSeed(3);
@@ -289,9 +296,11 @@ class App extends React.Component<{}, state> {
 
             if (data.auvActive === 'None') {
                 this.CesiumViewer.scene.globe.show = true;
+                this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
                 this.CesiumViewer.camera.flyHome(3);
                 this.topView.resetView();
-                return;
+                this.createPins();
+                this.isUnderwater = false;
             } else {
                 this.auvComponent.update(this.auvs, data.auvActive, this.CesiumViewer);
 
@@ -307,12 +316,12 @@ class App extends React.Component<{}, state> {
                 this.updateTopView();
                 this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 3000);
 
-                this.isReady = true;
+                this.isUnderwater = true;
             }
         }
 
         if(data.terrainExaggeration !== this.state.options.terrainExaggeration) {
-            if(this.isReady){
+            if(this.isUnderwater){
                 this.bathymetryComponent.onTerrainExaggeration(this.CesiumViewer, data.terrainExaggeration);
             }
         }
@@ -429,6 +438,12 @@ class App extends React.Component<{}, state> {
                         ais : app.state.options.ais,
                         wavesHeight : app.state.options.wavesHeight,
                         wavesVelocity: app.state.options.wavesVelocity,
+                        aisDensity: app.state.options.aisDensity,
+                        world_temp: app.state.options.world_temp,
+                        water_temp: app.state.options.water_temp,
+                        salinity: app.state.options.salinity,
+                        bathymetry: app.state.options.bathymetry,
+                        wrecks: app.state.options.wrecks,
                         updatePlan : app.state.options.updatePlan
                     };
                     app.updateRender(d);

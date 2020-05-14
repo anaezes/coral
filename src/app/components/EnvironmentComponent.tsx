@@ -312,6 +312,8 @@ class EnvironmentComponent {
             img.src = url;
             EnvironmentComponent.legend = img;
 
+            console.log("passei por aqui");
+
             return this.bathymetryLayer;
         }
     }

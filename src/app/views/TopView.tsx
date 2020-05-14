@@ -54,8 +54,8 @@ class TopView extends Component {
         return (
             <div>
                 <div id="TopView"/>
-                <DatGui id='my-gui-container' data={this.state} onUpdate={this.handleUpdate}
-                        style={{position: "absolute", top: "2px", left: "2px"}}>
+                <DatGui id='my-gui-container' class='my-gui-container topView' data={this.state} onUpdate={this.handleUpdate}
+                        labelWidth="0" style={{position: "absolute", top: "2px", left: "2px", width: "10%"}}>
                     <DatSelect
                         label="Views"
                         path="layerActive"
@@ -63,7 +63,6 @@ class TopView extends Component {
 
                 </DatGui>
             </div>
-
         );
     }
 
