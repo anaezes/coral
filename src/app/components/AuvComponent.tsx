@@ -61,9 +61,10 @@ class AuvComponent {
     }
 
     createAuvModel(viewer) {
-        viewer.scene.globe = new Cesium.Globe(Cesium.Ellipsoid.WGS84);
-        viewer.scene.globe.baseColor =  new Cesium.Color(0.24,0.24,0.24,1);
-        viewer.scene.globe.fillHighlightColor =  new Cesium.Color(0.24,0.24,0.24,1);
+        //viewer.scene.globe = new Cesium.Globe(Cesium.Ellipsoid.WGS84);
+        //viewer.scene.globe.baseColor =  new Cesium.Color(0.24,0.24,0.24,1);
+        //viewer.scene.globe.fillHighlightColor =  new Cesium.Color(0.24,0.24,0.24,1);
+        viewer.scene.globe.show = false;
         viewer.scene.backgroundColor = new Cesium.Color(0.043,0.18,0.24,1);
 
 

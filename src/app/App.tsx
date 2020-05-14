@@ -37,7 +37,7 @@ interface MenuOptions {
 
 class App extends React.Component<{}, state> {
     private isSystemInit: boolean = false;
-    private options: Array<string> = [];
+    private options: Array<string> = ['None'];
     private auvs: Array<AuvJSON> = [];
     private isReady: boolean = false;
     private CesiumViewer: any;
@@ -282,26 +282,33 @@ class App extends React.Component<{}, state> {
      * Handles user input and updates components accordingly
      */
     private updateRender(data) : void {
-        if(data.auvActive !== this.state.options.auvActive){
+        if(data.auvActive !== this.state.options.auvActive) {
+            this.state.options.auvActive = data.auvActive;
             this.CesiumViewer.entities.removeAll();
             this.resetApp();
 
-            this.auvComponent.update(this.auvs, data.auvActive, this.CesiumViewer);
+            if (data.auvActive === 'None') {
+                this.CesiumViewer.scene.globe.show = true;
+                this.CesiumViewer.camera.flyHome(3);
+                this.topView.resetView();
+                return;
+            } else {
+                this.auvComponent.update(this.auvs, data.auvActive, this.CesiumViewer);
 
-            this.initEnvironment();
+                this.initEnvironment();
 
-            // Bathymetry update
-            let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
-            this.bathymetryComponent.update(auvPosition, this.CesiumViewer, this.state.options.terrainExaggeration);
-            this.updateBathymetryIntervalId = setInterval(this.updateBathymetry.bind(this), 500);
+                // Bathymetry update
+                let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
+                this.bathymetryComponent.update(auvPosition, this.CesiumViewer, this.state.options.terrainExaggeration);
+                this.updateBathymetryIntervalId = setInterval(this.updateBathymetry.bind(this), 500);
 
-            // Top view
-            this.topView.showTopView = true;
-            this.updateTopView();
-            this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 3000);
+                // Top view
+                this.topView.showTopView = true;
+                this.updateTopView();
+                this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 3000);
 
-            this.isReady = true;
-            this.state.options.auvActive = data.auvActive;
+                this.isReady = true;
+            }
         }
 
         if(data.terrainExaggeration !== this.state.options.terrainExaggeration) {

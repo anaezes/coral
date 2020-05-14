@@ -173,6 +173,10 @@ class TopView extends Component {
             state: {...prevState, ...data.layerActive}
         }));
     }
+
+    resetView() {
+        this.viewer.camera.flyHome(3);
+    }
 }
 
 export default TopView;
