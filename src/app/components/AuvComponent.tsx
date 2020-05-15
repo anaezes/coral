@@ -22,7 +22,7 @@ class AuvComponent {
         return this.entityAUV;
     }
 
-    update(auvsOptions, auvChoosed, viewer){
+    setAuv(auvsOptions, auvChoosed, viewer){
         let i = 0;
         let found = false;
         while(i < auvsOptions.length){
@@ -37,11 +37,13 @@ class AuvComponent {
 
         if(!found || this.auvActive.waypoints.length === 0) {
             console.log("Option not available: waypoints not defined.");
-            return;
+            return false;
         }
 
         this.getBoundsTime(viewer);
         this.createAuvModel(viewer);
+
+        return true;
     }
 
     getBoundsTime(viewer) {

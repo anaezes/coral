@@ -20,7 +20,6 @@ class Auv {
         this.name = auv.name;
 
         if(auv.plan.waypoints.length === 0) {
-            console.log("ERROR: " + auv.plan.waypoints.length);
             return;
         }
 

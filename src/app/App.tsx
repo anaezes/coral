@@ -1,5 +1,5 @@
 import React from 'react';
-import DatGui, {DatSelect, DatNumber, DatBoolean, DatFolder} from "react-dat-gui";
+import DatGui, {DatSelect, DatNumber, DatBoolean, DatFolder, DatButton} from "react-dat-gui";
 import {AuvJSON, WaypointJSON} from './utils/AUVUtils';
 import WaterEffect from "./components/WaterEffect";
 import WaterParticles from "./components/WaterParticles";
@@ -45,12 +45,13 @@ interface MenuOptions {
 class App extends React.Component<{}, state> {
     private isSystemInit: boolean = false;
     private options: Array<string> = ['None'];
+    private dateOptions: Array<string> = [];
     private auvs: Array<AuvJSON> = [];
     private isUnderwater: boolean = false;
     private CesiumViewer: any;
     private container: any;
     private topView: any;
-    //private auvComponent = new AuvComponent();
+    private auvComponent = new AuvComponent();
     //private bathymetryComponent = new BathymetryComponent();
     private updateBathymetryIntervalId: any;
     private updateTopViewIntervalId: any;
@@ -62,8 +63,8 @@ class App extends React.Component<{}, state> {
         8.0e6,
         0.0
     ));
-    private auvComponent: any;
     private bathymetryComponent : any;
+    private dateMap : Map<string, Date> = new Map<string, Date>();
 
 
     state = {
@@ -84,7 +85,8 @@ class App extends React.Component<{}, state> {
             salinity: false,
             bathymetry: false,
             wrecks: false,
-            updatePlan: false
+            updatePlan: false,
+            date: 'Today',
         }
     };
 
@@ -143,6 +145,14 @@ class App extends React.Component<{}, state> {
     handleUpdate = newData =>
         this.updateRender(newData);
 
+    handleButtonClick() {
+        this.environment.clearAllLayer(this.CesiumViewer);
+
+        //reset date
+
+    }
+
+
     /**
      * Main rendering loop
      */
@@ -156,9 +166,11 @@ class App extends React.Component<{}, state> {
                 this.initCesium();
 
             this.getAuvs();
+            this.getDates();
             this.createPins();
 
             this.isSystemInit = true;
+
         }
 
         return (
@@ -166,34 +178,54 @@ class App extends React.Component<{}, state> {
                 <div id="Container" ref={element => this.container = element}/>
                 {this.isUnderwater && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
                 <DatGui class="mainview" data={options} onUpdate={this.handleUpdate} labelWidth="60%">
-                    <DatFolder title="Environment">
-                        <DatBoolean path='wavesHeight' label='Waves height'/>
-                        <DatBoolean path='wavesVelocity' label='Waves velocity'/>
-                        <DatBoolean path='salinity' label='Salinity' />
-                        <DatBoolean path='water_temp' label='Water temperature'/>
-                        <DatBoolean path='world_temp' label='World temperature' />
-                        <DatBoolean path='bathymetry' label='Bathymetry' />
-                        <DatBoolean path='wrecks' label='Wrecks' />
-                    </DatFolder>
                     <DatFolder title="AUV Tracking">
-                        <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
                         <DatSelect
                             label="Available AUV's"
                             path="auvActive"
                             options={this.options}/>
-                        <DatBoolean path='waterEffects' label='Water effects' />
-                        <DatBoolean path='updatePlan' label='Test update plan' />
+                        {this.isUnderwater? this.returnMenuAuv() : <div/> }
                     </DatFolder>
-                    <DatFolder title="AIS">
-                        <DatBoolean path='aisDensity' label='AIS density' />
-                        <DatBoolean path='ais' label='AIS' />
-                    </DatFolder>
-
+                    {this.isUnderwater?<div/> : this.returnMenuEnvironment() }
                 </DatGui>
                 <div id="legend-box">
                     {EnvironmentComponent.legend !== undefined?  <img src={EnvironmentComponent.legend.src}/>  : <div/>}
                 </div>
                 <TopView ref={element => this.topView = element}/>
+            </div>
+        );
+    }
+
+    returnMenuAuv() {
+        return(
+            <div>
+                <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
+                <DatBoolean path='waterEffects' label='Water effects' />
+                <DatBoolean path='updatePlan' label='Test update plan' />
+            </div>
+        );
+    }
+
+    returnMenuEnvironment(){
+        return(
+            <div>
+            <DatFolder title="AIS">
+                <DatBoolean path='aisDensity' label='AIS density' />
+                <DatBoolean path='ais' label='AIS' />
+            </DatFolder>
+            <DatFolder title="Environment" >
+                <DatSelect
+                    label="Choose day"
+                    path="date"
+                    options={this.dateOptions}/>
+                <DatBoolean path='wavesHeight' label='Waves height'/>
+                <DatBoolean path='wavesVelocity' label='Waves velocity'/>
+                <DatBoolean path='salinity' label='Salinity' />
+                <DatBoolean path='water_temp' label='Water temperature'/>
+                <DatBoolean path='world_temp' label='World temperature' />
+                <DatBoolean path='bathymetry' label='Bathymetry' />
+                <DatBoolean path='wrecks' label='Wrecks' />
+                <DatButton label="Reset" onClick={this.handleButtonClick} />
+            </DatFolder>
             </div>
         );
     }
@@ -301,8 +333,17 @@ class App extends React.Component<{}, state> {
                 this.topView.resetView();
                 this.createPins();
                 this.isUnderwater = false;
+
+                // todo reset timeline
+
             } else {
-                this.auvComponent.update(this.auvs, data.auvActive, this.CesiumViewer);
+                let success = this.auvComponent.setAuv(this.auvs, data.auvActive, this.CesiumViewer);
+
+                if(!success){
+                    console.log("Error: please choose another vehicle.");
+                    this.createPins();
+                    return;
+                }
 
                 this.initEnvironment();
 
@@ -330,19 +371,19 @@ class App extends React.Component<{}, state> {
           this.aisComponent.update(this.CesiumViewer, data.ais);
 
         if(data.wavesHeight !== this.state.options.wavesHeight){
-            this.environment.setWavesHeight(this.CesiumViewer, data.wavesHeight);
+            this.environment.setWavesHeight(this.CesiumViewer, data.wavesHeight, this.dateMap.get(data.date));
         }
 
         if(data.wavesVelocity !== this.state.options.wavesVelocity){
-            this.environment.setWavesVelocity(this.CesiumViewer, data.wavesVelocity);
+            this.environment.setWavesVelocity(this.CesiumViewer, data.wavesVelocity, this.dateMap.get(data.date));
         }
 
         if(data.water_temp !== this.state.options.water_temp){
-            this.environment.setWaterTemp(this.CesiumViewer, data.water_temp);
+            this.environment.setWaterTemp(this.CesiumViewer, data.water_temp, this.dateMap.get(data.date));
         }
 
         if(data.world_temp !== this.state.options.world_temp){
-            this.environment.setWorldTemp(this.CesiumViewer, data.world_temp);
+            this.environment.setWorldTemp(this.CesiumViewer, data.world_temp, this.dateMap.get(data.date));
         }
 
         if(data.wrecks !== this.state.options.wrecks){
@@ -350,7 +391,7 @@ class App extends React.Component<{}, state> {
         }
 
         if(data.salinity !== this.state.options.salinity){
-            this.environment.setSalinity(this.CesiumViewer, data.salinity);
+            this.environment.setSalinity(this.CesiumViewer, data.salinity, this.dateMap.get(data.date));
         }
 
         if(data.bathymetry !== this.state.options.bathymetry){
@@ -485,6 +526,26 @@ class App extends React.Component<{}, state> {
                 8.0e6,
                 0.0
             ));
+    }
+
+    private getDates() {
+        for(let i = -3; i < 4; i++){
+            let date = new Date();
+            date.setDate(date.getDate()+i);
+
+            if(date.getDate() === (new Date()).getDate()){
+                this.dateOptions.push("Today");
+                this.dateMap.set("Today", date );
+            }
+            else {
+                let day = date.getDate().toString();
+                let weekday = date.toLocaleString('default', { weekday: 'short' });
+                let month = date.toLocaleString('default', { month: 'short' });
+                let stringDate = weekday + " " + day + " " + month;
+                this.dateOptions.push(stringDate);
+                this.dateMap.set(stringDate, date );
+            }
+        }
     }
 };
 export default App;

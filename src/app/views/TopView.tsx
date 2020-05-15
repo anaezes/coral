@@ -68,7 +68,7 @@ class TopView extends Component {
 
 
     private initCesium() {
-        this.viewer = new Cesium.Viewer('TopView', {
+       this.viewer = new Cesium.Viewer('TopView', {
             globe: new Cesium.Globe(),
             timeline: false,
             animation: false,
@@ -88,6 +88,8 @@ class TopView extends Component {
             shouldAnimate: false,
             creditContainer: dummyCredit
         });
+
+        //this.viewer = new Cesium.CesiumWidget("TopView");
     }
 
     public setTopView(auv) {

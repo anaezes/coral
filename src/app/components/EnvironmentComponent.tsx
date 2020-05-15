@@ -12,7 +12,7 @@ class EnvironmentComponent {
     wrecksLayerWorldTerrain =  null;
     bathymetryLayer = null ;
     aisDensityLayer = null;
-    static legend;
+    static legend : HTMLImageElement | undefined;
 
 
     getImage(url, autentication?){
@@ -69,7 +69,7 @@ class EnvironmentComponent {
         if (!display) {
             viewer.imageryLayers.remove(this.salinityLayer);
             this.salinityLayer = null;
-            EnvironmentComponent.legend = null;
+            EnvironmentComponent.legend = undefined;
         } else {
             let today;
             date === undefined ? today = new Date() : today = date;
@@ -205,6 +205,9 @@ class EnvironmentComponent {
     * Mean waves height of a given date (update every 3 hours)
     ***/
     setWavesHeight(viewer: any, display:boolean = true, date?: any) {
+
+        //console.log("setWavesHeight: " + date.toString());
+
         if (!display) {
             viewer.imageryLayers.remove(this.wavesHeightLayer);
             this.wavesHeightLayer = null;
