@@ -210,9 +210,6 @@ class EnvironmentComponent {
             this.wavesHeightLayer = null;
             EnvironmentComponent.legend = undefined;
         } else {
-            if(this.wavesHeightLayer !== null)
-                return;
-
             this.wavesHeightLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
                     url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027",

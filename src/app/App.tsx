@@ -160,8 +160,6 @@ class App extends React.Component<{}, state> {
         }));
     }
 
-
-
     /**
      * Main rendering loop
      */
@@ -368,7 +366,6 @@ class App extends React.Component<{}, state> {
                 this.updateBathymetryIntervalId = setInterval(this.updateBathymetry.bind(this), 500);
 
                 // Top view
-                this.topView.showTopView = true;
                 this.updateTopView();
                 this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 3000);
 

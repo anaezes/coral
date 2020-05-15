@@ -10,6 +10,7 @@ const options = ["None", "AIS Density", "Waves Height", "Waves Velocity","Water 
 
 class TopView extends Component {
     private viewer: any;
+    private date: Date = new Date();
     private environment = new EnvironmentComponent();
     private aisComponent: AisComponent = new AisComponent(0.1, 1.5,
         new Cesium.NearFarScalar(
@@ -25,8 +26,7 @@ class TopView extends Component {
         error: false,
         layerActive: ''
     };
-    private first: boolean = true;
-    public showTopView: Boolean = false;
+
 
     async componentDidMount() {
         if (this.viewer == null)
@@ -109,6 +109,9 @@ class TopView extends Component {
             return;
         }
 
+        console.log("auv time: " + auv.startTime);
+        this.date = new Date(auv.startTime);
+
         this.viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
             billboard: {
@@ -129,6 +132,7 @@ class TopView extends Component {
 
     reset() {
         this.viewer.entities.removeAll();
+        this.date = new Date();
     }
 
     private updateRender(data: any) {
@@ -136,21 +140,23 @@ class TopView extends Component {
         if (data.layerActive !== this.state.layerActive) {
             this.environment.clearAllLayer(this.viewer);
 
+            console.log(this.date);
+
             switch(data.layerActive.toString()) {
                 case "Waves Height": {
-                    this.environment.setWavesHeight(this.viewer);
+                    this.environment.setWavesHeight(this.viewer, true, this.date);
                     break;
                 }
                 case "Waves Velocity": {
-                    this.environment.setWavesVelocity(this.viewer);
+                    this.environment.setWavesVelocity(this.viewer, true, this.date);
                     break;
                 }
                 case "Water temperature": {
-                    this.environment.setWaterTemp(this.viewer);
+                    this.environment.setWaterTemp(this.viewer, true, this.date);
                     break;
                 }
                 case "Salinity": {
-                    this.environment.setSalinity(this.viewer);
+                    this.environment.setSalinity(this.viewer, true, this.date);
                     break;
                 }
                 case "AIS Density": {
