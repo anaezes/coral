@@ -205,15 +205,14 @@ class EnvironmentComponent {
     * Mean waves height of a given date (update every 3 hours)
     ***/
     setWavesHeight(viewer: any, display:boolean = true, date?: any) {
-
-        //console.log("setWavesHeight: " + date.toString());
-
         if (!display) {
             viewer.imageryLayers.remove(this.wavesHeightLayer);
             this.wavesHeightLayer = null;
             EnvironmentComponent.legend = undefined;
-            return;
         } else {
+            if(this.wavesHeightLayer !== null)
+                return;
+
             this.wavesHeightLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
                     url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027",

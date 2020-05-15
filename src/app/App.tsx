@@ -37,7 +37,7 @@ interface MenuOptions {
     water_temp: boolean,
     salinity: boolean,
     bathymetry: boolean,
-    wrecks: boolean,
+    wrecks: boolean
 
     updatePlan: boolean
 }
@@ -145,12 +145,21 @@ class App extends React.Component<{}, state> {
     handleUpdate = newData =>
         this.updateRender(newData);
 
-    handleButtonClick() {
+    handleButtonClick = newData => {
         this.environment.clearAllLayer(this.CesiumViewer);
-
-        //reset date
-
+        newData.date = 'Today';
+        newData.wavesHeight = false;
+        newData.wavesVelocity= false;
+        newData.world_temp= false;
+        newData.water_temp= false;
+        newData.salinity= false;
+        newData.bathymetry= false;
+        newData.wrecks= false;
+        this.setState(prevState => ({
+            options: { ...prevState.options, ...newData }
+        }));
     }
+
 
 
     /**
@@ -177,16 +186,7 @@ class App extends React.Component<{}, state> {
             <div>
                 <div id="Container" ref={element => this.container = element}/>
                 {this.isUnderwater && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
-                <DatGui class="mainview" data={options} onUpdate={this.handleUpdate} labelWidth="60%">
-                    <DatFolder title="AUV Tracking">
-                        <DatSelect
-                            label="Available AUV's"
-                            path="auvActive"
-                            options={this.options}/>
-                        {this.isUnderwater? this.returnMenuAuv() : <div/> }
-                    </DatFolder>
-                    {this.isUnderwater?<div/> : this.returnMenuEnvironment() }
-                </DatGui>
+                {this.isUnderwater?  this.menuUnderwater() : this.menuSurface()}
                 <div id="legend-box">
                     {EnvironmentComponent.legend !== undefined?  <img src={EnvironmentComponent.legend.src}/>  : <div/>}
                 </div>
@@ -195,38 +195,53 @@ class App extends React.Component<{}, state> {
         );
     }
 
-    returnMenuAuv() {
+    menuUnderwater() {
+        const {options} = this.state;
+
         return(
-            <div>
-                <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
-                <DatBoolean path='waterEffects' label='Water effects' />
-                <DatBoolean path='updatePlan' label='Test update plan' />
-            </div>
+            <DatGui class="mainview" data={options} onUpdate={this.handleUpdate} labelWidth="60%">
+                <DatFolder title="AUV Tracking">
+                    <DatSelect
+                        label="Available AUV's"
+                        path="auvActive"
+                        options={this.options}/>
+                    <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
+                    <DatBoolean path='waterEffects' label='Water effects' />
+                    <DatBoolean path='updatePlan' label='Test update plan' />
+                </DatFolder>
+            </DatGui>
         );
     }
 
-    returnMenuEnvironment(){
+    menuSurface(){
+        const {options} = this.state;
         return(
-            <div>
-            <DatFolder title="AIS">
-                <DatBoolean path='aisDensity' label='AIS density' />
-                <DatBoolean path='ais' label='AIS' />
-            </DatFolder>
-            <DatFolder title="Environment" >
-                <DatSelect
-                    label="Choose day"
-                    path="date"
-                    options={this.dateOptions}/>
-                <DatBoolean path='wavesHeight' label='Waves height'/>
-                <DatBoolean path='wavesVelocity' label='Waves velocity'/>
-                <DatBoolean path='salinity' label='Salinity' />
-                <DatBoolean path='water_temp' label='Water temperature'/>
-                <DatBoolean path='world_temp' label='World temperature' />
-                <DatBoolean path='bathymetry' label='Bathymetry' />
-                <DatBoolean path='wrecks' label='Wrecks' />
-                <DatButton label="Reset" onClick={this.handleButtonClick} />
-            </DatFolder>
-            </div>
+            <DatGui class="mainview" data={options} onUpdate={this.handleUpdate} labelWidth="60%">
+                <DatFolder title="AUV Tracking">
+                    <DatSelect
+                        label="Available AUV's"
+                        path="auvActive"
+                        options={this.options}/>
+                </DatFolder>
+                <DatFolder title="AIS">
+                    <DatBoolean path='aisDensity' label='AIS density' />
+                    <DatBoolean path='ais' label='AIS' />
+                </DatFolder>
+                <DatFolder title="Environment" >
+                    <DatSelect
+                        label="Choose day"
+                        path="date"
+                        options={this.dateOptions}/>
+                    <DatBoolean path='wavesHeight' label='Waves height'/>
+                    <DatBoolean path='wavesVelocity' label='Waves velocity'/>
+                    <DatBoolean path='salinity' label='Salinity' />
+                    <DatBoolean path='water_temp' label='Water temperature'/>
+                    <DatBoolean path='world_temp' label='World temperature' />
+                    <DatBoolean path='bathymetry' label='Bathymetry' />
+                    <DatBoolean path='wrecks' label='Wrecks' />
+                    <DatButton label="Reset" onClick={this.handleButtonClick} />
+                </DatFolder>
+            </DatGui>
         );
     }
 
