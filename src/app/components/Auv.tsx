@@ -1,5 +1,5 @@
 import {AuvJSON, Sample, WaypointJSON} from '../utils/AUVUtils';
-const HEIGHT = 150.0;
+const SUPERFICE = 0;
 const Cesium = require('cesium');
 
 
@@ -9,7 +9,7 @@ class Auv {
     public longitude: number = 0;
     public waypoints: Array<WaypointJSON> = [];
     public path : any;
-    public startTime: any;
+    private startTime: any;
     public stopTime: any;
     public heading: any;
     position: any;
@@ -35,8 +35,15 @@ class Auv {
 
         for (let i = 0; i < this.waypoints.length; i += 1) {
 
+            let depth = SUPERFICE - 5;
+            if(this.waypoints[i].depth !== undefined) {
+                console.log("this.waypoints[i].depth: " + this.waypoints[i].depth);
+                depth = SUPERFICE  + this.waypoints[i].depth;
+                console.log("Depth: " + depth);
+            }
+
             let time = Cesium.JulianDate.fromDate(new Date(this.waypoints[i]['arrivalDate']));
-            var position = Cesium.Cartesian3.fromDegrees(this.waypoints[i].longitude, this.waypoints[i].latitude, HEIGHT);
+            let position = Cesium.Cartesian3.fromDegrees(this.waypoints[i].longitude, this.waypoints[i].latitude, depth);
             property.addSample(time, position);
 
             // debug
@@ -68,8 +75,13 @@ class Auv {
     public addSample(sample: Sample) {
         this.samples.set(sample.sampleType, sample);
     }
+
     public getSamples() {
         return this.samples;
+    }
+
+    public getStartTime() {
+        return this.startTime;
     }
 
     public updatePath(waypoints: Array<WaypointJSON>){

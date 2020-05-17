@@ -5,8 +5,6 @@ import {TileJSON} from "../utils/TilesUtils";
 import tiles from '../../data/coordTiles.json';
 
 const Cesium = require('cesium');
-const DEPTH = 0.0;
-
 
 class BathymetryComponent {
     public tiles: Array<Tile> = new Array<Tile>();
@@ -58,7 +56,7 @@ class BathymetryComponent {
             }
         });
 
-        var position = Cesium.Cartesian3.fromDegrees(this.mainTile.longitude,this.mainTile.latitude, DEPTH);
+        var position = Cesium.Cartesian3.fromDegrees(this.mainTile.longitude,this.mainTile.latitude, this.mainTile.depth);
         Cesium.Transforms.eastNorthUpToFixedFrame(position, viewer.scene.globe.ellipsoid, this.ENU);
     }
 
@@ -67,14 +65,15 @@ class BathymetryComponent {
         let offset;
 
         if(tile.coordsFixed || tile.assetId === this.mainTile.assetId){
-            cartesian = Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude, DEPTH);
+            cartesian = Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude, tile.depth);
         }
         else {
             offset = tile.getOffset(this.mainTile);
             let finalPos = Cesium.Matrix4.multiplyByPoint(this.ENU, offset, new Cesium.Cartesian3());
             let result = Cesium.Cartographic.fromCartesian(finalPos, Cesium.Ellipsoid.WGS84);
+
             cartesian = Cesium.Cartesian3.fromDegrees(Cesium.Math.toDegrees(result.longitude),
-                Cesium.Math.toDegrees(result.latitude), DEPTH);
+                Cesium.Math.toDegrees(result.latitude), tile.depth);
             tile.longitude = Cesium.Math.toDegrees(result.longitude);
             tile.latitude = Cesium.Math.toDegrees(result.latitude);
         }
@@ -92,7 +91,6 @@ class BathymetryComponent {
             dynamicScreenSpaceErrorDensity : 0.00278,
             dynamicScreenSpaceErrorFactor : 4.0,
             dynamicScreenSpaceErrorHeightFalloff : 0.25,
-
         });
 
         viewer.scene.primitives.add(tileset);

@@ -109,8 +109,8 @@ class TopView extends Component {
             return;
         }
 
-        console.log("auv time: " + auv.startTime);
-        this.date = new Date(auv.startTime);
+        //console.log("auv time: " + auv.startTime);
+        this.date = new Date(auv.getStartTime());
 
         this.viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(longitude, latitude),

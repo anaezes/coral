@@ -3,10 +3,11 @@ import Auv from "./Auv";
 import {TileJSON} from "../utils/TilesUtils";
 import Tile from "./Tile";
 
+
 const urlAuvs =  'https://ripples.lsts.pt/soi';
 const Cesium = require('cesium');
 
-const HEIGHT = 10.0;
+const HEIGHT = 0.0;
 
 class AuvComponent {
     private auvActive;
@@ -66,6 +67,8 @@ class AuvComponent {
         //viewer.scene.globe = new Cesium.Globe(Cesium.Ellipsoid.WGS84);
         //viewer.scene.globe.baseColor =  new Cesium.Color(0.24,0.24,0.24,1);
         //viewer.scene.globe.fillHighlightColor =  new Cesium.Color(0.24,0.24,0.24,1);
+        console.log('globeHeight = ' + viewer.scene.globe.getHeight(new Cesium.Cartographic(this.auvActive.longitude, this.auvActive.latitude)));
+
         viewer.scene.globe.show = false;
         viewer.scene.backgroundColor = new Cesium.Color(0.043,0.18,0.24,1);
 
@@ -87,7 +90,8 @@ class AuvComponent {
             //Load the Cesium plane model to represent the entity
             model: {
                 uri: '../models/lauv-80.glb',
-                minimumPixelSize: 64
+                minimumPixelSize: 64,
+                maximumScale: 1.0,
             },
             scale: 1.0,
 
@@ -104,12 +108,11 @@ class AuvComponent {
             // Color the model slightly blue when the eyepoint is underwater.
             color : new Cesium.Color(0.0, 0.0, 1.0, 1.0),
             colorBlendMode : Cesium.ColorBlendMode.MIX,
-            colorBlendAmount : new Cesium.CallbackProperty(function(time, result) {
+            /*colorBlendAmount : new Cesium.CallbackProperty(function(time, result) {
                 var underwater = viewer.camera.positionCartographic.height < 0;
-
-                console.log("underwater!!!");
                 return !underwater ? 1.0 : 0.0;
-            }, false),
+            }, false),*/
+
 
             label: {
                 text: new Cesium.CallbackProperty(this.updateSamplesLabel(this.auvActive), false),
@@ -132,14 +135,14 @@ class AuvComponent {
         let longitude = this.auvActive.longitude;
         let latitude = this.auvActive.latitude;
 
-        viewer.camera.setView({
+       /* viewer.camera.setView({
             orientation: {
                 heading: 0.03295948729686427 + Cesium.Math.PI_OVER_TWO,
                 pitch: 0.0, //-Cesium.Math.PI_OVER_TWO (top view)
                 roll: 0.0
             },
-            destination: Cesium.Cartesian3.fromDegrees(longitude - 0.00015, latitude, HEIGHT + 1.5)
-        });
+            destination: Cesium.Cartesian3.fromDegrees(longitude - 0.00015, latitude, HEIGHT + 3)
+        });*/
 
 
         let entity = this.entityAUV;
@@ -147,7 +150,7 @@ class AuvComponent {
             viewer.trackedEntity = entity;
             viewer.camera.setView({
                 orientation: entity.orientation,
-                destination: Cesium.Cartesian3.fromDegrees(longitude, latitude - 0.00015, HEIGHT+ 1.5)
+                destination: Cesium.Cartesian3.fromDegrees(longitude, latitude - 0.00015, HEIGHT + 5)
             });
             viewer.scene.camera.lookAt(entity.position.getValue(viewer.clock.currentTime), entity.orientation.getValue(viewer.clock.currentTime));
         });
@@ -157,11 +160,12 @@ class AuvComponent {
         return function callbackFunction() {
             let result = "";
             if(auv !== undefined){
+                let cartographic = new Cesium.Cartographic.fromCartesian(auv.getPosition());
+                result = "Depth: " + (cartographic.height).toFixed(3).toString() + "m";
                 auv.getSamples().forEach((sample: Sample, name: string) => {
-                    result += name + ": " + sample.value;
+                    result += "\n" + name + ": " + sample.value;
                     if(name === "Temperature")
                         result += " ºC";
-                    result += "\n";
                 });
             }
             return result;
@@ -175,6 +179,16 @@ class AuvComponent {
     updatePath(newPlan: Array<WaypointJSON>, viewer) {
         if(this.auvActive === undefined)
             return;
+
+/*      let auvPosition = this.entityAUV.position.getValue(viewer.clock.currentTime);
+        let cartographic = new Cesium.Cartographic.fromCartesian(auvPosition);
+        let initPoint = {
+            "latitude":Cesium.Math.toDegrees(cartographic.latitude),
+            "longitude": Cesium.Math.toDegrees(cartographic.longitude),
+            "depth": cartographic.height,
+            "arrivalDate": viewer.clock.currentTime
+        }*/
+
         this.auvActive.updatePath(newPlan);
         this.getBoundsTime(viewer);
         viewer.entities.removeById(this.entityAUV.id);

@@ -25,7 +25,8 @@ export interface WaypointJSON {
     duration:       number;
     eta:            number;
     latitude:       number;
-    longitude:      number
+    longitude:      number;
+    depth:          number;
 }
 
 export interface Sample {

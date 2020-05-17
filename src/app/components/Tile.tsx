@@ -15,8 +15,7 @@ class Tile extends React.Component{
     public active: boolean;
     public primitive: any;
     public coordsFixed: boolean;
-
-    //public coords: Cesium.Cartesian3;
+    depth: number;
 
     constructor(tile: TileJSON) {
         super(tile)
@@ -26,6 +25,7 @@ class Tile extends React.Component{
         this.active = false;
         this.coordsFixed = false;
         this.primitive = undefined;
+        this.depth = -tile.depth-tile.height/2;
     }
 
     getOffset(mainTile: Tile){

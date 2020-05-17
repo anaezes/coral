@@ -74,7 +74,7 @@ class App extends React.Component<{}, state> {
         error: false,
         options: {
             auvActive: '',
-            terrainExaggeration: 4,
+            terrainExaggeration: 1,
             waterEffects: false,
             ais: false,
             aisDensity: false,
@@ -145,8 +145,10 @@ class App extends React.Component<{}, state> {
     handleUpdate = newData =>
         this.updateRender(newData);
 
-    handleButtonClick = newData => {
+    handleButtonClick = (event: any) =>{
+        let target = event.currentTarget;
         this.environment.clearAllLayer(this.CesiumViewer);
+        let newData : any = {};
         newData.date = 'Today';
         newData.wavesHeight = false;
         newData.wavesVelocity= false;
@@ -177,7 +179,6 @@ class App extends React.Component<{}, state> {
             this.createPins();
 
             this.isSystemInit = true;
-
         }
 
         return (
@@ -203,7 +204,7 @@ class App extends React.Component<{}, state> {
                         label="Available AUV's"
                         path="auvActive"
                         options={this.options}/>
-                    <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={10} step={1} />
+                    <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={5} step={1} />
                     <DatBoolean path='waterEffects' label='Water effects' />
                     <DatBoolean path='updatePlan' label='Test update plan' />
                 </DatFolder>
@@ -256,6 +257,7 @@ class App extends React.Component<{}, state> {
         // Init scene
         let globe = new Cesium.Globe();
         globe.show = true;
+        globe.depthTestAgainstTerrain = true;
 
         let skyAtmosphere = new Cesium.SkyAtmosphere();
         skyAtmosphere.show = true;
@@ -287,6 +289,7 @@ class App extends React.Component<{}, state> {
 
         this.CesiumViewer.terrainProvider = Cesium.createWorldTerrain({
             requestWaterMask: true,
+           // requestVertexNormals: true
         });
 
         this.CesiumViewer.scene.globe.enableLighting = true;
@@ -313,7 +316,7 @@ class App extends React.Component<{}, state> {
         let newLatitude = this.auvComponent.getAuvActive().latitude-0.0005;
         let newLongitude = this.auvComponent.getAuvActive().longitude-0.0003;
         let modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-            Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude, DEPTH+47.5));
+            Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude, DEPTH));
 
         // naufrago
         var viewer = this.CesiumViewer;
@@ -348,6 +351,7 @@ class App extends React.Component<{}, state> {
                 this.isUnderwater = false;
 
                 // todo reset timeline
+                this.CesiumViewer.clock.shouldAnimate = false;
 
             } else {
                 let success = this.auvComponent.setAuv(this.auvs, data.auvActive, this.CesiumViewer);
@@ -415,9 +419,14 @@ class App extends React.Component<{}, state> {
         }
 
         if(data.updatePlan !== this.state.options.updatePlan){
+            //todo reset
+/*            if(this.bathymetryComponent !== undefined)
+                this.bathymetryComponent.tiles.forEach(tile => {
+                    this.bathymetryComponent.removeTile(tile, this.CesiumViewer);
+                });*/
+
             let newPlan : Array<WaypointJSON> = JSON.parse(JSON.stringify(waypoints.waypoints));
             this.auvComponent.updatePath(newPlan, this.CesiumViewer);
-            //todo reset tiles!
         }
 
         this.setState(prevState => ({
