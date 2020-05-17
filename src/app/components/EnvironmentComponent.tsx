@@ -1,4 +1,7 @@
 import moment from "moment";
+import Model from "./Model";
+import models from '../../data/models.json';
+import {ModelJSON} from "../utils/ModelUtils";
 
 const Cesium = require('cesium');
 
@@ -12,7 +15,88 @@ class EnvironmentComponent {
     wrecksLayerWorldTerrain =  null;
     bathymetryLayer = null ;
     aisDensityLayer = null;
+    public models: Array<Model> = new Array<Model>();
     static legend : HTMLImageElement | undefined;
+
+    constructor() {
+        let t : Array<ModelJSON> = JSON.parse(JSON.stringify(models.wrecks));
+        for (let i = 0; i < t.length; i++) {
+            this.models.push( new Model(t[i]));
+        }
+    }
+
+    update(auvPosition, viewer) {
+        let dist, assetId;
+
+        this.models.forEach(model => {
+            assetId = model.assetId;
+            dist = Cesium.Cartesian3.distance(auvPosition, new Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude)) / 1000;
+
+            if (dist <= 3.0) {
+                if(model.pin === undefined) {
+                    this.renderModel(model, viewer);
+                }
+            } else {
+                if(model.active)
+                    this.removeModel(model, viewer);
+            }
+        });
+    }
+
+
+    renderModel(model: Model, viewer){
+
+        if(model.assetId !== undefined) {
+            let modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
+                Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth));
+
+            var tileset = viewer.scene.primitives.add(
+                new Cesium.Cesium3DTileset({
+                    url: Cesium.IonResource.fromAssetId(model.assetId),
+                    modelMatrix : modelMatrix
+                })
+            )
+
+            model.primitive = tileset;
+            console.log("colocou modelo!!!");
+        }
+
+        let pinBuilder = new Cesium.PinBuilder();
+        let pin = viewer.entities.add({
+                name : model.name.toString(),
+                position : Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+10),
+                billboard: {
+                        image: pinBuilder.fromColor(Cesium.Color.ROYALBLUE, 48).toDataURL(),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                },
+                label: {
+                    text: model.name,
+                    font: "12px sans-serif",
+                    showBackground: true,
+                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                        0.0,
+                        20000.0
+                    )
+
+                }
+            });
+
+        model.active = true;
+        model.pin = pin;
+    }
+
+    removeModel(model: Model, viewer){
+        console.log("remove: " + model.assetId);
+        if(viewer.entities.contains(model.pin))
+            viewer.entities.remove(model.pin);
+        model.active = false;
+        model.pin = undefined;
+
+        if(viewer.scene.primitives.contains(model.primitive)) {
+            viewer.scene.primitives.remove(model.primitive);
+            model.primitive = undefined;
+        }
+    }
 
 
     getImage(url, autentication?){

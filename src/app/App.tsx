@@ -55,7 +55,8 @@ class App extends React.Component<{}, state> {
     //private bathymetryComponent = new BathymetryComponent();
     private updateBathymetryIntervalId: any;
     private updateTopViewIntervalId: any;
-    private environment = new EnvironmentComponent();
+    private updateEnvironmentIntervalId: any;
+    private environmentComponent = new EnvironmentComponent();
     private aisComponent: AisComponent = new AisComponent(0.2, 2,
         new Cesium.NearFarScalar(
         1.5e2,
@@ -89,6 +90,7 @@ class App extends React.Component<{}, state> {
             date: 'Today',
         }
     };
+
 
     /**
      * Get all available AUV's
@@ -147,7 +149,7 @@ class App extends React.Component<{}, state> {
 
     handleButtonClick = (event: any) =>{
         let target = event.currentTarget;
-        this.environment.clearAllLayer(this.CesiumViewer);
+        this.environmentComponent.clearAllLayer(this.CesiumViewer);
         let newData : any = {};
         newData.date = 'Today';
         newData.wavesHeight = false;
@@ -312,7 +314,7 @@ class App extends React.Component<{}, state> {
     /**
      * TODO: aplicar isto para vários modelos
      */
-    initEnvironment() : void {
+  /*  initEnvironment() : void {
         let newLatitude = this.auvComponent.getAuvActive().latitude-0.0005;
         let newLongitude = this.auvComponent.getAuvActive().longitude-0.0003;
         let modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
@@ -328,10 +330,10 @@ class App extends React.Component<{}, state> {
         );
 
         // Debug
-/*        let dist = Cesium.Cartesian3.distance(new Cesium.Cartesian3.fromDegrees(this.auvComponent.getAuvActive().longitude, this.auvComponent.getAuvActive().latitude),
+/!*        let dist = Cesium.Cartesian3.distance(new Cesium.Cartesian3.fromDegrees(this.auvComponent.getAuvActive().longitude, this.auvComponent.getAuvActive().latitude),
             new Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude));
-        console.log("Distance: " + dist);*/
-    }
+        console.log("Distance: " + dist);*!/
+    }*/
 
     /**
      * Handles user input and updates components accordingly
@@ -362,10 +364,13 @@ class App extends React.Component<{}, state> {
                     return;
                 }
 
-                this.initEnvironment();
+                //Environment update
+                let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
+                //this.environmentComponent.update(auvPosition, this.CesiumViewer);
+                this.updateEnvironmentIntervalId = setInterval(this.updateEnvironment.bind(this), 500);
 
                 // Bathymetry update
-                let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
+                //let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
                 this.bathymetryComponent.update(auvPosition, this.CesiumViewer, this.state.options.terrainExaggeration);
                 this.updateBathymetryIntervalId = setInterval(this.updateBathymetry.bind(this), 500);
 
@@ -387,35 +392,35 @@ class App extends React.Component<{}, state> {
           this.aisComponent.update(this.CesiumViewer, data.ais);
 
         if(data.wavesHeight !== this.state.options.wavesHeight){
-            this.environment.setWavesHeight(this.CesiumViewer, data.wavesHeight, this.dateMap.get(data.date));
+            this.environmentComponent.setWavesHeight(this.CesiumViewer, data.wavesHeight, this.dateMap.get(data.date));
         }
 
         if(data.wavesVelocity !== this.state.options.wavesVelocity){
-            this.environment.setWavesVelocity(this.CesiumViewer, data.wavesVelocity, this.dateMap.get(data.date));
+            this.environmentComponent.setWavesVelocity(this.CesiumViewer, data.wavesVelocity, this.dateMap.get(data.date));
         }
 
         if(data.water_temp !== this.state.options.water_temp){
-            this.environment.setWaterTemp(this.CesiumViewer, data.water_temp, this.dateMap.get(data.date));
+            this.environmentComponent.setWaterTemp(this.CesiumViewer, data.water_temp, this.dateMap.get(data.date));
         }
 
         if(data.world_temp !== this.state.options.world_temp){
-            this.environment.setWorldTemp(this.CesiumViewer, data.world_temp, this.dateMap.get(data.date));
+            this.environmentComponent.setWorldTemp(this.CesiumViewer, data.world_temp, this.dateMap.get(data.date));
         }
 
         if(data.wrecks !== this.state.options.wrecks){
-            this.environment.showWrecks(this.CesiumViewer, data.wrecks);
+            this.environmentComponent.showWrecks(this.CesiumViewer, data.wrecks);
         }
 
         if(data.salinity !== this.state.options.salinity){
-            this.environment.setSalinity(this.CesiumViewer, data.salinity, this.dateMap.get(data.date));
+            this.environmentComponent.setSalinity(this.CesiumViewer, data.salinity, this.dateMap.get(data.date));
         }
 
         if(data.bathymetry !== this.state.options.bathymetry){
-            this.environment.showBathymetryGlobe(this.CesiumViewer, data.bathymetry);
+            this.environmentComponent.showBathymetryGlobe(this.CesiumViewer, data.bathymetry);
         }
 
         if(data.aisDensity !== this.state.options.aisDensity){
-            this.environment.showAisDensity(this.CesiumViewer, data.aisDensity);
+            this.environmentComponent.showAisDensity(this.CesiumViewer, data.aisDensity);
         }
 
         if(data.updatePlan !== this.state.options.updatePlan){
@@ -448,6 +453,14 @@ class App extends React.Component<{}, state> {
     updateBathymetry() : void {
         let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
         this.bathymetryComponent.update(auvPosition, this.CesiumViewer, this.state.options.terrainExaggeration);
+    }
+
+    /**
+     * Updates bathymetry component
+     */
+    updateEnvironment() : void {
+        let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
+        this.environmentComponent.update(auvPosition, this.CesiumViewer);
     }
 
     /**
@@ -529,6 +542,7 @@ class App extends React.Component<{}, state> {
     resetApp(){
         clearInterval(this.updateBathymetryIntervalId);
         clearInterval(this.updateTopViewIntervalId);
+        clearInterval(this.updateEnvironmentIntervalId);
 
         this.topView.reset();
 
@@ -537,6 +551,7 @@ class App extends React.Component<{}, state> {
                 this.bathymetryComponent.removeTile(tile, this.CesiumViewer);
             });
 
+        this.environmentComponent = new EnvironmentComponent();
         this.bathymetryComponent = new BathymetryComponent();
         this.auvComponent = new AuvComponent();
 
