@@ -24,7 +24,13 @@ class Auv {
         }
 
         let waypoints: Array<WaypointJSON> = JSON.parse(JSON.stringify(auv.plan.waypoints));
-        this.setVariables(waypoints);
+        //this.setVariables(waypoints);
+
+        this.waypoints = waypoints;
+        this.longitude = this.waypoints[0].longitude;
+        this.latitude = this.waypoints[0].latitude;
+        this.startTime = this.waypoints[0].arrivalDate;
+        this.stopTime = this.waypoints[this.waypoints.length-1].arrivalDate;
 
         this.heading = auv.lastState.heading;
         this.path = this.generatePath();
@@ -84,17 +90,13 @@ class Auv {
         return this.startTime;
     }
 
-    public updatePath(waypoints: Array<WaypointJSON>){
-        this.setVariables(waypoints);
-        this.path = this.generatePath();
-    }
+    public updatePath(waypoints: Array<WaypointJSON>, auvPos){
+        waypoints.forEach(waypoint => {
+            this.waypoints.push(waypoint);
+        })
 
-    setVariables(waypoints: Array<WaypointJSON>) {
-        this.waypoints = waypoints;
-        this.longitude = this.waypoints[0].longitude;
-        this.latitude = this.waypoints[0].latitude;
-        this.startTime = this.waypoints[0].arrivalDate;
         this.stopTime = this.waypoints[this.waypoints.length-1].arrivalDate;
+        this.path = this.generatePath();
     }
 };
 

@@ -424,12 +424,6 @@ class App extends React.Component<{}, state> {
         }
 
         if(data.updatePlan !== this.state.options.updatePlan){
-            //todo reset
-/*            if(this.bathymetryComponent !== undefined)
-                this.bathymetryComponent.tiles.forEach(tile => {
-                    this.bathymetryComponent.removeTile(tile, this.CesiumViewer);
-                });*/
-
             let newPlan : Array<WaypointJSON> = JSON.parse(JSON.stringify(waypoints.waypoints));
             this.auvComponent.updatePath(newPlan, this.CesiumViewer);
         }

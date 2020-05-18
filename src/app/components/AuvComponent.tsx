@@ -47,7 +47,7 @@ class AuvComponent {
         return true;
     }
 
-    getBoundsTime(viewer) {
+    getBoundsTime(viewer, currentTime?) {
         //Set bounds of our simulation time
         this.startTime = Cesium.JulianDate.fromDate(new Date(this.auvActive.startTime));
         this.stopTime = Cesium.JulianDate.fromDate(new Date(this.auvActive.stopTime));
@@ -55,7 +55,12 @@ class AuvComponent {
         //Make sure viewer is at the desired time.
         viewer.clock.startTime = this.startTime.clone();
         viewer.clock.stopTime = this.stopTime.clone();
-        viewer.clock.currentTime = this.startTime.clone();
+
+        if(currentTime === undefined)
+            viewer.clock.currentTime = this.startTime.clone();
+        else
+            viewer.clock.currentTime = currentTime;
+
         viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP; //Loop at the end
         viewer.clock.multiplier = 10;
 
@@ -64,11 +69,6 @@ class AuvComponent {
     }
 
     createAuvModel(viewer) {
-        //viewer.scene.globe = new Cesium.Globe(Cesium.Ellipsoid.WGS84);
-        //viewer.scene.globe.baseColor =  new Cesium.Color(0.24,0.24,0.24,1);
-        //viewer.scene.globe.fillHighlightColor =  new Cesium.Color(0.24,0.24,0.24,1);
-        console.log('globeHeight = ' + viewer.scene.globe.getHeight(new Cesium.Cartographic(this.auvActive.longitude, this.auvActive.latitude)));
-
         viewer.scene.globe.show = false;
         viewer.scene.backgroundColor = new Cesium.Color(0.043,0.18,0.24,1);
 
@@ -131,19 +131,8 @@ class AuvComponent {
     }
 
     updateCamera(viewer) {
-
         let longitude = this.auvActive.longitude;
         let latitude = this.auvActive.latitude;
-
-       /* viewer.camera.setView({
-            orientation: {
-                heading: 0.03295948729686427 + Cesium.Math.PI_OVER_TWO,
-                pitch: 0.0, //-Cesium.Math.PI_OVER_TWO (top view)
-                roll: 0.0
-            },
-            destination: Cesium.Cartesian3.fromDegrees(longitude - 0.00015, latitude, HEIGHT + 3)
-        });*/
-
 
         let entity = this.entityAUV;
         viewer.flyTo(entity).then(function () {
@@ -180,19 +169,18 @@ class AuvComponent {
         if(this.auvActive === undefined)
             return;
 
-/*      let auvPosition = this.entityAUV.position.getValue(viewer.clock.currentTime);
-        let cartographic = new Cesium.Cartographic.fromCartesian(auvPosition);
-        let initPoint = {
-            "latitude":Cesium.Math.toDegrees(cartographic.latitude),
-            "longitude": Cesium.Math.toDegrees(cartographic.longitude),
-            "depth": cartographic.height,
-            "arrivalDate": viewer.clock.currentTime
-        }*/
+        let auvPosition = this.entityAUV.position.getValue(viewer.clock.currentTime);
 
-        this.auvActive.updatePath(newPlan);
-        this.getBoundsTime(viewer);
-        viewer.entities.removeById(this.entityAUV.id);
-        this.createAuvModel(viewer);
+        this.auvActive.updatePath(newPlan, auvPosition);
+        this.getBoundsTime(viewer, viewer.clock.currentTime);
+
+        this.entityAUV.availability = new Cesium.TimeIntervalCollection([new Cesium.TimeInterval({
+            start: this.startTime,
+            stop: this.stopTime
+        })]);
+        this.entityAUV.position = this.auvActive.path;
+        this.entityAUV.orientation = new Cesium.VelocityOrientationProperty(this.auvActive.path);
+
     }
 
 
