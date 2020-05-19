@@ -18,7 +18,7 @@ class TopView extends Component {
             0.5,
             8.0e6,
             0.0
-        ));
+        ), "top");
 
     state = {
         data: [],
@@ -93,7 +93,7 @@ class TopView extends Component {
     }
 
     public setTopView(auv) {
-        this.aisComponent.update(this.viewer, true, auv);
+        this.aisComponent.update(this.viewer, auv);
         this.setAuvPosition(auv);
         this.setCameraView(auv.getPosition());
     }

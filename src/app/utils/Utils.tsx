@@ -1,12 +1,12 @@
 const Cesium = require('cesium');
 
 export default class Utils {
-    static getPointFromAngleAndPoint(angle:number, origin_lon:number, origin_lat:number) {
+    static getPointFromAngleAndPoint(angle:number, origin_lon:number, origin_lat:number, dist: number) {
 
         if(angle > 360)
             angle = angle % 360;
 
-        let dist = 5000;
+        //let dist = 5000;
         let teta = Cesium.Math.toRadians(angle);
 
         //p0
@@ -23,7 +23,7 @@ export default class Utils {
         let result = new Cesium.Cartesian3();
         Cesium.Cartesian3.add(p0, offset, result);
 
-        return Cesium.Cartographic.fromCartesian(result);
+        return result;
     }
 
     static convertDegreesTo() {

@@ -5,20 +5,21 @@
       "longitude": -875403,
       "latitude": 41.21642,
       "depth" : -27,
-      "assetId": 100885
+      "assetId": 101139
     },
     {
       "name": "Inge",
       "longitude": -8.79951,
       "latitude": 41.54971,
-      "depth" : -27
+      "depth" : -27,
+      "assetId": 90688
     },
     {
       "name": "Exemple",
       "longitude": -8.824811935424805,
       "latitude": 41.57655715942383,
       "depth" : -27,
-      "assetId": 90688
+      "assetId": 101139
     },
     {
       "name": "Padre Cruz",

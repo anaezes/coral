@@ -3,11 +3,10 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="fae0b495-c047-4103-ab9e-2e31d4c8bad0" name="ripples.lsts" url="http://ripples.lsts.pt">
-        <fileTransfer host="ripples.lsts.pt" port="22" rootFolder="/home/coral" accessType="SFTP">
+        <fileTransfer rootFolder="/home/coral" accessType="SFTP" sshConfigId="c2a68199-e581-428f-812d-6c2a37781636" sshConfig="ripples.lsts">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
-          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
     </option>
