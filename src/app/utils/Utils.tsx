@@ -1,13 +1,18 @@
 const Cesium = require('cesium');
 
 export default class Utils {
-    static getPointFromAngleAndPoint(angle:number, origin_lon:number, origin_lat:number) {
+    static getPointFromAngleAndPoint(angle:number, origin_lon:number, origin_lat:number, distance?:number) {
 
-        if(angle > 360)
-            angle = angle % 360;
+/*        if(angle > 360)
+            angle = angle % 360;*/
+
+        //let angleNormal = Utils.normalRelativeAngle(angle);
 
         let dist = 5000;
-        let teta = Cesium.Math.toRadians(angle);
+        if(distance !== undefined)
+            dist = distance
+
+        let teta = Cesium.Math.toRadians(Utils.normalRelativeAngle(angle));
 
         //p0
         let p0_lon = origin_lon;
@@ -26,8 +31,19 @@ export default class Utils {
         return Cesium.Cartographic.fromCartesian(result);
     }
 
-    static convertDegreesTo() {
+    static normalRelativeAngle(angle) {
+        if (angle > -180 && angle <= 180) {
+            return angle;
+        }
+        let fixedAngle = angle;
 
+        while (fixedAngle <= -180) {
+            fixedAngle += 360;
+        }
+        while (fixedAngle > 180) {
+            fixedAngle -= 360;
+        }
+        return fixedAngle;
     }
 }
 
