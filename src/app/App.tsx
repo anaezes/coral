@@ -56,14 +56,10 @@ class App extends React.Component<{}, state> {
     private updateBathymetryIntervalId: any;
     private updateTopViewIntervalId: any;
     private updateEnvironmentIntervalId: any;
+    private updateAisIntervalId: any;
     private environmentComponent = new EnvironmentComponent();
-    private aisComponent: AisComponent = new AisComponent(0.2, 2,
-        new Cesium.NearFarScalar(
-        1.5e2,
-        1,
-        8.0e6,
-        0.0
-    ));
+    private aisComponent: AisComponent = new AisComponent(0.1, 1.5,
+        new Cesium.NearFarScalar(1.5e2, 2.0, 1.5e7, 0.5));
     private bathymetryComponent : any;
     private dateMap : Map<string, Date> = new Map<string, Date>();
 
@@ -90,6 +86,7 @@ class App extends React.Component<{}, state> {
             date: 'Today',
         }
     };
+
 
 
     /**
@@ -147,7 +144,7 @@ class App extends React.Component<{}, state> {
     handleUpdate = newData =>
         this.updateRender(newData);
 
-    handleButtonClick = (event: any) =>{
+    handleButtonResetLayersClick = (event: any) =>{
         let target = event.currentTarget;
         this.environmentComponent.clearAllLayer(this.CesiumViewer);
         let newData : any = {};
@@ -162,6 +159,11 @@ class App extends React.Component<{}, state> {
         this.setState(prevState => ({
             options: { ...prevState.options, ...newData }
         }));
+    }
+
+    handleButtonResetTimelineClick = (event: any) =>{
+        let target = event.currentTarget;
+        this.aisComponent.getBoundsTime(this.CesiumViewer);
     }
 
     /**
@@ -182,6 +184,9 @@ class App extends React.Component<{}, state> {
 
             this.isSystemInit = true;
         }
+
+     /*   if(this.aisComponent !== undefined && this.state.options.ais)
+            this.aisComponent.render(this.CesiumViewer);*/
 
         return (
             <div>
@@ -227,6 +232,7 @@ class App extends React.Component<{}, state> {
                 <DatFolder title="AIS">
                     <DatBoolean path='aisDensity' label='AIS density' />
                     <DatBoolean path='ais' label='AIS' />
+                    <DatButton label="Reset timeline" onClick={this.handleButtonResetTimelineClick} />
                 </DatFolder>
                 <DatFolder title="Environment" >
                     <DatSelect
@@ -240,7 +246,7 @@ class App extends React.Component<{}, state> {
                     <DatBoolean path='world_temp' label='World temperature' />
                     <DatBoolean path='bathymetry' label='Bathymetry' />
                     <DatBoolean path='wrecks' label='Wrecks' />
-                    <DatButton label="Reset" onClick={this.handleButtonClick} />
+                    <DatButton label="Reset" onClick={this.handleButtonResetLayersClick} />
                 </DatFolder>
             </DatGui>
         );
@@ -259,7 +265,7 @@ class App extends React.Component<{}, state> {
         // Init scene
         let globe = new Cesium.Globe();
         globe.show = true;
-        globe.depthTestAgainstTerrain = true;
+        globe.depthTestAgainstTerrain = false;
 
         let skyAtmosphere = new Cesium.SkyAtmosphere();
         skyAtmosphere.show = true;
@@ -341,10 +347,12 @@ class App extends React.Component<{}, state> {
     private updateRender(data) : void {
         if(data.auvActive !== this.state.options.auvActive) {
             this.state.options.auvActive = data.auvActive;
-            this.CesiumViewer.entities.removeAll();
-            this.resetApp();
+
+            this.resetApp()
+            this.CesiumViewer.entities.removeAll()
 
             if (data.auvActive === 'None') {
+                this.CesiumViewer.scene.globe.depthTestAgainstTerrain = false;
                 this.CesiumViewer.scene.globe.show = true;
                 this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
                 this.CesiumViewer.camera.flyHome(3);
@@ -356,6 +364,7 @@ class App extends React.Component<{}, state> {
                 this.CesiumViewer.clock.shouldAnimate = false;
 
             } else {
+                this.CesiumViewer.scene.globe.depthTestAgainstTerrain = true;
                 let success = this.auvComponent.setAuv(this.auvs, data.auvActive, this.CesiumViewer);
 
                 if(!success){
@@ -388,8 +397,18 @@ class App extends React.Component<{}, state> {
             }
         }
 
-        if(data.ais !== this.state.options.ais)
-          this.aisComponent.update(this.CesiumViewer, data.ais);
+        if(data.ais !== this.state.options.ais) {
+            if(data.ais) {
+                console.log("entrou");
+                this.aisComponent.getBoundsTime(this.CesiumViewer);
+                this.updateAis();
+                this.updateAisIntervalId  = setInterval(this.updateAis.bind(this), 3000);
+            }
+            else {
+                this.aisComponent.update(this.CesiumViewer, false);
+                clearInterval(this.updateAisIntervalId);
+            }
+        }
 
         if(data.wavesHeight !== this.state.options.wavesHeight){
             this.environmentComponent.setWavesHeight(this.CesiumViewer, data.wavesHeight, this.dateMap.get(data.date));
@@ -431,6 +450,12 @@ class App extends React.Component<{}, state> {
         this.setState(prevState => ({
             options: { ...prevState.options, ...data }
         }));
+    }
+
+    updateAis() {
+        //console.log("update ais app!");
+        //this.auvComponent.getAuvActive().setPosition(this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime));
+        this.aisComponent.update(this.CesiumViewer, true);
     }
 
     /**
@@ -538,6 +563,9 @@ class App extends React.Component<{}, state> {
         clearInterval(this.updateTopViewIntervalId);
         clearInterval(this.updateEnvironmentIntervalId);
 
+        //this.CesiumViewer.destroy();
+        //this.initCesium();
+
         this.topView.reset();
 
         if(this.bathymetryComponent !== undefined)
@@ -549,6 +577,9 @@ class App extends React.Component<{}, state> {
         this.bathymetryComponent = new BathymetryComponent();
         this.auvComponent = new AuvComponent();
 
+
+        this.aisComponent.update(this.CesiumViewer, false);
+        clearInterval(this.updateAisIntervalId);
         this.aisComponent = new AisComponent(0.2, 2,
             new Cesium.NearFarScalar(
                 1.5e2,
