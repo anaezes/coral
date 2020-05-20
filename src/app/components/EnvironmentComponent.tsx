@@ -456,6 +456,7 @@ class EnvironmentComponent {
         viewer.imageryLayers.remove(this.wavesVelocityLayer);
         viewer.imageryLayers.remove(this.waterTempLayer);
         viewer.imageryLayers.remove(this.aisDensityLayer);
+        viewer.imageryLayers.remove(this.worldLayer);
 
         this.aisDensityLayer = null;
         this.waterTempLayer = null;
@@ -463,7 +464,7 @@ class EnvironmentComponent {
         this.salinityLayer = null;
         this.wavesHeightLayer = null;
         this.wrecksLayer = null;
-        this.bathymetryLayer = null;
+        this.worldLayer = null;
 
         EnvironmentComponent.legend = undefined;
     }
