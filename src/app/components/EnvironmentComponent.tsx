@@ -250,6 +250,8 @@ class EnvironmentComponent {
             date === undefined ? today = new Date() : today = date;
             today.setMinutes(30, 0, 0);
 
+            console.log(date);
+
             this.wavesVelocityLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
                     url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",

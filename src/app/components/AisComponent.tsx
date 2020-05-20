@@ -16,6 +16,8 @@ class AisComponent {
     private startTime: any;
     private stopTime: any;
     public isAnimating : boolean = false;
+    public legend : HTMLImageElement | undefined;
+    private img = document.createElement('img');
 
     constructor(scale, width, scaleByDistance){
         this.scale = scale;
@@ -70,6 +72,8 @@ class AisComponent {
             else
                 this.renderAis(viewer, this.ais[i]);
         }
+
+        this.legend = this.img;
     }
 
     private  renderAis(viewer, ais){
@@ -118,6 +122,9 @@ class AisComponent {
         let time = Cesium.JulianDate.secondsDifference(timeTimeline, realTime);
 
        if(time < 300) {
+
+           this.img.src = "../images/realTimeInfo.png";
+
            entity.position = Cesium.Cartesian3.fromDegrees(ais.longitude, ais.latitude);
            entity.billboard.rotation = Cesium.Math.toRadians(Utils.normalRelativeAngle(ais.heading)) + Cesium.Math.PI;
 
@@ -131,7 +138,9 @@ class AisComponent {
            ]);
        }
        else {
-           //console.log("pim!!!")
+
+           this.img.src = "../images/forecastInfo.png";
+
            let distance = ais.sog * time;
            let result = Utils.getPointFromAngleAndPoint(ais.heading,
                ais.longitude, ais.latitude, distance);
@@ -167,33 +176,16 @@ class AisComponent {
         //Set timeline to simulation bounds
         viewer.timeline.zoomTo(this.startTime, this.stopTime);
         viewer.clock.canAnimate = false;
-
-/*        let aisComponent = this;
-        viewer.clock.onTick.addEventListener(function(clock){
-            aisComponent.render(clock, viewer);
-        }, false);*/
-
-
-/*            function(clock, this.ais){
-            for (let i = 0; i < ais.length; i++) {
-                let entity = viewer.entities.getById(this.ais[i].name);
-                if(entity !== undefined) {
-                    this.updateAisPosition(this.ais[i], entity, viewer);
-                    entity.show = true;
-                }
-                else
-                    this.renderAis(viewer, this.ais[i]);
-            }
-        });*/
     }
 
     clear(viewer) {
-        console.log("clear!");
         for (let i = 0; i < this.ais.length; i++) {
             let entity = viewer.entities.getById(this.ais[i].name);
             if(entity !== undefined)
                 entity.show = false;
         }
+
+        this.legend = undefined;
     }
 }
 export default AisComponent;

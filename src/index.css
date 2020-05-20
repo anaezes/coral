@@ -89,4 +89,17 @@ body {
 }
 
 
+#legend-timeline {
+  position: absolute;
+  left: 10%;
+  bottom: 3%;
+  z-index: 3;
+}
+
+#legend-timeline > img{
+  background: #1a1a1a;
+  width: 50%;
+}
+
+
 

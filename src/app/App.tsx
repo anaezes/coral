@@ -196,6 +196,9 @@ class App extends React.Component<{}, state> {
                 <div id="legend-box">
                     {EnvironmentComponent.legend !== undefined?  <img src={EnvironmentComponent.legend.src}/>  : <div/>}
                 </div>
+                <div id="legend-timeline">
+                    {this.aisComponent.legend !== undefined?  <img src={this.aisComponent.legend.src}/>  : <div/>}
+                </div>
                 <TopView ref={element => this.topView = element}/>
             </div>
         );
