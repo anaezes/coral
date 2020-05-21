@@ -2,6 +2,7 @@ import moment from "moment";
 import Model from "./Model";
 import models from '../../data/models.json';
 import {ModelJSON} from "../utils/ModelUtils";
+import Utils from "../utils/Utils";
 
 const Cesium = require('cesium');
 
@@ -127,7 +128,7 @@ class EnvironmentComponent {
             let today;
             date === undefined ? today = new Date() : today = date;
             today.setHours(12);
-            let url = 'https://api.meteomatics.com/' + this.formatDateForRequest(today) + '/t_0m:C/90,-180_-90,180:600x400/png';
+            let url = 'https://api.meteomatics.com/' + this.formatDateForRequest12(today) + '/t_0m:C/90,-180_-90,180:600x400/png';
             let autentication = 'faculdadedeengenhariadoporto_santos:5xHPl1YW0gsUb';
             this.getImage(url, autentication).then(image => {
                 this.worldLayer = viewer.imageryLayers.addImageryProvider(new Cesium.SingleTileImageryProvider({
@@ -174,7 +175,7 @@ class EnvironmentComponent {
                         belowmaxcolor:"extend",
                         elevation:"-0.49402499198913574",
                         attribution:"E.U. Copernicus Marine Service Information",
-                        time: encodeURI(this.formatDateForRequest(today))
+                        time: encodeURI(this.formatDateForRequest24(today))
                     },
                 })
             );
@@ -190,7 +191,7 @@ class EnvironmentComponent {
     }
 
     /*
-    * Water temperature of a given date (daily)
+    * Water temperature of a given date (hourly)
     * **/
     setWaterTemp(viewer: any, display:boolean = true, date?) {
         if (!display) {
@@ -198,12 +199,34 @@ class EnvironmentComponent {
             this.waterTempLayer = null;
             EnvironmentComponent.legend = undefined;
         } else {
-            let today;
+/*            let today;
             date === undefined ? today = new Date() : today = date;
+
+            console.log(today);
+
             today.setHours(12);
+            today.setMinutes(30, 0, 0);
+
+            console.log(today);*/
+
+            let today;
+            if(date === undefined){
+                today = new Date();
+                today.setMinutes(30, 0, 0);
+            }
+            else {
+                // todo add label real time vs forecast
+                today = date;
+                let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
+                if(currentTime.minute > 30)
+                    today.setHours(currentTime.hour, 30, 0, 0);
+                else
+                    today.setHours(currentTime.hour - 1, 30, 0, 0);
+            }
+
             this.waterTempLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
-                    url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024",
+                    url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
                     layers: "thetao",
                     parameters: {
                         service: "WMS",
@@ -217,7 +240,7 @@ class EnvironmentComponent {
                         belowmaxcolor: "extend",
                         elevation: "-0.49402499198913574",
                         attribution: "E.U. Copernicus Marine Service Information",
-                        time: encodeURI(this.formatDateForRequest(today)),
+                        time: encodeURI(today.toISOString()),
                     },
                 })
             );
@@ -247,10 +270,19 @@ class EnvironmentComponent {
 
         } else {
             let today;
-            date === undefined ? today = new Date() : today = date;
-            today.setMinutes(30, 0, 0);
-
-            console.log(date);
+            if(date === undefined){
+                today = new Date();
+                today.setMinutes(30, 0, 0);
+            }
+            else {
+                // todo add label real time vs forecast
+                today = date;
+                let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
+                if(currentTime.minute > 30)
+                    today.setHours(currentTime.hour, 30, 0, 0);
+                else
+                    today.setHours(currentTime.hour - 1, 30, 0, 0);
+            }
 
             this.wavesVelocityLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
@@ -296,6 +328,22 @@ class EnvironmentComponent {
             this.wavesHeightLayer = null;
             EnvironmentComponent.legend = undefined;
         } else {
+
+            let today;
+            if(date === undefined)
+                today = new Date();
+            else {
+                // todo add label real time vs forecast
+                today = date;
+                let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
+                today.setHours(currentTime.hour);
+                console.log(today);
+            }
+
+            let time = this.getMultipleTime(3, today);
+
+            console.log(this.formatDateForRequest24(time));
+
             this.wavesHeightLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
                     url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027",
@@ -309,7 +357,7 @@ class EnvironmentComponent {
                         transparent: "true",
                         colorscalerange: "0.01,10",
                         attribution: "E.U. Copernicus Marine Service Information",
-                        time: encodeURI(this.getTime(3, date)),
+                        time: encodeURI(this.formatDateForRequest24(time)),
                     },
                 })
             );
@@ -397,8 +445,6 @@ class EnvironmentComponent {
             img.src = url;
             EnvironmentComponent.legend = img;
 
-            console.log("passei por aqui");
-
             return this.bathymetryLayer;
         }
     }
@@ -429,24 +475,29 @@ class EnvironmentComponent {
     }
 
 
-    getTime(multiple: number, d?: any){
-        let date;
-        d === undefined ? date = new Date() : date = d;
+    getMultipleTime(multiple: number, date: any){
+        let rest = date.getHours() % multiple;
+        let hour = date.getHours() - rest;
 
-        let hour = date.getHours() % multiple;
-
-        hour -=  (hour - multiple);
-
-        date.setHours(hour);
-
-        return this.formatDateForRequest(date);
+        console.log(hour);
+        date.setHours(hour, 0, 0, 0);
+        console.log(date);
+        return date;
     }
 
-    public formatDateForRequest(date: Date) {
+
+    public formatDateForRequest24(date: Date) {
+        return moment(date)
+            .format('YYYY-MM-DDTHH:00:00.000')
+            .concat('Z')
+    }
+
+    public formatDateForRequest12(date: Date) {
         return moment(date)
             .format('YYYY-MM-DDThh:00:00.000')
             .concat('Z')
     }
+
 
 
     clearAllLayer(viewer: any) {
