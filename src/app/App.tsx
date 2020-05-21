@@ -318,6 +318,8 @@ class App extends React.Component<{}, state> {
         this.CesiumViewer.scene.fog.density = 2.0e-4;
 
         this.CesiumViewer.animation.viewModel.setShuttleRingTicks([0, 1500]);
+
+        this.aisComponent.getBoundsTime(this.CesiumViewer);
     }
 
     /**
@@ -549,6 +551,8 @@ class App extends React.Component<{}, state> {
             Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }
 
+
+
     /**
      * Processes the data of the auvs requested from the server
      */
@@ -579,7 +583,6 @@ class App extends React.Component<{}, state> {
         this.environmentComponent = new EnvironmentComponent();
         this.bathymetryComponent = new BathymetryComponent();
         this.auvComponent = new AuvComponent();
-
 
         this.aisComponent.update(this.CesiumViewer, false);
         clearInterval(this.updateAisIntervalId);

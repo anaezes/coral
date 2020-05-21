@@ -118,7 +118,7 @@ class AisComponent {
     private updateAisPosition(ais, entity, viewer) {
 
         let timeTimeline = viewer.clock.currentTime;
-        let realTime = Cesium.JulianDate.now();
+        let realTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), 1, new Cesium.JulianDate());
         let time = Cesium.JulianDate.secondsDifference(timeTimeline, realTime);
 
        if(time < 300) {
@@ -162,8 +162,8 @@ class AisComponent {
 
     getBoundsTime(viewer) {
         //Set bounds of our simulation time
-        this.startTime = Cesium.JulianDate.now();
-        this.stopTime = Cesium.JulianDate.addHours(this.startTime, 2, new Cesium.JulianDate());
+        this.startTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), 1, new Cesium.JulianDate());
+        this.stopTime = Cesium.JulianDate.addHours(this.startTime, 6, new Cesium.JulianDate());
 
         //Make sure viewer is at the desired time.
         viewer.clock.startTime = this.startTime.clone();
