@@ -102,7 +102,7 @@ class AisComponent {
             billboard: {
                 image: "../images/navigation-arrow-white-25perc.png",
                 rotation: Cesium.Math.toRadians(Utils.normalRelativeAngle(rotation)),
-                color: Cesium.Color.GREEN,
+                color: this.getColorVessel(ais),
                 scale: this.scale,
                 distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
                     0.0,
@@ -122,7 +122,7 @@ class AisComponent {
         let realTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), 1, new Cesium.JulianDate());
         let time = Cesium.JulianDate.secondsDifference(timeTimeline, realTime);
 
-       if(time < 300) {
+       if(time < 50) {
            this.img.src = "../images/realTimeInfo.png";
            entity.position = Cesium.Cartesian3.fromDegrees(ais.longitude, ais.latitude);
 
@@ -172,7 +172,8 @@ class AisComponent {
 
         //Set timeline to simulation bounds
         viewer.timeline.zoomTo(this.startTime, this.stopTime);
-        //viewer.clock.canAnimate = false;
+        viewer.clock.canAnimate = true;
+        viewer.clock.shouldAnimate = true;
     }
 
     clear(viewer) {
@@ -183,6 +184,29 @@ class AisComponent {
         }
 
         this.legend = undefined;
+    }
+
+    private getColorVessel(ais) {
+        if(ais.strtype.includes("Cargo") || ais.strtype.includes("Tug Tow") )
+            return Cesium.Color.GOLD;
+
+        if(ais.strtype.includes("Fishing"))
+            return Cesium.Color.DARKGOLDENROD;
+
+        if(ais.strtype.includes("Military"))
+            return Cesium.Color.MEDIUMSLATEBLUE;
+
+        if(ais.strtype.includes("Passenger"))
+            return Cesium.Color.GREEN;
+
+        if(ais.strtype.includes("Pleasure Craft") || ais.strtype.includes("Sailing"))
+            return Cesium.Color.LIGHTGREEN;
+
+        if(ais.strtype.includes("Tanker") )
+            return Cesium.Color.SALMON;
+
+        return Cesium.Color.WHITE;
+
     }
 }
 export default AisComponent;
