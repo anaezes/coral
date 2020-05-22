@@ -17,6 +17,7 @@ const DEPTH = 0.0;
 const urlAuvs =  'https://ripples.lsts.pt/soi';
 const dummyCredit = document.createElement("div");
 
+
 interface state {
     data: Array<string>,
     wsMsg: Array<string>,
@@ -52,7 +53,6 @@ class App extends React.Component<{}, state> {
     private container: any;
     private topView: any;
     private auvComponent = new AuvComponent();
-    //private bathymetryComponent = new BathymetryComponent();
     private updateBathymetryIntervalId: any;
     private updateTopViewIntervalId: any;
     private updateEnvironmentIntervalId: any;
@@ -185,9 +185,6 @@ class App extends React.Component<{}, state> {
             this.isSystemInit = true;
         }
 
-     /*   if(this.aisComponent !== undefined && this.state.options.ais)
-            this.aisComponent.render(this.CesiumViewer);*/
-
         return (
             <div>
                 <div id="Container" ref={element => this.container = element}/>
@@ -292,7 +289,8 @@ class App extends React.Component<{}, state> {
             timeline: true,
             navigationHelpButton: false,
             navigationInstructionsInitiallyVisible: false,
-            shouldAnimate: false, // Enable animations
+            shouldAnimate: false, // Enable
+            canAnimate: false,
             requestRenderMode: false,
             creditContainer: dummyCredit,
             showWaterEffect: true
@@ -309,8 +307,6 @@ class App extends React.Component<{}, state> {
         //this.CesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
         //this.CesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
-        //this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
-
         //Set the random number seed for consistent results.
         Cesium.Math.setRandomNumberSeed(3);
 
@@ -319,32 +315,38 @@ class App extends React.Component<{}, state> {
 
         this.CesiumViewer.animation.viewModel.setShuttleRingTicks([0, 1500]);
 
+
+        // Set bounds timeline [now, +6h]
         this.aisComponent.getBoundsTime(this.CesiumViewer);
+
+        // Update layers event listeners
+        let app = this;
+        let updateAnimation = false;
+        this.CesiumViewer.clock.onTick.addEventListener(function(){
+            updateAnimation = app.updateLayerTime(updateAnimation);
+        });
+
+        let updateTimeline = false;
+        const eventObj = {
+            handleEvent(e) {
+                updateTimeline = app.updateLayerTime(updateTimeline);
+            }
+        }
+        this.CesiumViewer.timeline.container.addEventListener('click', eventObj)
     }
 
-    /**
-     * TODO: aplicar isto para vários modelos
-     */
-  /*  initEnvironment() : void {
-        let newLatitude = this.auvComponent.getAuvActive().latitude-0.0005;
-        let newLongitude = this.auvComponent.getAuvActive().longitude-0.0003;
-        let modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-            Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude, DEPTH));
+    updateLayerTime(update) {
+        let currentTime = Cesium.JulianDate.toGregorianDate(this.CesiumViewer.clock.currentTime);
+        if(!update && currentTime.minute > 30 && currentTime.minute < 32) {
+            let date = this.dateMap.get(this.state.options.date)
+            this.environmentComponent.updateLayersTime(this.CesiumViewer, date);
+            return true;
+        }
+        if(currentTime.minute === 0)
+            return false;
+        return update;
+    }
 
-        // naufrago
-        var viewer = this.CesiumViewer;
-        var tileset = viewer.scene.primitives.add(
-            new Cesium.Cesium3DTileset({
-                url: Cesium.IonResource.fromAssetId(90688),
-                modelMatrix : modelMatrix
-            })
-        );
-
-        // Debug
-/!*        let dist = Cesium.Cartesian3.distance(new Cesium.Cartesian3.fromDegrees(this.auvComponent.getAuvActive().longitude, this.auvComponent.getAuvActive().latitude),
-            new Cesium.Cartesian3.fromDegrees(newLongitude, newLatitude));
-        console.log("Distance: " + dist);*!/
-    }*/
 
     /**
      * Handles user input and updates components accordingly
@@ -458,8 +460,6 @@ class App extends React.Component<{}, state> {
     }
 
     updateAis() {
-        //console.log("update ais app!");
-        //this.auvComponent.getAuvActive().setPosition(this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime));
         this.aisComponent.update(this.CesiumViewer, true);
     }
 

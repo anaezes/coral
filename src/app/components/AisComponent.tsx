@@ -175,7 +175,7 @@ class AisComponent {
 
         //Set timeline to simulation bounds
         viewer.timeline.zoomTo(this.startTime, this.stopTime);
-        viewer.clock.canAnimate = false;
+        //viewer.clock.canAnimate = false;
     }
 
     clear(viewer) {
