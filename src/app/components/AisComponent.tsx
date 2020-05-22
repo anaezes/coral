@@ -79,6 +79,7 @@ class AisComponent {
     private  renderAis(viewer, ais){
         let origin = Cesium.Cartographic.fromDegrees(ais.longitude, ais.latitude);
         let result = Utils.getPointFromAngleAndPoint(ais.cog, ais.longitude, ais.latitude);
+        let rotation = Math.round(ais.heading !== 511 ? ais.heading : ais.cog);
 
         viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(ais.longitude, ais.latitude),
@@ -100,7 +101,7 @@ class AisComponent {
              },
             billboard: {
                 image: "../images/navigation-arrow-white-25perc.png",
-                rotation: Cesium.Math.toRadians(Utils.normalRelativeAngle(ais.heading)),
+                rotation: Cesium.Math.toRadians(Utils.normalRelativeAngle(rotation)),
                 color: Cesium.Color.GREEN,
                 scale: this.scale,
                 distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
@@ -122,11 +123,8 @@ class AisComponent {
         let time = Cesium.JulianDate.secondsDifference(timeTimeline, realTime);
 
        if(time < 300) {
-
            this.img.src = "../images/realTimeInfo.png";
-
            entity.position = Cesium.Cartesian3.fromDegrees(ais.longitude, ais.latitude);
-           entity.billboard.rotation = Cesium.Math.toRadians(Utils.normalRelativeAngle(ais.heading)) + Cesium.Math.PI;
 
            let origin = Cesium.Cartographic.fromDegrees(ais.longitude, ais.latitude);
            let result = Utils.getPointFromAngleAndPoint(ais.cog, ais.longitude, ais.latitude);
@@ -138,17 +136,13 @@ class AisComponent {
            ]);
        }
        else {
-
            this.img.src = "../images/forecastInfo.png";
 
            let distance = ais.sog * time;
            let result = Utils.getPointFromAngleAndPoint(ais.heading,
                ais.longitude, ais.latitude, distance);
            let futurePos = Cesium.Cartesian3.fromRadians(result.longitude, result.latitude);
-
            entity.position = futurePos;
-           entity.billboard.rotation = Cesium.Math.toRadians(Utils.normalRelativeAngle(ais.heading)) + Cesium.Math.PI;
-
            let cogDirectionPos = Utils.getPointFromAngleAndPoint(ais.cog, Cesium.Math.toDegrees(result.longitude), Cesium.Math.toDegrees(result.latitude));
            entity.polyline.positions =  Cesium.Cartesian3.fromRadiansArray([
                cogDirectionPos.longitude,
@@ -157,6 +151,9 @@ class AisComponent {
                result.latitude,
            ]);
        }
+
+        let rotation = Math.round(ais.heading !== 511 ? ais.heading : ais.cog);
+        entity.billboard.rotation = Cesium.Math.toRadians(Utils.normalRelativeAngle(rotation)) + Cesium.Math.PI;
     }
 
 
