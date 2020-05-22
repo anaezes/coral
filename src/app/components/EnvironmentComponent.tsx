@@ -2,7 +2,6 @@ import moment from "moment";
 import Model from "./Model";
 import models from '../../data/models.json';
 import {ModelJSON} from "../utils/ModelUtils";
-import Utils from "../utils/Utils";
 
 const Cesium = require('cesium');
 
@@ -159,8 +158,8 @@ class EnvironmentComponent {
             let today;
             date === undefined ? today = new Date() : today = date;
             today.setHours(12);
-            this.salinityLayer = viewer.imageryLayers.addImageryProvider(
-                new Cesium.WebMapServiceImageryProvider({
+
+            let layer = new Cesium.WebMapServiceImageryProvider({
                     url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024",
                     layers: "so",
                     parameters: {
@@ -177,8 +176,10 @@ class EnvironmentComponent {
                         attribution:"E.U. Copernicus Marine Service Information",
                         time: encodeURI(this.formatDateForRequest24(today))
                     },
-                })
-            );
+                });
+
+            layer.defaultAlpha = 0.5;
+            this.salinityLayer = viewer.imageryLayers.addImageryProvider(layer);
 
             let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
                 'request=GetLegendGraphic&layer=so&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
@@ -199,16 +200,6 @@ class EnvironmentComponent {
             this.waterTempLayer = null;
             EnvironmentComponent.legend = undefined;
         } else {
-/*            let today;
-            date === undefined ? today = new Date() : today = date;
-
-            console.log(today);
-
-            today.setHours(12);
-            today.setMinutes(30, 0, 0);
-
-            console.log(today);*/
-
             let today;
             if(date === undefined){
                 today = new Date();
@@ -224,8 +215,7 @@ class EnvironmentComponent {
                     today.setHours(currentTime.hour - 1, 30, 0, 0);
             }
 
-            this.waterTempLayer = viewer.imageryLayers.addImageryProvider(
-                new Cesium.WebMapServiceImageryProvider({
+            let layer = new Cesium.WebMapServiceImageryProvider({
                     url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
                     layers: "thetao",
                     parameters: {
@@ -242,8 +232,10 @@ class EnvironmentComponent {
                         attribution: "E.U. Copernicus Marine Service Information",
                         time: encodeURI(today.toISOString()),
                     },
-                })
-            );
+                });
+
+            layer.defaultAlpha = 0.5;
+            this.wavesVelocityLayer = viewer.imageryLayers.addImageryProvider(layer);
 
             let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
                 'request=GetLegendGraphic&layer=thetao&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
@@ -284,26 +276,26 @@ class EnvironmentComponent {
                     today.setHours(currentTime.hour - 1, 30, 0, 0);
             }
 
-            this.wavesVelocityLayer = viewer.imageryLayers.addImageryProvider(
-                new Cesium.WebMapServiceImageryProvider({
-                    url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
-                    layers: "sea_water_velocity",
-                    parameters: {
-                        service:"WMS",
-                        request: "GetMap",
-                        version: "1.3.0",
-                        format:"image/png",
-                        styles: 'vector/rainbow',
-                        transparent: "true",
-                        colorscalerange:"0.00193016,1.9712055",
-                        ELEVATION:"-0.49402499198913574",
-                        attribution:"E.U. Copernicus Marine Service Information",
-                        time: encodeURI(today.toISOString()),
-                        NUMCOLORBANDS:"250",
-                        continuousWorld: "true"
-                    },
-                })
-            );
+            let layer = new Cesium.WebMapServiceImageryProvider({
+                url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
+                layers: "sea_water_velocity",
+                parameters: {
+                    service:"WMS",
+                    request: "GetMap",
+                    version: "1.3.0",
+                    format:"image/png",
+                    styles: 'vector/rainbow',
+                    transparent: "true",
+                    colorscalerange:"0.00193016,1.9712055",
+                    ELEVATION:"-0.49402499198913574",
+                    attribution:"E.U. Copernicus Marine Service Information",
+                    time: encodeURI(today.toISOString()),
+                    NUMCOLORBANDS:"250",
+                    continuousWorld: "true"
+                }
+            });
+            layer.defaultAlpha = 0.5;
+            this.wavesVelocityLayer = viewer.imageryLayers.addImageryProvider(layer);
 
             viewer.terrainProvider = Cesium.createWorldTerrain({
                 requestWaterMask: false,
@@ -342,10 +334,7 @@ class EnvironmentComponent {
 
             let time = this.getMultipleTime(3, today);
 
-            console.log(this.formatDateForRequest24(time));
-
-            this.wavesHeightLayer = viewer.imageryLayers.addImageryProvider(
-                new Cesium.WebMapServiceImageryProvider({
+            let layer = new Cesium.WebMapServiceImageryProvider({
                     url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027",
                     layers: "VHM0",
                     parameters: {
@@ -359,8 +348,9 @@ class EnvironmentComponent {
                         attribution: "E.U. Copernicus Marine Service Information",
                         time: encodeURI(this.formatDateForRequest24(time)),
                     },
-                })
-            );
+                });
+            layer.defaultAlpha = 0.5;
+            this.wavesHeightLayer = viewer.imageryLayers.addImageryProvider(layer);
 
             let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027?service=WMS&' +
                 'request=GetLegendGraphic&layer=VHM0&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
@@ -521,5 +511,21 @@ class EnvironmentComponent {
 
         EnvironmentComponent.legend = undefined;
     }
+
+    public updateLayersTime(viewer, date) {
+        console.log("update layers");
+
+        if (this.wavesHeightLayer !== null)
+            this.setWavesHeight(viewer, true, date);
+
+        if (this.waterTempLayer !== null)
+            this.setWaterTemp(viewer, true, date);
+
+        if (this.wavesVelocityLayer !== null)
+            this.setWavesVelocity(viewer, true, date);
+
+    }
+
+
 }
 export default EnvironmentComponent
