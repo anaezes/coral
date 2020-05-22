@@ -65,7 +65,7 @@ class BathymetryComponent {
         let offset;
 
         if(tile.coordsFixed || tile.assetId === this.mainTile.assetId){
-            cartesian = Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude, tile.depth);
+            cartesian = Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude, tile.depth*terrainExaggeration);
         }
         else {
             offset = tile.getOffset(this.mainTile);
@@ -73,14 +73,14 @@ class BathymetryComponent {
             let result = Cesium.Cartographic.fromCartesian(finalPos, Cesium.Ellipsoid.WGS84);
 
             cartesian = Cesium.Cartesian3.fromDegrees(Cesium.Math.toDegrees(result.longitude),
-                Cesium.Math.toDegrees(result.latitude), tile.depth);
+                Cesium.Math.toDegrees(result.latitude), tile.depth*terrainExaggeration/2);
             tile.longitude = Cesium.Math.toDegrees(result.longitude);
             tile.latitude = Cesium.Math.toDegrees(result.latitude);
         }
 
         var transform = new Cesium.Matrix4();
         var translation = Cesium.Transforms.eastNorthUpToFixedFrame(cartesian);
-        var scale = Cesium.Matrix4.fromScale(new Cesium.Cartesian3(1,1, terrainExaggeration), undefined);
+        var scale = Cesium.Matrix4.fromScale(new Cesium.Cartesian3(1,1, terrainExaggeration/2), undefined);
         Cesium.Matrix4.multiply(translation, scale, transform);
         var rotation = Cesium.Matrix4.fromRotationTranslation(Cesium.Matrix3.IDENTITY, undefined, undefined);
         Cesium.Matrix4.multiply(transform, rotation, transform);
