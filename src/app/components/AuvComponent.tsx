@@ -145,16 +145,17 @@ class AuvComponent {
         });
     }
 
+    //todo melhorar: colocar mapa de dados com casas decimais + unidades
     updateSamplesLabel(auv) {
         return function callbackFunction() {
             let result = "";
             if(auv !== undefined){
                 let cartographic = new Cesium.Cartographic.fromCartesian(auv.getPosition());
-                result = "Depth: " + (cartographic.height).toFixed(3).toString() + "m";
+                result = "Depth: " + (cartographic.height).toFixed(1).toString() + "m";
                 auv.getSamples().forEach((sample: Sample, name: string) => {
-                    result += "\n" + name + ": " + sample.value;
+                    result += "\n" + name + ": " + sample.value.toFixed(2).toString();
                     if(name === "Temperature")
-                        result += " ºC";
+                        result += String.fromCharCode(0x2103);
                 });
             }
             return result;
