@@ -16,7 +16,7 @@ class AisComponent {
     private startTime: any;
     private stopTime: any;
     public isAnimating : boolean = false;
-    public legend : HTMLImageElement | undefined;
+    public legendTime : HTMLImageElement | undefined;
     private img = document.createElement('img');
 
     constructor(scale, width, scaleByDistance){
@@ -73,7 +73,7 @@ class AisComponent {
                 this.renderAis(viewer, this.ais[i]);
         }
 
-        this.legend = this.img;
+        this.legendTime = this.img;
     }
 
     private  renderAis(viewer, ais){
@@ -109,6 +109,18 @@ class AisComponent {
                     2000000.0
                 ),
                 scaleByDistance : this.scaleByDistance
+            },
+            label : {
+                text : ais.name + " (" + ais.strtype + ")",
+                font : '9px sans-serif',
+                showBackground : true,
+                horizontalOrigin : Cesium.HorizontalOrigin.CENTER,
+                verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+                    0.0,
+                    500000.0
+                ),
+                show: false
             },
             name: ais.name,
             id: ais.name,
@@ -174,6 +186,26 @@ class AisComponent {
         viewer.timeline.zoomTo(this.startTime, this.stopTime);
         viewer.clock.canAnimate = true;
         viewer.clock.shouldAnimate = true;
+
+
+        viewer.screenSpaceEventHandler.setInputAction(function onLeftDown(
+            movement) {
+
+            let pickedLabel = viewer.scene.pick(movement.position);
+
+            if(pickedLabel === undefined)
+                return;
+            pickedLabel.id.label.show = true;
+        }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+
+        viewer.screenSpaceEventHandler.setInputAction(function onLeftUp(
+            movement) {
+            let pickedLabel = viewer.scene.pick(movement.position);
+            if(pickedLabel === undefined)
+                return;
+            pickedLabel.id.label.show = false;
+        }, Cesium.ScreenSpaceEventType.LEFT_UP);
+
     }
 
     clear(viewer) {
@@ -183,7 +215,7 @@ class AisComponent {
                 entity.show = false;
         }
 
-        this.legend = undefined;
+        this.legendTime = undefined;
     }
 
     private getColorVessel(ais) {

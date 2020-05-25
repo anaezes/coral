@@ -63,6 +63,9 @@ class App extends React.Component<{}, state> {
     private bathymetryComponent : any;
     private dateMap : Map<string, Date> = new Map<string, Date>();
 
+    public legendTime : HTMLImageElement | undefined;
+    private img = document.createElement('img');
+
 
     state = {
         data: [],
@@ -185,21 +188,29 @@ class App extends React.Component<{}, state> {
             this.isSystemInit = true;
         }
 
+        this.updateLabelTime();
+
         return (
             <div>
                 <div id="Container" ref={element => this.container = element}/>
                 {this.isUnderwater && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
                 {this.isUnderwater?  this.menuUnderwater() : this.menuSurface()}
-                <div id="legend-box">
+                <div id="legend-env-box">
                     {EnvironmentComponent.legend !== undefined?  <img src={EnvironmentComponent.legend.src}/>  : <div/>}
                 </div>
                 <div id="legend-timeline">
-                    {this.aisComponent.legend !== undefined?  <img src={this.aisComponent.legend.src}/>  : <div/>}
+                    {this.legendTime !== undefined?  <img src={this.legendTime.src}/>  : <div/>}
                 </div>
                 <TopView ref={element => this.topView = element}/>
             </div>
         );
     }
+
+    /*
+                    <!--div id="legend-ais-box">
+                    {this.aisComponent.legendAis !== undefined?  <img src={this.aisComponent.legendAis.src}/>  : <div/>}
+                </div>
+    */
 
     menuUnderwater() {
         const {options} = this.state;
@@ -211,7 +222,7 @@ class App extends React.Component<{}, state> {
                         label="Available AUV's"
                         path="auvActive"
                         options={this.options}/>
-                    <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={5} step={1} />
+                    <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={8} step={1} />
                     <DatBoolean path='waterEffects' label='Water effects' />
                     <DatBoolean path='updatePlan' label='Test update plan' />
                 </DatFolder>
@@ -324,12 +335,14 @@ class App extends React.Component<{}, state> {
         let updateAnimation = false;
         this.CesiumViewer.clock.onTick.addEventListener(function(){
             updateAnimation = app.updateLayerTime(updateAnimation);
+            app.updateLabelTime();
         });
 
         let updateTimeline = false;
         const eventObj = {
             handleEvent(e) {
                 updateTimeline = app.updateLayerTime(updateTimeline);
+                app.updateLabelTime();
             }
         }
         this.CesiumViewer.timeline.container.addEventListener('click', eventObj)
@@ -368,9 +381,11 @@ class App extends React.Component<{}, state> {
                 this.isUnderwater = false;
 
                 // todo reset timeline
-                this.CesiumViewer.clock.shouldAnimate = false;
+                this.CesiumViewer.clock.canAnimate = true;
+                this.CesiumViewer.clock.shouldAnimate = true;
 
             } else {
+
                 this.CesiumViewer.scene.globe.depthTestAgainstTerrain = true;
                 let success = this.auvComponent.setAuv(this.auvs, data.auvActive, this.CesiumViewer);
 
@@ -468,7 +483,7 @@ class App extends React.Component<{}, state> {
      */
     updateTopView() {
         this.auvComponent.getAuvActive().setPosition(this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime));
-        this.topView.setTopView(this.auvComponent.getAuvActive());
+        this.topView.setTopView(this.auvComponent.getAuvActive(), this.CesiumViewer.clock.currentTime);
     }
 
     /**
@@ -525,27 +540,31 @@ class App extends React.Component<{}, state> {
             movement) {
                 var pickedLabel = viewer.scene.pick(movement.position);
 
-                //do nothing
-                if(app.auvComponent.getAuvActive() !== undefined)
+                if(app.isUnderwater)
                     return;
 
-                if (Cesium.defined(pickedLabel)) {
-                    let d: MenuOptions = {
-                        auvActive : pickedLabel.id.id,
-                        terrainExaggeration : app.state.options.terrainExaggeration,
-                        waterEffects : app.state.options.waterEffects,
-                        ais : app.state.options.ais,
-                        wavesHeight : app.state.options.wavesHeight,
-                        wavesVelocity: app.state.options.wavesVelocity,
-                        aisDensity: app.state.options.aisDensity,
-                        world_temp: app.state.options.world_temp,
-                        water_temp: app.state.options.water_temp,
-                        salinity: app.state.options.salinity,
-                        bathymetry: app.state.options.bathymetry,
-                        wrecks: app.state.options.wrecks,
-                        updatePlan : app.state.options.updatePlan
-                    };
-                    app.updateRender(d);
+                if(pickedLabel === undefined)
+                    return;
+
+                if(app.options.includes(pickedLabel.id.id)){
+                    if (Cesium.defined(pickedLabel)) {
+                        let d: MenuOptions = {
+                            auvActive : pickedLabel.id.id,
+                            terrainExaggeration : app.state.options.terrainExaggeration,
+                            waterEffects : app.state.options.waterEffects,
+                            ais : app.state.options.ais,
+                            wavesHeight : app.state.options.wavesHeight,
+                            wavesVelocity: app.state.options.wavesVelocity,
+                            aisDensity: app.state.options.aisDensity,
+                            world_temp: app.state.options.world_temp,
+                            water_temp: app.state.options.water_temp,
+                            salinity: app.state.options.salinity,
+                            bathymetry: app.state.options.bathymetry,
+                            wrecks: app.state.options.wrecks,
+                            updatePlan : app.state.options.updatePlan
+                        };
+                        app.updateRender(d);
+                    }
                 }
             },
             Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -593,6 +612,9 @@ class App extends React.Component<{}, state> {
                 8.0e6,
                 0.0
             ));
+
+        this.CesiumViewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOWN);
+        this.CesiumViewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_UP);
     }
 
     private getDates() {
@@ -614,5 +636,28 @@ class App extends React.Component<{}, state> {
             }
         }
     }
+
+    private updateLabelTime() {
+
+        if(this.CesiumViewer === undefined)
+            return;
+
+        if(this.isUnderwater) {
+            this.legendTime = undefined;
+            return;
+        }
+
+        let timeTimeline = this.CesiumViewer.clock.currentTime;
+        let realTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), 1, new Cesium.JulianDate());
+        let time = Cesium.JulianDate.secondsDifference(timeTimeline, realTime);
+
+        if(time < 5)
+            this.img.src = "../images/realTimeInfo.png";
+        else
+            this.img.src = "../images/forecastInfo.png";
+
+        this.legendTime = this.img;
+    }
+
 };
 export default App;

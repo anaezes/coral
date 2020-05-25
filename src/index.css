@@ -72,14 +72,14 @@ body {
   position: absolute;
 }
 
-#legend-box {
+#legend-env-box {
   position: absolute;
   right: 0;
   bottom: 5%;
   z-index: 3;
 }
 
-#legend-box > img{
+#legend-env-box > img{
   background: #1a1a1a;
   width: 75%;
 }
@@ -99,6 +99,18 @@ body {
 #legend-timeline > img{
   background: #1a1a1a;
   width: 50%;
+}
+
+#legend-ais-box {
+  position: absolute;
+  right: 9%;
+  bottom: 5%;
+  z-index: 3;
+}
+
+#legend-ais-box > img{
+  background: #1a1a1a;
+  width: 75%;
 }
 
 

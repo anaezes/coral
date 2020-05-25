@@ -66,6 +66,9 @@ class AuvComponent {
 
         //Set timeline to simulation bounds
         viewer.timeline.zoomTo(this.startTime, this.stopTime);
+
+        viewer.clock.canAnimate = false;
+        viewer.clock.shouldAnimate = false;
     }
 
     createAuvModel(viewer) {

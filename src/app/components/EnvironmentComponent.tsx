@@ -15,8 +15,9 @@ class EnvironmentComponent {
     wrecksLayerWorldTerrain =  null;
     bathymetryLayer = null ;
     aisDensityLayer = null;
-    public models: Array<Model> = new Array<Model>();
+    public models : Array<Model> = new Array<Model>();
     static legend : HTMLImageElement | undefined;
+    //images : Map<string, string> = new Map<string, string>();
 
     constructor() {
         let t : Array<ModelJSON> = JSON.parse(JSON.stringify(models.wrecks));
@@ -149,7 +150,7 @@ class EnvironmentComponent {
     /*
     * Salinity of a given date (daily)
     * **/
-    setSalinity(viewer, display:boolean = true, date?){
+    setSalinity(viewer, display: boolean, date){
         if (!display) {
             viewer.imageryLayers.remove(this.salinityLayer);
             this.salinityLayer = null;
@@ -188,32 +189,29 @@ class EnvironmentComponent {
             let img = document.createElement('img');
             img.src = url;
             EnvironmentComponent.legend = img;
+
+           // this.images.set("salinityLayer",img.src);
         }
     }
 
     /*
     * Water temperature of a given date (hourly)
     * **/
-    setWaterTemp(viewer: any, display:boolean = true, date?) {
+    setWaterTemp(viewer: any, display: boolean, date) {
+
+        console.log("display: " + display);
         if (!display) {
             viewer.imageryLayers.remove(this.waterTempLayer);
             this.waterTempLayer = null;
             EnvironmentComponent.legend = undefined;
         } else {
-            let today;
-            if(date === undefined){
-                today = new Date();
-                today.setMinutes(30, 0, 0);
-            }
-            else {
-                // todo add label real time vs forecast
-                today = date;
-                let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
-                if(currentTime.minute > 30)
-                    today.setHours(currentTime.hour, 30, 0, 0);
-                else
-                    today.setHours(currentTime.hour - 1, 30, 0, 0);
-            }
+            let today = date;
+            let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
+            if(currentTime.minute > 30)
+                today.setHours(currentTime.hour, 30, 0, 0);
+            else
+                today.setHours(currentTime.hour - 1, 30, 0, 0);
+
 
             let layer = new Cesium.WebMapServiceImageryProvider({
                     url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
@@ -235,7 +233,7 @@ class EnvironmentComponent {
                 });
 
             layer.defaultAlpha = 0.5;
-            this.wavesVelocityLayer = viewer.imageryLayers.addImageryProvider(layer);
+            this.waterTempLayer = viewer.imageryLayers.addImageryProvider(layer);
 
             let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
                 'request=GetLegendGraphic&layer=thetao&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
@@ -250,8 +248,9 @@ class EnvironmentComponent {
     /*
     * Mean waves velocity of a given date (hourly)
     ***/
-    setWavesVelocity(viewer: any, display:boolean = true, date?: any) {
+    setWavesVelocity(viewer: any, display:boolean, date: any) {
         if (!display) {
+            console.log("here");
             viewer.imageryLayers.remove(this.wavesVelocityLayer);
             this.wavesVelocityLayer = null;
             EnvironmentComponent.legend = undefined;
@@ -261,20 +260,12 @@ class EnvironmentComponent {
             });
 
         } else {
-            let today;
-            if(date === undefined){
-                today = new Date();
-                today.setMinutes(30, 0, 0);
-            }
-            else {
-                // todo add label real time vs forecast
-                today = date;
-                let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
-                if(currentTime.minute > 30)
-                    today.setHours(currentTime.hour, 30, 0, 0);
-                else
-                    today.setHours(currentTime.hour - 1, 30, 0, 0);
-            }
+            let today = date;
+            let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
+            if(currentTime.minute > 30)
+                today.setHours(currentTime.hour, 30, 0, 0);
+            else
+                today.setHours(currentTime.hour - 1, 30, 0, 0);
 
             let layer = new Cesium.WebMapServiceImageryProvider({
                 url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
@@ -286,7 +277,7 @@ class EnvironmentComponent {
                     format:"image/png",
                     styles: 'vector/rainbow',
                     transparent: "true",
-                    colorscalerange:"0.00193016,1.9712055",
+                    colorscalerange:"0.015746597,0.44014812",
                     ELEVATION:"-0.49402499198913574",
                     attribution:"E.U. Copernicus Marine Service Information",
                     time: encodeURI(today.toISOString()),
@@ -303,7 +294,7 @@ class EnvironmentComponent {
 
             let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
                 'request=GetLegendGraphic&layer=sea_water_velocity&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
-                '&version=1.1.1&colorscalerange=0.00193016%2C1.9712055&belowmincolor=extend&belowmaxcolor=extend' +
+                '&version=1.1.1&colorscalerange=0.015746597%2C0.44014812&belowmincolor=extend&belowmaxcolor=extend' +
                 '&width=256&height=256&srs=EPSG%3A3857&'
             let img = document.createElement('img');
             img.src = url;
@@ -314,24 +305,15 @@ class EnvironmentComponent {
     /*
     * Mean waves height of a given date (update every 3 hours)
     ***/
-    setWavesHeight(viewer: any, display:boolean = true, date?: any) {
+    setWavesHeight(viewer: any, display:boolean, date: any) {
         if (!display) {
             viewer.imageryLayers.remove(this.wavesHeightLayer);
             this.wavesHeightLayer = null;
             EnvironmentComponent.legend = undefined;
         } else {
-
-            let today;
-            if(date === undefined)
-                today = new Date();
-            else {
-                // todo add label real time vs forecast
-                today = date;
-                let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
-                today.setHours(currentTime.hour);
-                console.log(today);
-            }
-
+            let today = date;
+            let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
+            today.setHours(currentTime.hour);
             let time = this.getMultipleTime(3, today);
 
             let layer = new Cesium.WebMapServiceImageryProvider({
@@ -466,9 +448,11 @@ class EnvironmentComponent {
 
 
     getMultipleTime(multiple: number, date: any){
+        console.log("hour: " + date.getHours());
+
         let rest = date.getHours() % multiple;
         let hour = date.getHours() - rest;
-
+        console.log("rest: " + rest);
         console.log(hour);
         date.setHours(hour, 0, 0, 0);
         console.log(date);
@@ -515,14 +499,23 @@ class EnvironmentComponent {
     public updateLayersTime(viewer, date) {
         console.log("update layers");
 
-        if (this.wavesHeightLayer !== null)
+        if (this.wavesHeightLayer !== null) {
+            viewer.imageryLayers.remove(this.wavesHeightLayer);
+            this.wavesHeightLayer = null;
             this.setWavesHeight(viewer, true, date);
+        }
 
-        if (this.waterTempLayer !== null)
+        if (this.waterTempLayer !== null) {
+            viewer.imageryLayers.remove(this.waterTempLayer);
+            this.waterTempLayer = null;
             this.setWaterTemp(viewer, true, date);
+        }
 
-        if (this.wavesVelocityLayer !== null)
+        if (this.wavesVelocityLayer !== null) {
+            viewer.imageryLayers.remove(this.wavesVelocityLayer);
+            this.wavesVelocityLayer = null;
             this.setWavesVelocity(viewer, true, date);
+        }
 
     }
 

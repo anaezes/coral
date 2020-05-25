@@ -2,7 +2,7 @@
 <project version="4">
   <component name="SshConfigs">
     <configs>
-      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="1b01a67c-a66d-45dc-a4cc-bde81a210785" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="1b01a67c-a66d-45dc-a4cc-bde81a210785" port="22" customName="ripples.lsts" nameFormat="CUSTOM" username="coral" />
       <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="ec3e3004-7f1e-4bc1-8963-8dce83fa0afc" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
       <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="d0a40ae2-0985-40d8-ba82-687ac6bd8b9e" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
       <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="adfb917f-59f2-4870-aa2c-a7346ddf22a2" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
@@ -29,6 +29,18 @@
       <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="7883b340-1535-403f-aca5-454440a69b61" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
       <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="73125ae0-4ce5-4189-8606-d46b199e814b" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
       <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="3a36c038-cde5-4066-91de-d89cf5619f19" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="947b2f94-30fb-43d6-bbb4-c6923a522051" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="b8e1f42b-54be-4a07-8b0d-7f164e8e3947" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="bab9ea9d-dee5-4d0f-8e6d-d96f365f1360" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="ab33c114-045a-46fd-bebb-e9f19d48e4b5" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="9292dc4a-4565-4fe4-a419-127bd257edea" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="b52989a9-f325-48b8-953b-3aaa5f8a01cc" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="88338238-07fd-4023-ac9e-90df118c83b4" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="8834b649-b581-4e90-9bc0-7c31e33884b3" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="153917ff-a483-402f-9d85-6c67a29e179f" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="fd30a171-9c99-48c8-a56b-bd583bad01c0" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="31c62493-463d-46af-a774-555f751b481c" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="ripples.lsts.pt" id="90136e8e-a32f-4131-acdc-5509ce54ae76" port="22" customName="ripples.lsts" nameFormat="CUSTOM" />
     </configs>
   </component>
 </project>

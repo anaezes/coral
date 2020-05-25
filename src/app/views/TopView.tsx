@@ -10,7 +10,7 @@ const options = ["None", "AIS Density", "Waves Height", "Waves Velocity","Water 
 
 class TopView extends Component {
     private viewer: any;
-    private date: Date = new Date();
+    private date: any;
     private environment = new EnvironmentComponent();
     private aisComponent: AisComponent = new AisComponent(0.1, 1.5,
         new Cesium.NearFarScalar(
@@ -26,11 +26,15 @@ class TopView extends Component {
         error: false,
         layerActive: ''
     };
+    private showMenu: boolean = false;
 
 
     async componentDidMount() {
-        if (this.viewer == null)
+        if (this.viewer == null) {
             this.initCesium();
+            //this.viewer.scene.morphTo2D(0);
+            //this.viewer.scene.camera.zoomOut(20);
+        }
     }
 
     public setCameraView(pos) {
@@ -41,6 +45,8 @@ class TopView extends Component {
         this.viewer.camera.flyTo({
             destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 5000.0)
         });
+
+        this.showMenu = true;
     }
 
     handleUpdate = newData =>
@@ -54,20 +60,30 @@ class TopView extends Component {
         return (
             <div>
                 <div id="TopView"/>
-                <DatGui id='my-gui-container' class='my-gui-container topView' data={this.state} onUpdate={this.handleUpdate}
+                { this.showMenu ? <DatGui id='my-gui-container' class='my-gui-container topView' data={this.state} onUpdate={this.handleUpdate}
                         labelWidth="0" style={{position: "absolute", top: "2px", left: "2px", width: "10%"}}>
                     <DatSelect
                         label="Views"
                         path="layerActive"
                         options={options}/>
-
-                </DatGui>
+                </DatGui> : <div/> }
             </div>
         );
     }
 
 
     private initCesium() {
+
+        var west = 180.0;
+        var south = 90.0;
+        var east = -180.0;
+        var north = -90.0;
+
+        var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+
+        //Cesium.Camera.DEFAULT_VIEW_FACTOR = 0;
+        //Cesium.Camera.DEFAULT_VIEW_RECTANGLE = rectangle;
+
        this.viewer = new Cesium.Viewer('TopView', {
             globe: new Cesium.Globe(),
             timeline: false,
@@ -79,23 +95,33 @@ class TopView extends Component {
             baseLayerPicker: false,
             geocoder: false,
             homeButton: false,
-            fullscreenButton: true,
+            fullscreenButton: false,
             infoBox: false,
             sceneModePicker: false,
             selectionIndicator: false,
             navigationHelpButton: false,
             navigationInstructionsInitiallyVisible: false,
             shouldAnimate: false,
-            creditContainer: dummyCredit
+            creditContainer: dummyCredit,
+            sceneMode : Cesium.SceneMode.SCENE2D,
+            mapMode2D: Cesium.MapMode2D.ROTATE
         });
 
-        //this.viewer = new Cesium.CesiumWidget("TopView");
+        this.viewer.camera.DEFAULT_VIEW_RECTANGLE = rectangle;
+
+       this.viewer.camera.setView({
+            destination: rectangle,
+        });
+
+        //Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Cesium.Rectangle.fromDegrees(0, -89, 170, 89);
+        //Cesium.Camera.DEFAULT_VIEW_FACTOR = 1.1;
     }
 
-    public setTopView(auv) {
+    public setTopView(auv, time) {
         this.aisComponent.update(this.viewer, true, auv);
         this.setAuvPosition(auv);
         this.setCameraView(auv.getPosition());
+        this.viewer.clock.currentTime = time.clone();
     }
 
     public setAuvPosition(auv: Auv) {
@@ -111,6 +137,8 @@ class TopView extends Component {
 
         //console.log("auv time: " + auv.startTime);
         this.date = new Date(auv.getStartTime());
+
+        console.log("auv.getStartTime()" + auv.getStartTime());
 
         this.viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
@@ -133,6 +161,7 @@ class TopView extends Component {
     reset() {
         this.viewer.entities.removeAll();
         this.date = new Date();
+        this.showMenu = false;
     }
 
     private updateRender(data: any) {
@@ -181,9 +210,22 @@ class TopView extends Component {
         }));
     }
 
+    //todo
     resetView() {
+/*       var west = 180.0;
+        var south = 90.0;
+        var east = -180.0;
+        var north = -90.0;
+
+        var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+
+        this.viewer.camera.setView({
+            destination: rectangle,
+        });*/
+
         this.viewer.camera.flyHome(3);
     }
+
 }
 
 export default TopView;
