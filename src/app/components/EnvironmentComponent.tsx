@@ -362,7 +362,7 @@ class EnvironmentComponent {
             );
             this.wrecksLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
-                    url: "https://geoserver1.oceanwise.eu/wms",
+                    url: "http://geoserver1.oceanwise.eu/wms",
                     layers: "BASEMAP:wrecks_EMODNet",
                     parameters: {
                         service: "WMS",
@@ -379,7 +379,7 @@ class EnvironmentComponent {
                 requestWaterMask: false,
             });
 
-            let url = 'https://geoserver1.oceanwise.eu/ows?service=WMS&request=GetLegendGraphic&format=image%2Fpng&' +
+            let url = 'http://geoserver1.oceanwise.eu/ows?service=WMS&request=GetLegendGraphic&format=image%2Fpng&' +
                 'width=20&height=20&layer=wrecks_EMODNet'
             let img = document.createElement('img');
             img.src = url;
@@ -428,8 +428,7 @@ class EnvironmentComponent {
         } else {
             this.aisDensityLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
-                    url: "https://ows.emodnet-humanactivities.eu/wms",
-                    proxy: new Cesium.DefaultProxy('/proxy/'),
+                    url: "http://ows.emodnet-humanactivities.eu/wms",
                     layers: "emodnet:2017_01_st_All",
                     parameters: {
                         service:"WMS",
