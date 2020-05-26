@@ -14,7 +14,7 @@ import waypoints from '../data/waypointsTest.json';
 
 const Cesium = require('cesium');
 const DEPTH = 0.0;
-const urlAuvs =  'https://ripples.lsts.pt/soi';
+const urlAuvs =  'https://cors-anywhere.herokuapp.com/https://ripples.lsts.pt/soi';
 const dummyCredit = document.createElement("div");
 
 
