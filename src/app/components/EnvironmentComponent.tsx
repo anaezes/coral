@@ -428,7 +428,7 @@ class EnvironmentComponent {
         } else {
             this.aisDensityLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
-                    url: "https://ows.emodnet-humanactivities.eu/wms",
+                    url: "https://cors-anywhere.herokuapp.com/https://ows.emodnet-humanactivities.eu/wms",
                     layers: "emodnet:2017_01_st_All",
                     parameters: {
                         service:"WMS",
