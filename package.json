@@ -2,7 +2,6 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://ripples.lsts.pt/coral",
   "dependencies": {
     "@material-ui/core": "^4.9.13",
     "@reach/menu-button": "^0.10.1",
