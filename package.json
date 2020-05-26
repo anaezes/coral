@@ -2,6 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://ripples.lsts.pt/coral",
   "dependencies": {
     "@material-ui/core": "^4.9.13",
     "@reach/menu-button": "^0.10.1",
@@ -14,6 +15,7 @@
     "cesium": "^1.67.0",
     "glslify-loader": "^2.0.0",
     "material-ui": "^0.20.2",
+    "moment": "^2.26.0",
     "prop-types": "^15.7.2",
     "raw-loader": "^4.0.0",
     "react": "^16.13.0",
