@@ -363,6 +363,7 @@ class EnvironmentComponent {
             this.wrecksLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
                     url: "http://geoserver1.oceanwise.eu/wms",
+                    proxy: new Cesium.DefaultProxy('/proxy/'),
                     layers: "BASEMAP:wrecks_EMODNet",
                     parameters: {
                         service: "WMS",
@@ -428,7 +429,8 @@ class EnvironmentComponent {
         } else {
             this.aisDensityLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
-                    url: "http://ows.emodnet-humanactivities.eu/wms",
+                    url: "https://ows.emodnet-humanactivities.eu/wms",
+                    proxy: new Cesium.DefaultProxy('/proxy/'),
                     layers: "emodnet:2017_01_st_All",
                     parameters: {
                         service:"WMS",
