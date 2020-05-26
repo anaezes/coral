@@ -178,6 +178,10 @@ class App extends React.Component<{}, state> {
 
         this.updateLabelTime();
 
+        if(this.CesiumViewer !== null && this.state.options.ais){
+            this.aisComponent.render(this.CesiumViewer);
+        }
+
         return (
             <div>
                 <div id="Container" ref={element => this.container = element}/>
@@ -228,11 +232,6 @@ class App extends React.Component<{}, state> {
                         path="auvActive"
                         options={this.options}/>
                 </DatFolder>
-                <DatFolder title="AIS">
-                    <DatBoolean path='aisDensity' label='AIS density' />
-                    <DatBoolean path='ais' label='AIS' />
-                    <DatButton label="Reset timeline" onClick={this.handleButtonResetTimelineClick} />
-                </DatFolder>
                 <DatFolder title="Environment" >
                     <DatSelect
                         label="Choose day"
@@ -247,8 +246,17 @@ class App extends React.Component<{}, state> {
                     <DatBoolean path='wrecks' label='Wrecks' />
                     <DatButton label="Reset" onClick={this.handleButtonResetLayersClick} />
                 </DatFolder>
+                <DatFolder title="AIS">
+                    <DatBoolean path='aisDensity' label='AIS density' />
+                    <DatBoolean path='ais' label='AIS' onMouseOver={this.changeBackground}/>
+                    <DatButton label="Reset timeline" onClick={this.handleButtonResetTimelineClick} />
+                </DatFolder>
             </DatGui>
         );
+    }
+
+    changeBackground(e) {
+        console.log("pimm");
     }
 
 
@@ -598,6 +606,8 @@ class App extends React.Component<{}, state> {
         //this.CesiumViewer.destroy();
         //this.initCesium();
 
+        this.aisComponent.getBoundsTime(this.CesiumViewer);
+
         this.topView.reset();
         this.resetEnvironmentLayers();
 
@@ -649,22 +659,24 @@ class App extends React.Component<{}, state> {
         if(this.CesiumViewer === undefined)
             return;
 
-        if(this.isUnderwater) {
-            this.legendTime = undefined;
-            return;
-        }
-
         let timeTimeline = this.CesiumViewer.clock.currentTime;
         let realTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), 1, new Cesium.JulianDate());
         let time = Cesium.JulianDate.secondsDifference(timeTimeline, realTime);
 
-        if(time < 5)
+
+        if(time < - 1) {
+            this.img.src = "../images/replayInfo.png";
+        }
+        else if(time >= -1 && time < 5) { //fix latency render
             this.img.src = "../images/realTimeInfo.png";
+            this.CesiumViewer.clock.currentTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), 1, new Cesium.JulianDate());
+        }
         else
             this.img.src = "../images/forecastInfo.png";
 
         this.legendTime = this.img;
     }
+
 
     private resetEnvironmentLayers() {
         this.environmentComponent.clearAllLayer(this.CesiumViewer);

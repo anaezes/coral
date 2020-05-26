@@ -2,17 +2,10 @@
 <project version="4">
   <component name="PublishConfigData" autoUpload="On explicit save action" serverName="ripples.lsts" autoUploadExternalChanges="true">
     <serverData>
-      <paths name="Copy of project-level server 'ripples.lsts'">
-        <serverdata>
-          <mappings>
-            <mapping deploy="coral" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="ripples.lsts">
         <serverdata>
           <mappings>
-            <mapping deploy="coral" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="coral-debug" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

@@ -38,7 +38,6 @@ class AisComponent {
 
         let latMax, latMin, lonMax, lonMin;
         if(auv === undefined) {
-            console.log("fui pelo main view!!!");
             latMax = 42.0;
             latMin = 36.5;
             lonMax = -7.25;
@@ -54,7 +53,7 @@ class AisComponent {
         aisProvider.getAisFromArea(latMax,latMin,lonMax,lonMin).then(response => {
             try{
                 this.ais = JSON.parse(response);
-                this.render(viewer);
+                //this.render(viewer);
             }
             catch (e) {
                 console.error(e.toString());
@@ -100,7 +99,7 @@ class AisComponent {
                  )
              },
             billboard: {
-                image: "../images/navigation-arrow-white-25perc.png",
+                image: "../images/navigation-arrow-gray.png",
                 rotation: Cesium.Math.toRadians(Utils.normalRelativeAngle(rotation)),
                 color: this.getColorVessel(ais),
                 scale: this.scale,
