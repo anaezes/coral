@@ -73,7 +73,7 @@ class BathymetryComponent {
             let result = Cesium.Cartographic.fromCartesian(finalPos, Cesium.Ellipsoid.WGS84);
 
             cartesian = Cesium.Cartesian3.fromDegrees(Cesium.Math.toDegrees(result.longitude),
-                Cesium.Math.toDegrees(result.latitude), tile.depth*terrainExaggeration/2);
+                Cesium.Math.toDegrees(result.latitude), tile.depth*terrainExaggeration);
             tile.longitude = Cesium.Math.toDegrees(result.longitude);
             tile.latitude = Cesium.Math.toDegrees(result.latitude);
         }
