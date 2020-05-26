@@ -73,17 +73,6 @@ class TopView extends Component {
 
 
     private initCesium() {
-
-        var west = 180.0;
-        var south = 90.0;
-        var east = -180.0;
-        var north = -90.0;
-
-        var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
-
-        //Cesium.Camera.DEFAULT_VIEW_FACTOR = 0;
-        //Cesium.Camera.DEFAULT_VIEW_RECTANGLE = rectangle;
-
        this.viewer = new Cesium.Viewer('TopView', {
             globe: new Cesium.Globe(),
             timeline: false,
@@ -102,19 +91,8 @@ class TopView extends Component {
             navigationHelpButton: false,
             navigationInstructionsInitiallyVisible: false,
             shouldAnimate: false,
-            creditContainer: dummyCredit,
-            sceneMode : Cesium.SceneMode.SCENE2D,
-            mapMode2D: Cesium.MapMode2D.ROTATE
+            creditContainer: dummyCredit
         });
-
-        this.viewer.camera.DEFAULT_VIEW_RECTANGLE = rectangle;
-
-       this.viewer.camera.setView({
-            destination: rectangle,
-        });
-
-        //Cesium.Camera.DEFAULT_VIEW_RECTANGLE = Cesium.Rectangle.fromDegrees(0, -89, 170, 89);
-        //Cesium.Camera.DEFAULT_VIEW_FACTOR = 1.1;
     }
 
     public setTopView(auv, time) {
@@ -210,19 +188,7 @@ class TopView extends Component {
         }));
     }
 
-    //todo
     resetView() {
-/*       var west = 180.0;
-        var south = 90.0;
-        var east = -180.0;
-        var north = -90.0;
-
-        var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
-
-        this.viewer.camera.setView({
-            destination: rectangle,
-        });*/
-
         this.viewer.camera.flyHome(3);
     }
 
