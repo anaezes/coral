@@ -93,7 +93,7 @@ class TopView extends Component {
         });
 
         this.viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(0.0, 25.0, 40000000),
+            destination: Cesium.Cartesian3.fromDegrees(-6.5, 40.0, 2000000),
             duration: 0
         });
     }
@@ -192,7 +192,7 @@ class TopView extends Component {
 
     resetView() {
         this.viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(0.0, 25.0, 40000000),
+            destination: Cesium.Cartesian3.fromDegrees(-6.5, 40.0, 2000000),
             duration: 3
         });
     }
