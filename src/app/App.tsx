@@ -164,8 +164,6 @@ class App extends React.Component<{}, state> {
         const {isLoading, data, options} = this.state;
 
         if (!isLoading && !this.isSystemInit) {
-            this.topView = new TopView(this.props);
-
             if(this.CesiumViewer == null)
                 this.initCesium();
 
@@ -174,6 +172,8 @@ class App extends React.Component<{}, state> {
             this.createPins();
 
             this.isSystemInit = true;
+
+            this.topView = new TopView(this.props);
         }
 
         this.updateLabelTime();
@@ -295,6 +295,11 @@ class App extends React.Component<{}, state> {
             showWaterEffect: true
         });
 
+        this.CesiumViewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(0.0, 25.0, 40000000),
+            duration: 0
+        });
+
         this.CesiumViewer.terrainProvider = Cesium.createWorldTerrain({
             requestWaterMask: true,
            // requestVertexNormals: true
@@ -363,7 +368,12 @@ class App extends React.Component<{}, state> {
                 this.CesiumViewer.scene.globe.depthTestAgainstTerrain = false;
                 this.CesiumViewer.scene.globe.show = true;
                 this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
-                this.CesiumViewer.camera.flyHome(3);
+
+                this.CesiumViewer.camera.flyTo({
+                    destination: Cesium.Cartesian3.fromDegrees(0.0, 25.0, 40000000),
+                    duration: 3
+                });
+
                 this.topView.resetView();
                 this.createPins();
                 this.isUnderwater = false;
@@ -570,11 +580,14 @@ class App extends React.Component<{}, state> {
      */
     private getAuvs() : void {
         let auvs : Array<AuvJSON> = JSON.parse(JSON.stringify(this.state.data));
-        this.auvs = auvs; //copy
-
-        for (let i = 0; i < this.auvs.length; i++) {
-            this.options.push(this.auvs[i].name);
+        let temp: Array<AuvJSON> = [];
+        for (let i = 0; i < auvs.length; i++) {
+            if(auvs[i].plan.waypoints.length !== 0){
+                temp.push(auvs[i]);
+                this.options.push(auvs[i].name);
+            }
         }
+        this.auvs = temp;
     }
 
     resetApp(){

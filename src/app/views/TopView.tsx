@@ -32,8 +32,6 @@ class TopView extends Component {
     async componentDidMount() {
         if (this.viewer == null) {
             this.initCesium();
-            //this.viewer.scene.morphTo2D(0);
-            //this.viewer.scene.camera.zoomOut(20);
         }
     }
 
@@ -43,7 +41,7 @@ class TopView extends Component {
         let latitude = Cesium.Math.toDegrees(result.latitude);
 
         this.viewer.camera.flyTo({
-            destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 5000.0)
+            destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 5500.0)
         });
 
         this.showMenu = true;
@@ -93,6 +91,11 @@ class TopView extends Component {
             shouldAnimate: false,
             creditContainer: dummyCredit
         });
+
+        this.viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(0.0, 25.0, 40000000),
+            duration: 0
+        });
     }
 
     public setTopView(auv, time) {
@@ -113,7 +116,6 @@ class TopView extends Component {
             return;
         }
 
-        //console.log("auv time: " + auv.startTime);
         this.date = new Date(auv.getStartTime());
 
         console.log("auv.getStartTime()" + auv.getStartTime());
@@ -189,7 +191,10 @@ class TopView extends Component {
     }
 
     resetView() {
-        this.viewer.camera.flyHome(3);
+        this.viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(0.0, 25.0, 40000000),
+            duration: 3
+        });
     }
 
 }
