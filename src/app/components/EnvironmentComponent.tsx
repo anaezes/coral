@@ -161,7 +161,7 @@ class EnvironmentComponent {
             today.setHours(12);
 
             let layer = new Cesium.WebMapServiceImageryProvider({
-                    url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024",
+                    url: "https://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024",
                     layers: "so",
                     parameters: {
                         service:"WMS",
@@ -182,7 +182,7 @@ class EnvironmentComponent {
             layer.defaultAlpha = 0.5;
             this.salinityLayer = viewer.imageryLayers.addImageryProvider(layer);
 
-            let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
+            let url = 'https://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
                 'request=GetLegendGraphic&layer=so&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
                 '&version=1.1.1&colorscalerange=31%2C39&belowmincolor=extend&belowmaxcolor=extend' +
                 '&width=256&height=256&srs=EPSG%3A3857&'
@@ -214,7 +214,7 @@ class EnvironmentComponent {
 
 
             let layer = new Cesium.WebMapServiceImageryProvider({
-                    url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
+                    url: "https://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
                     layers: "thetao",
                     parameters: {
                         service: "WMS",
@@ -235,7 +235,7 @@ class EnvironmentComponent {
             layer.defaultAlpha = 0.5;
             this.waterTempLayer = viewer.imageryLayers.addImageryProvider(layer);
 
-            let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
+            let url = 'https://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
                 'request=GetLegendGraphic&layer=thetao&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
                 '&version=1.1.1&colorscalerange=0%2C36&belowmincolor=extend&belowmaxcolor=extend' +
                 '&width=256&height=256&srs=EPSG%3A3857&'
@@ -268,7 +268,7 @@ class EnvironmentComponent {
                 today.setHours(currentTime.hour - 1, 30, 0, 0);
 
             let layer = new Cesium.WebMapServiceImageryProvider({
-                url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
+                url: "https://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh?",
                 layers: "sea_water_velocity",
                 parameters: {
                     service:"WMS",
@@ -292,7 +292,7 @@ class EnvironmentComponent {
                 requestWaterMask: false,
             });
 
-            let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
+            let url = 'https://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-phy-001-024?service=WMS&' +
                 'request=GetLegendGraphic&layer=sea_water_velocity&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
                 '&version=1.1.1&colorscalerange=0.015746597%2C0.44014812&belowmincolor=extend&belowmaxcolor=extend' +
                 '&width=256&height=256&srs=EPSG%3A3857&'
@@ -317,7 +317,7 @@ class EnvironmentComponent {
             let time = this.getMultipleTime(3, today);
 
             let layer = new Cesium.WebMapServiceImageryProvider({
-                    url: "http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027",
+                    url: "https://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027",
                     layers: "VHM0",
                     parameters: {
                         service: "WMS",
@@ -334,7 +334,7 @@ class EnvironmentComponent {
             layer.defaultAlpha = 0.8;
             this.wavesHeightLayer = viewer.imageryLayers.addImageryProvider(layer);
 
-            let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027?service=WMS&' +
+            let url = 'https://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027?service=WMS&' +
                 'request=GetLegendGraphic&layer=VHM0&styles=boxfill%2Fsst_36&format=image%2Fpng&transparent=true' +
                 '&version=1.1.1&colorscalerange=0.01%2C10&belowmincolor=extend&belowmaxcolor=extend' +
                 '&width=256&height=256&srs=EPSG%3A3857&'
@@ -362,7 +362,7 @@ class EnvironmentComponent {
             );
             this.wrecksLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
-                    url: "http://geoserver1.oceanwise.eu/wms",
+                    url: "https://geoserver1.oceanwise.eu/wms",
                     layers: "BASEMAP:wrecks_EMODNet",
                     parameters: {
                         service: "WMS",
@@ -379,7 +379,7 @@ class EnvironmentComponent {
                 requestWaterMask: false,
             });
 
-            let url = 'http://geoserver1.oceanwise.eu/ows?service=WMS&request=GetLegendGraphic&format=image%2Fpng&' +
+            let url = 'https://geoserver1.oceanwise.eu/ows?service=WMS&request=GetLegendGraphic&format=image%2Fpng&' +
                 'width=20&height=20&layer=wrecks_EMODNet'
             let img = document.createElement('img');
             img.src = url;
