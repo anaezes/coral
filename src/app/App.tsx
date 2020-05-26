@@ -149,19 +149,7 @@ class App extends React.Component<{}, state> {
 
     handleButtonResetLayersClick = (event: any) =>{
         let target = event.currentTarget;
-        this.environmentComponent.clearAllLayer(this.CesiumViewer);
-        let newData : any = {};
-        newData.date = 'Today';
-        newData.wavesHeight = false;
-        newData.wavesVelocity= false;
-        newData.world_temp= false;
-        newData.water_temp= false;
-        newData.salinity= false;
-        newData.bathymetry= false;
-        newData.wrecks= false;
-        this.setState(prevState => ({
-            options: { ...prevState.options, ...newData }
-        }));
+        this.resetEnvironmentLayers();
     }
 
     handleButtonResetTimelineClick = (event: any) =>{
@@ -251,7 +239,7 @@ class App extends React.Component<{}, state> {
                         path="date"
                         options={this.dateOptions}/>
                     <DatBoolean path='wavesHeight' label='Waves height'/>
-                    <DatBoolean path='wavesVelocity' label='Waves velocity'/>
+                    <DatBoolean path='wavesVelocity' label='Sea water velocity'/>
                     <DatBoolean path='salinity' label='Salinity' />
                     <DatBoolean path='water_temp' label='Water temperature'/>
                     <DatBoolean path='world_temp' label='World temperature' />
@@ -345,7 +333,7 @@ class App extends React.Component<{}, state> {
                 app.updateLabelTime();
             }
         }
-        this.CesiumViewer.timeline.container.addEventListener('click', eventObj)
+        this.CesiumViewer.timeline.container.addEventListener('click', eventObj);
     }
 
     updateLayerTime(update) {
@@ -467,6 +455,11 @@ class App extends React.Component<{}, state> {
         if(data.updatePlan !== this.state.options.updatePlan){
             let newPlan : Array<WaypointJSON> = JSON.parse(JSON.stringify(waypoints.waypoints));
             this.auvComponent.updatePath(newPlan, this.CesiumViewer);
+        }
+
+        if(data.date !== this.state.options.date){
+            console.log("pim!!!");
+            this.environmentComponent.updateLayersTime(this.CesiumViewer, this.dateMap.get(data.date));
         }
 
         this.setState(prevState => ({
@@ -593,6 +586,7 @@ class App extends React.Component<{}, state> {
         //this.initCesium();
 
         this.topView.reset();
+        this.resetEnvironmentLayers();
 
         if(this.bathymetryComponent !== undefined)
             this.bathymetryComponent.tiles.forEach(tile => {
@@ -659,5 +653,20 @@ class App extends React.Component<{}, state> {
         this.legendTime = this.img;
     }
 
+    private resetEnvironmentLayers() {
+        this.environmentComponent.clearAllLayer(this.CesiumViewer);
+        let newData : any = {};
+        newData.date = 'Today';
+        newData.wavesHeight = false;
+        newData.wavesVelocity= false;
+        newData.world_temp= false;
+        newData.water_temp= false;
+        newData.salinity= false;
+        newData.bathymetry= false;
+        newData.wrecks= false;
+        this.setState(prevState => ({
+            options: { ...prevState.options, ...newData }
+        }));
+    }
 };
 export default App;

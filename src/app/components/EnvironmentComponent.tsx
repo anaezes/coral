@@ -331,7 +331,7 @@ class EnvironmentComponent {
                         time: encodeURI(this.formatDateForRequest24(time)),
                     },
                 });
-            layer.defaultAlpha = 0.5;
+            layer.defaultAlpha = 0.8;
             this.wavesHeightLayer = viewer.imageryLayers.addImageryProvider(layer);
 
             let url = 'http://nrt.cmems-du.eu/thredds/wms/global-analysis-forecast-wav-001-027?service=WMS&' +
@@ -515,6 +515,18 @@ class EnvironmentComponent {
             viewer.imageryLayers.remove(this.wavesVelocityLayer);
             this.wavesVelocityLayer = null;
             this.setWavesVelocity(viewer, true, date);
+        }
+
+        if (this.salinityLayer !== null) {
+            viewer.imageryLayers.remove(this.salinityLayer);
+            this.salinityLayer = null;
+            this.setSalinity(viewer, true, date);
+        }
+
+        if (this.worldLayer !== null) {
+            viewer.imageryLayers.remove(this.worldLayer);
+            this.worldLayer = null;
+            this.setWorldTemp(viewer, true, date);
         }
 
     }
