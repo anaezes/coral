@@ -362,7 +362,7 @@ class EnvironmentComponent {
             );
             this.wrecksLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
-                    url: "https://cors-anywhere.herokuapp.com/http://geoserver1.oceanwise.eu/wms",
+                    url: "http://geoserver1.oceanwise.eu/wms",
                     layers: "BASEMAP:wrecks_EMODNet",
                     parameters: {
                         service: "WMS",
@@ -428,7 +428,7 @@ class EnvironmentComponent {
         } else {
             this.aisDensityLayer = viewer.imageryLayers.addImageryProvider(
                 new Cesium.WebMapServiceImageryProvider({
-                    url: "https://ows.emodnet-humanactivities.eu/wms",
+                    url: "https://cors-anywhere.herokuapp.com/https://ows.emodnet-humanactivities.eu/wms",
                     layers: "emodnet:2017_01_st_All",
                     parameters: {
                         service:"WMS",
@@ -444,7 +444,8 @@ class EnvironmentComponent {
                 })
             );
         }
-    }
+    } //https://ows.emodnet-humanactivities.eu/wms?LAYERS=2018_st_All_avg&FORMAT=image%2Fpng&TRANSPARENT=TRUE&
+    // SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&SRS=EPSG%3A3857&BBOX=0,7514065.6275,2504688.5425,10018754.17&WIDTH=256&HEIGHT=256
 
 
     getMultipleTime(multiple: number, date: any){
