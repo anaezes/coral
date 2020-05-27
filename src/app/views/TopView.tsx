@@ -3,6 +3,7 @@ import DatGui, {DatSelect} from "react-dat-gui";
 import Auv from "../components/Auv";
 import AisComponent from "../components/AisComponent";
 import EnvironmentComponent from "../components/EnvironmentComponent";
+import Utils from "../utils/Utils";
 
 const Cesium = require('cesium');
 const dummyCredit = document.createElement("div");
@@ -98,34 +99,41 @@ class TopView extends Component {
         });
     }
 
-    public setTopView(auv, time) {
+    public setTopView(auv, hpr, time) {
         this.aisComponent.update(this.viewer, true, auv);
-        this.setAuvPosition(auv);
+        this.setAuvPosition(auv, hpr);
         this.setCameraView(auv.getPosition());
         this.viewer.clock.currentTime = time.clone();
     }
 
-    public setAuvPosition(auv: Auv) {
+    public setAuvPosition(auv: Auv, hpr) {
         let result = Cesium.Cartographic.fromCartesian(auv.getPosition(), Cesium.Ellipsoid.WGS84);
         let longitude = Cesium.Math.toDegrees(result.longitude);
         let latitude = Cesium.Math.toDegrees(result.latitude);
 
+
+
+        let heading = Utils.normalRelativeAngle(Cesium.Math.toDegrees(hpr.heading)) + Cesium.Math.PI;
+
+        console.log("heading: " + heading);
+
+
         let e = this.viewer.entities.getById(auv.name);
         if (e !== undefined) {
+
             e.position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
+            e.billboard.rotation = Cesium.Math.toRadians(heading);
             return;
         }
 
         this.date = new Date(auv.getStartTime());
-
-        console.log("auv.getStartTime()" + auv.getStartTime());
 
         this.viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
             billboard: {
                 //Icons made by photo3idea_studiofrom  www.flaticon.com<
                 image: "../images/auv.png",
-                rotation: Cesium.Math.toRadians(auv.heading % 360),
+                rotation: Cesium.Math.toRadians(heading),
                 color: Cesium.Color.ORANGERED,
                 scale: 0.075,
                 distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
@@ -133,6 +141,7 @@ class TopView extends Component {
                     20000.0
                 )
             },
+            orientation: hpr,
             name: auv.name,
             id: auv.name
         });

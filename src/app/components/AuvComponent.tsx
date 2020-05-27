@@ -4,7 +4,7 @@ import {TileJSON} from "../utils/TilesUtils";
 import Tile from "./Tile";
 
 
-const urlAuvs =  'https://ripples.lsts.pt/soi';
+const urlAuvs =  'https://ripples.lsts.pt/imcrouter/imc/systems/';//'https://ripples.lsts.pt/soi';
 const Cesium = require('cesium');
 
 const HEIGHT = 0.0;
@@ -154,7 +154,7 @@ class AuvComponent {
             let result = "";
             if(auv !== undefined){
                 let cartographic = new Cesium.Cartographic.fromCartesian(auv.getPosition());
-                result = "Depth: " + (cartographic.height).toFixed(1).toString() + "m";
+                result = "Depth: " + (cartographic.height).toFixed(2).toString() + "m";
                 auv.getSamples().forEach((sample: Sample, name: string) => {
                     result += "\n" + name + ": " + sample.value.toFixed(2).toString();
                     if(name === "Temperature")

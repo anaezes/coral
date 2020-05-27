@@ -13,8 +13,8 @@ import EnvironmentComponent from "./components/EnvironmentComponent";
 import waypoints from '../data/waypointsTest.json';
 
 const Cesium = require('cesium');
-const DEPTH = 0.0;
-const urlAuvs =  'https://cors-anywhere.herokuapp.com/https://ripples.lsts.pt/soi';
+const urlAuvs =  'https://ripples.lsts.pt/imcrouter/imc/systems/';
+//const urlAuvs =  'https://cors-anywhere.herokuapp.com/https://ripples.lsts.pt/soi';
 const dummyCredit = document.createElement("div");
 
 
@@ -96,6 +96,8 @@ class App extends React.Component<{}, state> {
      * Get all available AUV's
      */
     componentDidMount() {
+        this.initCesium();
+
         fetch(urlAuvs)
             .then(response => response.json())
             .then(data =>
@@ -163,18 +165,18 @@ class App extends React.Component<{}, state> {
     render() {
         const {isLoading, data, options} = this.state;
 
-        if (!isLoading && !this.isSystemInit) {
-            if(this.CesiumViewer == null)
-                this.initCesium();
+        /*if(this.CesiumViewer == null)
+            this.initCesium();*/
 
+        if (!isLoading && !this.isSystemInit) {
             this.getAuvs();
             this.getDates();
             this.createPins();
-
             this.isSystemInit = true;
-
             this.topView = new TopView(this.props);
         }
+
+
 
         this.updateLabelTime();
 
@@ -248,17 +250,12 @@ class App extends React.Component<{}, state> {
                 </DatFolder>
                 <DatFolder title="AIS">
                     <DatBoolean path='aisDensity' label='AIS density' />
-                    <DatBoolean path='ais' label='AIS' onMouseOver={this.changeBackground}/>
+                    <DatBoolean path='ais' label='AIS'/>
                     <DatButton label="Reset timeline" onClick={this.handleButtonResetTimelineClick} />
                 </DatFolder>
             </DatGui>
         );
     }
-
-    changeBackground(e) {
-        console.log("pimm");
-    }
-
 
 
     /**
@@ -427,7 +424,6 @@ class App extends React.Component<{}, state> {
 
         if(data.ais !== this.state.options.ais) {
             if(data.ais) {
-                console.log("entrou");
                 this.aisComponent.getBoundsTime(this.CesiumViewer);
                 this.updateAis();
                 this.updateAisIntervalId  = setInterval(this.updateAis.bind(this), 3000);
@@ -476,7 +472,6 @@ class App extends React.Component<{}, state> {
         }
 
         if(data.date !== this.state.options.date){
-            console.log("pim!!!");
             this.environmentComponent.updateLayersTime(this.CesiumViewer, this.dateMap.get(data.date));
         }
 
@@ -494,7 +489,10 @@ class App extends React.Component<{}, state> {
      */
     updateTopView() {
         this.auvComponent.getAuvActive().setPosition(this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime));
-        this.topView.setTopView(this.auvComponent.getAuvActive(), this.CesiumViewer.clock.currentTime);
+        let quaternion = this.auvComponent.getAuvEntity().orientation.getValue(this.CesiumViewer.clock.currentTime);
+        let hpr = Cesium.HeadingPitchRoll.fromQuaternion(quaternion);
+        console.log("heading: " + hpr.heading);
+        this.topView.setTopView(this.auvComponent.getAuvActive(), hpr, this.CesiumViewer.clock.currentTime);
     }
 
     /**
@@ -590,7 +588,7 @@ class App extends React.Component<{}, state> {
         let auvs : Array<AuvJSON> = JSON.parse(JSON.stringify(this.state.data));
         let temp: Array<AuvJSON> = [];
         for (let i = 0; i < auvs.length; i++) {
-            if(auvs[i].plan.waypoints.length !== 0){
+            if(auvs[i].type === 'UUV'){
                 temp.push(auvs[i]);
                 this.options.push(auvs[i].name);
             }

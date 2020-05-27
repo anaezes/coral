@@ -15,22 +15,21 @@ class Auv {
     position: any;
     samples = new Map<string, Sample>();
 
-
     constructor(auv: AuvJSON) {
         this.name = auv.name;
 
-        if(auv.plan.waypoints.length === 0) {
+        if(auv.plan.length === 0) {
             return;
         }
 
-        let waypoints: Array<WaypointJSON> = JSON.parse(JSON.stringify(auv.plan.waypoints));
+        let waypoints: Array<WaypointJSON> = JSON.parse(JSON.stringify(auv.plan));
         //this.setVariables(waypoints);
 
         this.waypoints = waypoints;
         this.longitude = this.waypoints[0].longitude;
         this.latitude = this.waypoints[0].latitude;
-        this.startTime = this.waypoints[0].arrivalDate;
-        this.stopTime = this.waypoints[this.waypoints.length-1].arrivalDate;
+        this.startTime = this.waypoints[0].eta;
+        this.stopTime = this.waypoints[this.waypoints.length-1].eta;
 
         this.heading = auv.lastState.heading;
         this.path = this.generatePath();
@@ -38,31 +37,11 @@ class Auv {
 
     generatePath() {
         var property = new Cesium.SampledPositionProperty();
-
         for (let i = 0; i < this.waypoints.length; i += 1) {
-
-            let depth = SUPERFICE - 5;
-            if(this.waypoints[i].depth !== undefined) {
-                console.log("this.waypoints[i].depth: " + this.waypoints[i].depth);
-                depth = SUPERFICE  + this.waypoints[i].depth;
-                console.log("Depth: " + depth);
-            }
-
-            let time = Cesium.JulianDate.fromDate(new Date(this.waypoints[i]['arrivalDate']));
-            let position = Cesium.Cartesian3.fromDegrees(this.waypoints[i].longitude, this.waypoints[i].latitude, depth);
+            let depth = SUPERFICE  - this.waypoints[i].depth;
+            let time = Cesium.JulianDate.fromDate(new Date(this.waypoints[i]['eta']));
+            let position = Cesium.Cartesian3.fromDegrees(this.waypoints[i].longitude, this.waypoints[i].latitude,depth);
             property.addSample(time, position);
-
-            // debug
-            // //Also create a point for each sample we generate.
-            // this.CesiumViewer.entities.add({
-            //     position : position,
-            //     point : {
-            //         pixelSize : 8,
-            //         color : Cesium.Color.TRANSPARENT,
-            //         outlineColor : Cesium.Color.YELLOW,
-            //         outlineWidth : 3
-            //     }
-            // });
         }
         return property;
     }
@@ -95,7 +74,7 @@ class Auv {
             this.waypoints.push(waypoint);
         })
 
-        this.stopTime = this.waypoints[this.waypoints.length-1].arrivalDate;
+        this.stopTime = this.waypoints[this.waypoints.length-1].eta;
         this.path = this.generatePath();
     }
 };
