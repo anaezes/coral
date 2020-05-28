@@ -74,7 +74,7 @@ class AuvComponent {
     createAuvModel(viewer) {
         viewer.scene.globe.show = false;
         viewer.scene.backgroundColor = new Cesium.Color(0.043,0.18,0.24,1);
-        
+
         this.entityAUV = viewer.entities.add({
             id: this.auvActive.name,
             //Set the entity availability to the same interval as the simulation time.
