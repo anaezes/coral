@@ -199,6 +199,8 @@ class TopView extends Component {
     }
 
     resetView() {
+        //this.viewer.entities.remove(this.auvEntity);
+        this.auvEntity = undefined;
         this.viewer.camera.flyTo({
             destination: Cesium.Cartesian3.fromDegrees(-6.5, 40.0, 2000000),
             duration: 3
