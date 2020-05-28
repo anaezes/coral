@@ -74,8 +74,7 @@ class AuvComponent {
     createAuvModel(viewer) {
         viewer.scene.globe.show = false;
         viewer.scene.backgroundColor = new Cesium.Color(0.043,0.18,0.24,1);
-
-
+        
         this.entityAUV = viewer.entities.add({
             id: this.auvActive.name,
             //Set the entity availability to the same interval as the simulation time.
@@ -111,12 +110,6 @@ class AuvComponent {
             // Color the model slightly blue when the eyepoint is underwater.
             color : new Cesium.Color(0.0, 0.0, 1.0, 1.0),
             colorBlendMode : Cesium.ColorBlendMode.MIX,
-            /*colorBlendAmount : new Cesium.CallbackProperty(function(time, result) {
-                var underwater = viewer.camera.positionCartographic.height < 0;
-                return !underwater ? 1.0 : 0.0;
-            }, false),*/
-
-
             label: {
                 text: new Cesium.CallbackProperty(this.updateSamplesLabel(this.auvActive), false),
                 font: "20px sans-serif",
@@ -128,23 +121,13 @@ class AuvComponent {
                 eyeOffset: new Cesium.Cartesian3(0, 1.5, 0),
             }
         });
-
-
         this.updateCamera(viewer);
     }
 
     updateCamera(viewer) {
-        let longitude = this.auvActive.longitude;
-        let latitude = this.auvActive.latitude;
-
         let entity = this.entityAUV;
         viewer.flyTo(entity).then(function () {
             viewer.trackedEntity = entity;
-            viewer.camera.setView({
-                orientation: entity.orientation,
-                destination: Cesium.Cartesian3.fromDegrees(longitude, latitude - 0.00015, HEIGHT + 5)
-            });
-            viewer.scene.camera.lookAt(entity.position.getValue(viewer.clock.currentTime), entity.orientation.getValue(viewer.clock.currentTime));
         });
     }
 

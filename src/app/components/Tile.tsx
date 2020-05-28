@@ -27,8 +27,6 @@ class Tile extends React.Component{
         this.coordsFixed = false;
         this.primitive = undefined;
         this.depth = -tile.depth + tile.height/2 - CORRECTION_FACTOR_DEPTH;
-
-        console.log("assetid: " + this.assetId + "; depth:" + this.depth);
     }
 
     getOffset(mainTile: Tile){
