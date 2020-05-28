@@ -34,7 +34,6 @@ interface MenuOptions {
     wavesHeight: boolean,
     wavesVelocity: boolean,
     aisDensity: boolean,
-    world_temp: boolean,
     water_temp: boolean,
     salinity: boolean,
     bathymetry: boolean,
@@ -243,7 +242,6 @@ class App extends React.Component<{}, state> {
                     <DatBoolean path='wavesVelocity' label='Sea water velocity'/>
                     <DatBoolean path='salinity' label='Salinity' />
                     <DatBoolean path='water_temp' label='Water temperature'/>
-                    <DatBoolean path='world_temp' label='World temperature' />
                     <DatBoolean path='bathymetry' label='Bathymetry' />
                     <DatBoolean path='wrecks' label='Wrecks' />
                     <DatButton label="Reset" onClick={this.handleButtonResetLayersClick} />
@@ -410,7 +408,7 @@ class App extends React.Component<{}, state> {
 
                 // Top view
                 this.updateTopView();
-                this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 3000);
+                this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 2000);
 
                 this.isUnderwater = true;
             }
@@ -444,10 +442,6 @@ class App extends React.Component<{}, state> {
 
         if(data.water_temp !== this.state.options.water_temp){
             this.environmentComponent.setWaterTemp(this.CesiumViewer, data.water_temp, this.dateMap.get(data.date));
-        }
-
-        if(data.world_temp !== this.state.options.world_temp){
-            this.environmentComponent.setWorldTemp(this.CesiumViewer, data.world_temp, this.dateMap.get(data.date));
         }
 
         if(data.wrecks !== this.state.options.wrecks){
@@ -491,7 +485,6 @@ class App extends React.Component<{}, state> {
         this.auvComponent.getAuvActive().setPosition(this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime));
         let quaternion = this.auvComponent.getAuvEntity().orientation.getValue(this.CesiumViewer.clock.currentTime);
         let hpr = Cesium.HeadingPitchRoll.fromQuaternion(quaternion);
-        console.log("heading: " + hpr.heading);
         this.topView.setTopView(this.auvComponent.getAuvActive(), hpr, this.CesiumViewer.clock.currentTime);
     }
 
@@ -565,7 +558,6 @@ class App extends React.Component<{}, state> {
                             wavesHeight : app.state.options.wavesHeight,
                             wavesVelocity: app.state.options.wavesVelocity,
                             aisDensity: app.state.options.aisDensity,
-                            world_temp: app.state.options.world_temp,
                             water_temp: app.state.options.water_temp,
                             salinity: app.state.options.salinity,
                             bathymetry: app.state.options.bathymetry,
@@ -578,7 +570,6 @@ class App extends React.Component<{}, state> {
             },
             Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }
-
 
 
     /**

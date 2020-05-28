@@ -42,7 +42,7 @@ class TopView extends Component {
         let latitude = Cesium.Math.toDegrees(result.latitude);
 
         this.viewer.camera.flyTo({
-            destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 5500.0)
+            destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 100.0)
         });
 
         this.showMenu = true;
@@ -110,25 +110,17 @@ class TopView extends Component {
         let result = Cesium.Cartographic.fromCartesian(auv.getPosition(), Cesium.Ellipsoid.WGS84);
         let longitude = Cesium.Math.toDegrees(result.longitude);
         let latitude = Cesium.Math.toDegrees(result.latitude);
-
-
-
-        let heading = Utils.normalRelativeAngle(Cesium.Math.toDegrees(hpr.heading)) + Cesium.Math.PI;
-
-        console.log("heading: " + heading);
-
+        let heading = Utils.normalRelativeAngle(180 - Cesium.Math.toDegrees(hpr.heading));
 
         let e = this.viewer.entities.getById(auv.name);
         if (e !== undefined) {
-
             e.position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
             e.billboard.rotation = Cesium.Math.toRadians(heading);
             return;
         }
 
         this.date = new Date(auv.getStartTime());
-
-        this.viewer.entities.add({
+        let auvEntity = this.viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
             billboard: {
                 //Icons made by photo3idea_studiofrom  www.flaticon.com<
@@ -138,13 +130,22 @@ class TopView extends Component {
                 scale: 0.075,
                 distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
                     0.0,
-                    20000.0
+                    400.0
                 )
             },
-            orientation: hpr,
+            //orientation: hpr,
+            //orientation: new Cesium.VelocityOrientationProperty(auv.path),
             name: auv.name,
             id: auv.name
         });
+
+        let viewer = this.viewer;
+        this.viewer.flyTo(auvEntity).then(() => {
+            viewer.camera.setView({
+                destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 200.0)
+            });
+
+        })
     }
 
     reset() {
@@ -157,8 +158,6 @@ class TopView extends Component {
 
         if (data.layerActive !== this.state.layerActive) {
             this.environment.clearAllLayer(this.viewer);
-
-            console.log(this.date);
 
             switch(data.layerActive.toString()) {
                 case "Waves Height": {
