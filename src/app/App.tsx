@@ -408,7 +408,7 @@ class App extends React.Component<{}, state> {
 
                 // Top view
                 this.updateTopView();
-                this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 2000);
+                this.updateTopViewIntervalId = setInterval(this.updateTopView.bind(this), 500);
 
                 this.isUnderwater = true;
             }

@@ -28,6 +28,7 @@ class TopView extends Component {
         layerActive: ''
     };
     private showMenu: boolean = false;
+    private auvEntity: any;
 
 
     async componentDidMount() {
@@ -42,7 +43,7 @@ class TopView extends Component {
         let latitude = Cesium.Math.toDegrees(result.latitude);
 
         this.viewer.camera.flyTo({
-            destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 100.0)
+            destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 550.0)
         });
 
         this.showMenu = true;
@@ -102,7 +103,7 @@ class TopView extends Component {
     public setTopView(auv, hpr, time) {
         this.aisComponent.update(this.viewer, true, auv);
         this.setAuvPosition(auv, hpr);
-        this.setCameraView(auv.getPosition());
+        //this.setCameraView(auv.getPosition());
         this.viewer.clock.currentTime = time.clone();
     }
 
@@ -112,15 +113,15 @@ class TopView extends Component {
         let latitude = Cesium.Math.toDegrees(result.latitude);
         let heading = Utils.normalRelativeAngle(180 - Cesium.Math.toDegrees(hpr.heading));
 
-        let e = this.viewer.entities.getById(auv.name);
-        if (e !== undefined) {
-            e.position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
-            e.billboard.rotation = Cesium.Math.toRadians(heading);
+        //let e = this.viewer.entities.getById(auv.name);
+        if (this.auvEntity !== undefined) {
+            this.auvEntity.position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
+            this.auvEntity.billboard.rotation = Cesium.Math.toRadians(heading);
             return;
         }
 
         this.date = new Date(auv.getStartTime());
-        let auvEntity = this.viewer.entities.add({
+        this.auvEntity = this.viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
             billboard: {
                 //Icons made by photo3idea_studiofrom  www.flaticon.com<
@@ -130,21 +131,20 @@ class TopView extends Component {
                 scale: 0.075,
                 distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
                     0.0,
-                    400.0
+                    12000.0
                 )
             },
-            //orientation: hpr,
-            //orientation: new Cesium.VelocityOrientationProperty(auv.path),
             name: auv.name,
-            id: auv.name
+            id: auv.name,
+            viewFrom: new Cesium.Cartesian3(0, 0, 12000),
         });
 
-        let viewer = this.viewer;
-        this.viewer.flyTo(auvEntity).then(() => {
-            viewer.camera.setView({
-                destination: new Cesium.Cartesian3.fromDegrees(longitude, latitude, 200.0)
-            });
+        //this.viewer.trackedEntity = this.auvEntity;
+        this.showMenu = true;
 
+        let viewer = this.viewer;
+        this.viewer.flyTo(this.auvEntity).then(() => {
+            viewer.trackedEntity = this.auvEntity;
         })
     }
 
