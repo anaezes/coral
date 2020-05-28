@@ -7,7 +7,6 @@ const Cesium = require('cesium');
 
 class EnvironmentComponent {
     wavesHeightLayer =  null;
-    worldLayer = null;
     waterTempLayer = null;
     salinityLayer = null;
     wavesVelocityLayer = null;
@@ -114,37 +113,6 @@ class EnvironmentComponent {
             }).catch(err => {
                 return err;
             });
-    }
-    /*
-    * World temperature of a given date (daily)
-    * TODO: pedir por wms se possivel + arrajnar + contas meteomatics -> random
-    ***/
-    setWorldTemp(viewer: any, display?: boolean, date? ) {
-        if (!display) {
-            viewer.imageryLayers.remove(this.worldLayer);
-            this.worldLayer = null;
-            EnvironmentComponent.legend = undefined;
-        } else {
-            let today;
-            date === undefined ? today = new Date() : today = date;
-            today.setHours(12);
-            let url = 'https://api.meteomatics.com/' + this.formatDateForRequest12(today) + '/t_0m:C/90,-180_-90,180:600x400/png';
-            let autentication = 'faculdadedeengenhariadoporto_santos:5xHPl1YW0gsUb';
-            this.getImage(url, autentication).then(image => {
-                this.worldLayer = viewer.imageryLayers.addImageryProvider(new Cesium.SingleTileImageryProvider({
-                    url: image,
-                    rectangle: Cesium.Rectangle.fromDegrees(
-                        -180.0,
-                        -90.0,
-                        180.0,
-                        90.0),
-                }));
-            });
-
-            let img = document.createElement('img');
-            img.src = "../images/worldTemp-legend.png";
-            EnvironmentComponent.legend = img;
-        }
     }
 
     /*
@@ -484,7 +452,6 @@ class EnvironmentComponent {
         viewer.imageryLayers.remove(this.wavesVelocityLayer);
         viewer.imageryLayers.remove(this.waterTempLayer);
         viewer.imageryLayers.remove(this.aisDensityLayer);
-        viewer.imageryLayers.remove(this.worldLayer);
 
         this.aisDensityLayer = null;
         this.waterTempLayer = null;
@@ -492,7 +459,6 @@ class EnvironmentComponent {
         this.salinityLayer = null;
         this.wavesHeightLayer = null;
         this.wrecksLayer = null;
-        this.worldLayer = null;
 
         EnvironmentComponent.legend = undefined;
     }
@@ -522,12 +488,6 @@ class EnvironmentComponent {
             viewer.imageryLayers.remove(this.salinityLayer);
             this.salinityLayer = null;
             this.setSalinity(viewer, true, date);
-        }
-
-        if (this.worldLayer !== null) {
-            viewer.imageryLayers.remove(this.worldLayer);
-            this.worldLayer = null;
-            this.setWorldTemp(viewer, true, date);
         }
 
     }
