@@ -1,8 +1,7 @@
-const urlAllAis =  'https://ripples.lsts.pt/ais';
-
+const urlAis =  'https://ripples.lsts.pt/imcrouter/ships';
 
 class AisProvider {
-    async getAllAis() {
+/*    async getAllAis() {
         return fetch(urlAllAis)
             .then(response => response.text())
             .then(text => {
@@ -11,10 +10,10 @@ class AisProvider {
                 console.error('fetch failed', err);
                 return err;
             });
-    }
+    }*/
 
     async getAisFromArea(latMax, latMin, lonMax, lonMin ) {
-        let url = new URL("http://localhost:9090/ships"),
+        let url = new URL(urlAis),
             params = { latmax: latMax, latmin: latMin,
                 lonmax: lonMax, lonmin: lonMin  }
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));

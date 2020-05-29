@@ -2,7 +2,6 @@
 export interface AisJSON {
     id: string;
     mmsi: number;
-    strtype: string;
     type: number;
     name: string;
     timestamp: number;

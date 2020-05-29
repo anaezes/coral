@@ -117,7 +117,6 @@ class App extends React.Component<{}, state> {
                     wsMsg: newData
                 }
             })
-            //console.log(this.state.data);
         };
     }
 
@@ -164,9 +163,6 @@ class App extends React.Component<{}, state> {
     render() {
         const {isLoading, data, options} = this.state;
 
-        /*if(this.CesiumViewer == null)
-            this.initCesium();*/
-
         if (!isLoading && !this.isSystemInit) {
             this.getAuvs();
             this.getDates();
@@ -175,13 +171,7 @@ class App extends React.Component<{}, state> {
             this.topView = new TopView(this.props);
         }
 
-
-
-        this.updateLabelTime();
-
-        if(this.CesiumViewer !== null && this.state.options.ais){
-            this.aisComponent.render(this.CesiumViewer);
-        }
+        //this.updateLabelTime();
 
         return (
             <div>
@@ -198,12 +188,6 @@ class App extends React.Component<{}, state> {
             </div>
         );
     }
-
-    /*
-                    <!--div id="legend-ais-box">
-                    {this.aisComponent.legendAis !== undefined?  <img src={this.aisComponent.legendAis.src}/>  : <div/>}
-                </div>
-    */
 
     menuUnderwater() {
         const {options} = this.state;
@@ -249,8 +233,8 @@ class App extends React.Component<{}, state> {
                 <DatFolder title="AIS">
                     <DatBoolean path='aisDensity' label='AIS density' />
                     <DatBoolean path='ais' label='AIS'/>
-                    <DatButton label="Reset timeline" onClick={this.handleButtonResetTimelineClick} />
                 </DatFolder>
+                <DatButton label="Reset timeline" onClick={this.handleButtonResetTimelineClick} />
             </DatGui>
         );
     }
@@ -322,9 +306,10 @@ class App extends React.Component<{}, state> {
 
         this.CesiumViewer.animation.viewModel.setShuttleRingTicks([0, 1500]);
 
-
         // Set bounds timeline [now, +6h]
         this.aisComponent.getBoundsTime(this.CesiumViewer);
+
+
 
         // Update layers event listeners
         let app = this;
@@ -424,6 +409,7 @@ class App extends React.Component<{}, state> {
             if(data.ais) {
                 this.aisComponent.getBoundsTime(this.CesiumViewer);
                 this.updateAis();
+                this.aisComponent.setLabels(this.CesiumViewer);
                 this.updateAisIntervalId  = setInterval(this.updateAis.bind(this), 3000);
             }
             else {
@@ -645,25 +631,25 @@ class App extends React.Component<{}, state> {
 
     private updateLabelTime() {
 
-        if(this.CesiumViewer === undefined)
+        if (this.CesiumViewer === undefined)
             return;
 
         let timeTimeline = this.CesiumViewer.clock.currentTime;
         let realTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), 1, new Cesium.JulianDate());
-        let time = Cesium.JulianDate.secondsDifference(timeTimeline, realTime);
+        let time = Cesium.JulianDate.secondsDifference(timeTimeline, realTime).toFixed(1);
 
 
-        if(time < - 1) {
+        if (time < -60.0) {
             this.img.src = "../images/replayInfo.png";
-        }
-        else if(time >= -1 && time < 5) { //fix latency render
-            this.img.src = "../images/realTimeInfo.png";
-            this.CesiumViewer.clock.currentTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), 1, new Cesium.JulianDate());
-        }
-        else
+        } else if (time > 20.0) {
             this.img.src = "../images/forecastInfo.png";
+        } else {
+            this.img.src = "../images/realTimeInfo.png";
+        }
 
         this.legendTime = this.img;
+
+        this.forceUpdate();
     }
 
 

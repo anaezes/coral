@@ -53,7 +53,7 @@ class AisComponent {
         aisProvider.getAisFromArea(latMax,latMin,lonMax,lonMin).then(response => {
             try{
                 this.ais = JSON.parse(response);
-                //this.render(viewer);
+                this.render(viewer);
             }
             catch (e) {
                 console.error(e.toString());
@@ -134,7 +134,7 @@ class AisComponent {
         let time = Cesium.JulianDate.secondsDifference(timeTimeline, realTime);
 
        if(time < 50) {
-           this.img.src = "../images/realTimeInfo.png";
+           //this.img.src = "../images/realTimeInfo.png";
            entity.position = Cesium.Cartesian3.fromDegrees(ais.longitude, ais.latitude);
 
            let origin = Cesium.Cartographic.fromDegrees(ais.longitude, ais.latitude);
@@ -147,7 +147,7 @@ class AisComponent {
            ]);
        }
        else {
-           this.img.src = "../images/forecastInfo.png";
+           //this.img.src = "../images/forecastInfo.png";
 
            let distance = ais.sog * time;
            let result = Utils.getPointFromAngleAndPoint(ais.heading,
@@ -178,15 +178,16 @@ class AisComponent {
         viewer.clock.stopTime = this.stopTime.clone();
         viewer.clock.currentTime = this.startTime.clone();
         //viewer.clock.clockStep = Cesium.ClockStep.SYSTEM_CLOCK;
-        viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;
-        viewer.clock.multiplier = 1;
+        //viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;
+        //viewer.clock.multiplier = 1;
 
         //Set timeline to simulation bounds
         viewer.timeline.zoomTo(this.startTime, this.stopTime);
         viewer.clock.canAnimate = true;
         viewer.clock.shouldAnimate = true;
+    }
 
-
+    setLabels(viewer){
         viewer.screenSpaceEventHandler.setInputAction(function onLeftDown(
             movement) {
 
@@ -204,7 +205,6 @@ class AisComponent {
                 return;
             pickedLabel.id.label.show = false;
         }, Cesium.ScreenSpaceEventType.LEFT_UP);
-
     }
 
     clear(viewer) {
