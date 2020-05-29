@@ -113,5 +113,13 @@ body {
   width: 75%;
 }
 
+#animation_pathWingButton {
+  display: none !important;
+}
+
+#animation_pathClock {
+  display: none !important;
+}
+
 
 
