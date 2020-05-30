@@ -16,7 +16,6 @@ class EnvironmentComponent {
     aisDensityLayer = null;
     public models : Array<Model> = new Array<Model>();
     static legend : HTMLImageElement | undefined;
-    //images : Map<string, string> = new Map<string, string>();
 
     constructor() {
         let t : Array<ModelJSON> = JSON.parse(JSON.stringify(models.wrecks));
@@ -26,10 +25,8 @@ class EnvironmentComponent {
     }
 
     update(auvPosition, viewer) {
-        let dist, assetId;
-
+        let dist;
         this.models.forEach(model => {
-            assetId = model.assetId;
             dist = Cesium.Cartesian3.distance(auvPosition, new Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude)) / 1000;
 
             if (dist <= 3.0) {
@@ -58,7 +55,6 @@ class EnvironmentComponent {
             )
 
             model.primitive = tileset;
-            console.log("colocou modelo!!!");
         }
 
         let pinBuilder = new Cesium.PinBuilder();
@@ -86,7 +82,6 @@ class EnvironmentComponent {
     }
 
     removeModel(model: Model, viewer){
-        console.log("remove: " + model.assetId);
         if(viewer.entities.contains(model.pin))
             viewer.entities.remove(model.pin);
         model.active = false;
@@ -166,8 +161,6 @@ class EnvironmentComponent {
     * Water temperature of a given date (hourly)
     * **/
     setWaterTemp(viewer: any, display: boolean, date) {
-
-        console.log("display: " + display);
         if (!display) {
             viewer.imageryLayers.remove(this.waterTempLayer);
             this.waterTempLayer = null;
@@ -218,7 +211,6 @@ class EnvironmentComponent {
     ***/
     setWavesVelocity(viewer: any, display:boolean, date: any) {
         if (!display) {
-            console.log("here");
             viewer.imageryLayers.remove(this.wavesVelocityLayer);
             this.wavesVelocityLayer = null;
             EnvironmentComponent.legend = undefined;
@@ -417,14 +409,9 @@ class EnvironmentComponent {
 
 
     getMultipleTime(multiple: number, date: any){
-        console.log("hour: " + date.getHours());
-
         let rest = date.getHours() % multiple;
         let hour = date.getHours() - rest;
-        console.log("rest: " + rest);
-        console.log(hour);
         date.setHours(hour, 0, 0, 0);
-        console.log(date);
         return date;
     }
 
@@ -464,8 +451,6 @@ class EnvironmentComponent {
     }
 
     public updateLayersTime(viewer, date) {
-        console.log("update layers");
-
         if (this.wavesHeightLayer !== null) {
             viewer.imageryLayers.remove(this.wavesHeightLayer);
             this.wavesHeightLayer = null;

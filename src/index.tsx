@@ -7,8 +7,6 @@ import './index.css';
 //https://github.com/claus/react-dat-gui/issues/43
 import 'react-dat-gui/dist/index.css';
 
-import TopView from "./app/views/TopView";
-
 let Cesium = require('cesium');
 
 Cesium.buildModuleUrl.setBaseUrl('./cesium/');

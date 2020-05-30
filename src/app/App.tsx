@@ -148,11 +148,13 @@ class App extends React.Component<{}, state> {
         this.updateRender(newData);
 
     handleButtonResetLayersClick = (event: any) =>{
+        // eslint-disable-next-line
         let target = event.currentTarget;
         this.resetEnvironmentLayers();
     }
 
     handleButtonResetTimelineClick = (event: any) =>{
+        // eslint-disable-next-line
         let target = event.currentTarget;
         this.aisComponent.getBoundsTime(this.CesiumViewer);
     }
@@ -161,7 +163,7 @@ class App extends React.Component<{}, state> {
      * Main rendering loop
      */
     render() {
-        const {isLoading, data, options} = this.state;
+        const {isLoading, options} = this.state;
 
         if (!isLoading && !this.isSystemInit) {
             this.getAuvs();
@@ -179,10 +181,10 @@ class App extends React.Component<{}, state> {
                 {this.isUnderwater && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
                 {this.isUnderwater?  this.menuUnderwater() : this.menuSurface()}
                 <div id="legend-env-box">
-                    {EnvironmentComponent.legend !== undefined?  <img src={EnvironmentComponent.legend.src}/>  : <div/>}
+                    {EnvironmentComponent.legend !== undefined?  <img src={EnvironmentComponent.legend.src} alt="Legend" />  : <div/>}
                 </div>
                 <div id="legend-timeline">
-                    {this.legendTime !== undefined?  <img src={this.legendTime.src}/>  : <div/>}
+                    {this.legendTime !== undefined?  <img src={this.legendTime.src} alt="Time"/>  : <div/>}
                 </div>
                 <TopView ref={element => this.topView = element}/>
             </div>
@@ -309,8 +311,6 @@ class App extends React.Component<{}, state> {
         // Set bounds timeline [now, +6h]
         this.aisComponent.getBoundsTime(this.CesiumViewer);
 
-
-
         // Update layers event listeners
         let app = this;
         let updateAnimation = false;
@@ -347,6 +347,7 @@ class App extends React.Component<{}, state> {
      */
     private updateRender(data) : void {
         if(data.auvActive !== this.state.options.auvActive) {
+            // eslint-disable-next-line
             this.state.options.auvActive = data.auvActive;
 
             this.resetApp()

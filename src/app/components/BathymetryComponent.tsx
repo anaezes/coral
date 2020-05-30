@@ -10,7 +10,6 @@ class BathymetryComponent {
     public tiles: Array<Tile> = new Array<Tile>();
     private mainTile: any;
     private ENU = new Cesium.Matrix4();
-    private static bathymetryLayer: any = null;
 
     constructor() {
         let t : Array<TileJSON> = JSON.parse(JSON.stringify(tiles.tiles));
@@ -21,11 +20,10 @@ class BathymetryComponent {
 
     update(auvPosition, viewer, terrainExaggeration){
         this.findMainTile(auvPosition, viewer);
-        let dist, assetId;
+        let dist;
 
         // Render neighbors
         this.tiles.forEach(tile => {
-            assetId = tile.assetId;
             dist = Cesium.Cartesian3.distance(auvPosition, new Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude)) / 1000;
 
             if (dist <= 5.0) {
@@ -40,14 +38,11 @@ class BathymetryComponent {
     }
 
     private findMainTile(auvPosition, viewer){
-        let dist, assetId;
-        //let auvPosition = this.entityAUV.position.getValue(this.CesiumViewer.clock.currentTime);
-
+        let dist;
         let minDist = Number.MAX_VALUE;
 
         // Find main tile
         this.tiles.forEach(tile => {
-            assetId = tile.assetId;
             dist = Cesium.Cartesian3.distance(auvPosition, new Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude))/1000;
 
             if(dist < minDist) {
@@ -56,7 +51,7 @@ class BathymetryComponent {
             }
         });
 
-        var position = Cesium.Cartesian3.fromDegrees(this.mainTile.longitude,this.mainTile.latitude, this.mainTile.depth);
+        let position = Cesium.Cartesian3.fromDegrees(this.mainTile.longitude,this.mainTile.latitude, this.mainTile.depth);
         Cesium.Transforms.eastNorthUpToFixedFrame(position, viewer.scene.globe.ellipsoid, this.ENU);
     }
 
@@ -105,12 +100,9 @@ class BathymetryComponent {
 
         tile.active = true;
         tile.primitive = tileset;
-
-        console.log("Render: " + tile.assetId);
     }
 
     removeTile(tile: Tile, viewer){
-        console.log("remove: " + tile.assetId);
         if(viewer.scene.primitives.contains(tile.primitive))
             viewer.scene.primitives.remove(tile.primitive);
         tile.active = false;

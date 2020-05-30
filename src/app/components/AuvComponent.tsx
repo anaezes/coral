@@ -1,13 +1,6 @@
-import {AuvJSON, Sample, WaypointJSON} from "../utils/AUVUtils";
+import {Sample, WaypointJSON} from "../utils/AUVUtils";
 import Auv from "./Auv";
-import {TileJSON} from "../utils/TilesUtils";
-import Tile from "./Tile";
-
-
-const urlAuvs =  'https://ripples.lsts.pt/imcrouter/imc/systems/';//'https://ripples.lsts.pt/soi';
 const Cesium = require('cesium');
-
-const HEIGHT = 0.0;
 
 class AuvComponent {
     private auvActive;

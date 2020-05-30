@@ -190,6 +190,7 @@ class TopView extends Component {
                 }
             }
 
+            // eslint-disable-next-line
             this.state.layerActive = data.layerActive;
         }
 
