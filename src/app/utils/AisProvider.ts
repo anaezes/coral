@@ -1,4 +1,4 @@
-const urlAis =  'https://ripples.lsts.pt/imcrouter/ships';
+const urlAis =  'https://cors-anywhere.herokuapp.com/https://ripples.lsts.pt/imcrouter/ships';
 
 class AisProvider {
 /*    async getAllAis() {
