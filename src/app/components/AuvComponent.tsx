@@ -84,7 +84,7 @@ class AuvComponent {
 
             //Load the Cesium plane model to represent the entity
             model: {
-                uri: '../models/lauv-80.glb',
+                uri: '../models/lauv-80-animated.glb',
                 minimumPixelSize: 64,
                 maximumScale: 1.0,
             },
@@ -114,6 +114,14 @@ class AuvComponent {
                 eyeOffset: new Cesium.Cartesian3(0, 1.5, 0),
             }
         });
+
+        Cesium.when(this.entityAUV.model.readyPromise).then(function(model) {
+            model.activeAnimations.addAll({
+                loop : Cesium.ModelAnimationLoop.REPEAT,
+                multiplier : 500,
+            });
+        });
+
         this.updateCamera(viewer);
     }
 
