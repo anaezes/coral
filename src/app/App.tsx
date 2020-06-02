@@ -15,7 +15,6 @@ import waypoints from '../data/waypointsTest.json';
 const Cesium = require('cesium');
 const urlAuvs =  'https://coral-cors.herokuapp.com/https://ripples.lsts.pt/imcrouter/imc/systems/';
 //const urlAuvs =  'https://ripples.lsts.pt/imcrouter/imc/systems/';
-//const urlAuvs =  'https://cors-anywhere.herokuapp.com/https://ripples.lsts.pt/soi';
 const dummyCredit = document.createElement("div");
 
 
@@ -567,7 +566,7 @@ class App extends React.Component<{}, state> {
         let auvs : Array<AuvJSON> = JSON.parse(JSON.stringify(this.state.data));
         let temp: Array<AuvJSON> = [];
         for (let i = 0; i < auvs.length; i++) {
-            if(auvs[i].type === 'UUV'){
+            if(auvs[i].type === 'UUV' && auvs[i].plan.length !== 0){
                 temp.push(auvs[i]);
                 this.options.push(auvs[i].name);
             }
