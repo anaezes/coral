@@ -2,11 +2,45 @@
   "wrecks": [
     {
       "name": "U 1277",
-      "longitude": -875403,
-      "latitude": 41.21642,
-      "depth" : -27,
+      "longitude": -8.75401,
+      "latitude": 41.21630,
+      "depth" : -15,
       "assetId": 100885
     },
+    {
+      "name": "Senhora da livração",
+      "longitude": -8.74989,
+      "latitude": 41.19947,
+      "depth" : -15
+    },
+    {
+      "name": "Farmsum",
+      "longitude": -8.69193,
+      "latitude": 41.16856,
+      "depth" : -15
+    },
+    {
+      "name": "Amethyst",
+      "longitude": -8.68798,
+      "latitude": 41.16015,
+      "depth" : -15
+    },
+    {
+      "name": "Tor Bay (possibly)",
+      "longitude": -8.79951,
+      "latitude": 41.54971,
+      "depth" : -15
+    },
+    {
+      "name": "unknown",
+      "longitude": -8.72145,
+      "latitude": 41.17011,
+      "depth" : -25,
+      "assetId": 90688
+    },
+
+
+
     {
       "name": "Inge",
       "longitude": -8.79951,

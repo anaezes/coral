@@ -100,6 +100,8 @@ class BathymetryComponent {
 
         tile.active = true;
         tile.primitive = tileset;
+
+        console.log("render: " + tile.assetId);
     }
 
     removeTile(tile: Tile, viewer){
@@ -107,6 +109,8 @@ class BathymetryComponent {
             viewer.scene.primitives.remove(tile.primitive);
         tile.active = false;
         tile.primitive = undefined;
+
+        console.log("remove: " + tile.assetId);
     }
 
     onTerrainExaggeration(viewer, terrainExaggeration) {

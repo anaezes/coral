@@ -2,10 +2,10 @@ import React from 'react';
 import {TileJSON} from "../utils/TilesUtils";
 
 const Cesium = require('cesium');
-const CORRECTION_FACTOR_POS = 1.32;
+const CORRECTION_FACTOR_POS = 1.29;
 const CORRECTION_FACTOR_DEPTH = 20;
-const HEIGHT =  5280.0;
-const WIDTH = 3768.0;
+//const LENGTH =  5280.0;
+//const WIDTH = 3768.0;
 
 const epsilon = 0.000001;
 
@@ -17,6 +17,8 @@ class Tile extends React.Component{
     public primitive: any;
     public coordsFixed: boolean;
     depth: number;
+    public length: number;
+    public width: number;
 
     constructor(tile: TileJSON) {
         super(tile)
@@ -27,13 +29,15 @@ class Tile extends React.Component{
         this.coordsFixed = false;
         this.primitive = undefined;
         this.depth = -tile.depth + tile.height/2 - CORRECTION_FACTOR_DEPTH;
+        this.length = tile.length;
+        this.width = tile.width
     }
 
     getOffset(mainTile: Tile){
         let lat = this.latitude;
         let lon = this.longitude;
-        let offsetN = HEIGHT * CORRECTION_FACTOR_POS;
-        let offsetE = WIDTH * CORRECTION_FACTOR_POS;
+        let offsetN = this.length * CORRECTION_FACTOR_POS;
+        let offsetE = this.width * CORRECTION_FACTOR_POS;
         let offset;
 
         if(Cesium.Math.equalsEpsilon(mainTile.latitude, lat, epsilon)) {// west or east

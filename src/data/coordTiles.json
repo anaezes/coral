@@ -3,6 +3,8 @@
     {
       "longitude": -8.8444996,
       "latitude": 41.5872182,
+      "length": 5280,
+      "width": 3768,
       "height": 37.6,
       "depth": 20.98,
       "assetId": 94168
@@ -10,6 +12,8 @@
     {
       "longitude": -8.7991926,
       "latitude": 41.5872182,
+      "length": 5280,
+      "width": 3768,
       "height": 15.7,
       "depth": 20.98,
       "assetId": 94169
@@ -17,6 +21,8 @@
     {
       "longitude": -8.8444996,
       "latitude": 41.5397747,
+      "length": 5280,
+      "width": 3768,
       "height": 32,
       "depth": 20.98,
       "assetId": 92603
@@ -24,6 +30,8 @@
     {
       "longitude": -8.7991926,
       "latitude": 41.5397747,
+      "length": 5280,
+      "width": 3768,
       "height": 22.5,
       "depth": 20.98,
       "assetId": 92604
@@ -31,6 +39,8 @@
     {
       "longitude": -8.8444746,
       "latitude": 41.4923581,
+      "length": 5280,
+      "width": 3768,
       "height": 28.4,
       "depth": 20.98,
       "assetId": 92605
@@ -38,9 +48,67 @@
     {
       "longitude": -8.7991926,
       "latitude": 41.4923312,
+      "length": 5280,
+      "width": 3768,
       "height": 36.9,
       "depth": 20.98,
       "assetId": 92606
+    },
+
+
+    {
+      "longitude": -8.7538435,
+      "latitude": 41.1974733,
+      "length": 5910,
+      "width": 3570,
+      "height": 20.8,
+      "depth": 25,
+      "assetId": 107660
+    },
+    {
+      "longitude": -8.7111352,
+      "latitude": 41.1974733,
+      "length": 5910,
+      "width": 3570,
+      "height": 71.1,
+      "depth": 80,
+      "assetId": 107661
+    },
+    {
+      "longitude": -8.6694685,
+      "latitude": 41.1974733,
+      "length": 5910,
+      "width": 3570,
+      "height": 96.3,
+      "depth": 11,
+      "assetId": 107662
+    },
+    {
+      "longitude": -8.7538435,
+      "latitude": 41.1448691,
+      "length": 5910,
+      "width": 3570,
+      "height": 9,
+      "depth": 11,
+      "assetId": 107663
+    },
+    {
+      "longitude": -8.7111352,
+      "latitude": 41.1448691,
+      "length": 5910,
+      "width": 3570,
+      "height": 27.1,
+      "depth": 32,
+      "assetId": 107664
+    },
+    {
+      "longitude": -8.6694685,
+      "latitude":  41.1448691,
+      "length": 5910,
+      "width": 3570,
+      "height": 94.1,
+      "depth": 11,
+      "assetId": 107665
     }
   ]
 }
