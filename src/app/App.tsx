@@ -13,7 +13,8 @@ import EnvironmentComponent from "./components/EnvironmentComponent";
 import waypoints from '../data/waypointsTest.json';
 
 const Cesium = require('cesium');
-const urlAuvs =  'https://cors-anywhere.herokuapp.com/https://ripples.lsts.pt/imcrouter/imc/systems/';
+const urlAuvs =  'https://coral-cors.herokuapp.com/https://ripples.lsts.pt/imcrouter/imc/systems/';
+//const urlAuvs =  'https://ripples.lsts.pt/imcrouter/imc/systems/';
 //const urlAuvs =  'https://cors-anywhere.herokuapp.com/https://ripples.lsts.pt/soi';
 const dummyCredit = document.createElement("div");
 
