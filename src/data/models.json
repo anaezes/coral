@@ -2,40 +2,47 @@
   "wrecks": [
     {
       "name": "U 1277",
-      "longitude": -8.75401,
-      "latitude": 41.21630,
+      "longitude": -8.75403,
+      "latitude": 41.21611,
       "depth" : -15,
       "assetId": 100885
     },
     {
-      "name": "Senhora da livração",
-      "longitude": -8.74989,
-      "latitude": 41.19947,
+      "name": "Senhora da Livração",
+      "longitude": -8.74995,
+      "latitude": 41.20008,
       "depth" : -15
     },
     {
       "name": "Farmsum",
-      "longitude": -8.69193,
-      "latitude": 41.16856,
+      "longitude": -8.69229,
+      "latitude": 41.16858,
       "depth" : -15
     },
     {
       "name": "Amethyst",
-      "longitude": -8.68798,
-      "latitude": 41.16015,
+      "longitude": -8.68800,
+      "latitude": 41.16017,
       "depth" : -15
     },
     {
-      "name": "Tor Bay (possibly)",
-      "longitude": -8.79951,
-      "latitude": 41.54971,
+      "name": "Torbay (possibly)",
+      "longitude": -8.68680,
+      "latitude": 41.15845,
       "depth" : -15
     },
     {
       "name": "unknown",
-      "longitude": -8.72145,
-      "latitude": 41.17011,
-      "depth" : -25,
+      "longitude": -8.72128,
+      "latitude": 41.16987,
+      "depth" : -15,
+      "assetId": 90688
+    },
+    {
+      "name": "Vida do Porto",
+      "longitude": -8.71132,
+      "latitude": 41.18103,
+      "depth" : -15,
       "assetId": 90688
     },
 
@@ -43,28 +50,29 @@
 
     {
       "name": "Inge",
-      "longitude": -8.79951,
+      "longitude": -8.79970,
       "latitude": 41.54971,
-      "depth" : -27
-    },
-    {
-      "name": "Exemple",
-      "longitude": -8.824811935424805,
-      "latitude": 41.57655715942383,
       "depth" : -27,
       "assetId": 90688
     },
     {
+      "name": "unknown",
+      "longitude": -8.78326,
+      "latitude": 41.53320,
+      "depth" : -27
+    },
+    {
       "name": "Padre Cruz",
-      "longitude": -8.91637,
-      "latitude": 41.55001,
+      "longitude": -8.91686,
+      "latitude": 41.54987,
       "depth" : -27
     },
     {
       "name": "Cordeiro de Deus",
-      "longitude": -8.83298,
-      "latitude": 41.49980,
-      "depth" : -27
+      "longitude": -8.83300,
+      "latitude": 41.49992,
+      "depth" : -27,
+      "assetId": 108247
     }
   ]
 }

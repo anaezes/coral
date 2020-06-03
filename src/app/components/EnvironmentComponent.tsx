@@ -29,7 +29,7 @@ class EnvironmentComponent {
         this.models.forEach(model => {
             dist = Cesium.Cartesian3.distance(auvPosition, new Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude)) / 1000;
 
-            if (dist <= 3.0) {
+            if (dist <= 5.0) {
                 if(model.pin === undefined) {
                     this.renderModel(model, viewer);
                 }
@@ -60,9 +60,10 @@ class EnvironmentComponent {
         let pinBuilder = new Cesium.PinBuilder();
         let pin = viewer.entities.add({
                 name : model.name.toString(),
-                position : Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+10),
+                position : model.assetId !== undefined ? Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+50) :
+                    Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+10) ,
                 billboard: {
-                        image: pinBuilder.fromColor(Cesium.Color.ROYALBLUE, 48).toDataURL(),
+                        image: pinBuilder.fromColor(Cesium.Color.ROYALBLUE, 32).toDataURL(),
                         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
                 },
                 label: {
@@ -72,7 +73,9 @@ class EnvironmentComponent {
                     distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
                         0.0,
                         20000.0
-                    )
+                    ),
+                    position : model.assetId !== undefined ? Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+50) :
+                        Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+10) ,
 
                 }
             });

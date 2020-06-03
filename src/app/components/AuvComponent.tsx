@@ -138,7 +138,7 @@ class AuvComponent {
             let result = "";
             if(auv !== undefined){
                 let cartographic = new Cesium.Cartographic.fromCartesian(auv.getPosition());
-                result = "Depth: " + (cartographic.height).toFixed(2).toString() + "m";
+                result = "Depth: " + ((cartographic.height).toFixed(2)*-1.0).toString() + " m";
                 auv.getSamples().forEach((sample: Sample, name: string) => {
                     result += "\n" + name + ": " + sample.value.toFixed(2).toString();
                     if(name === "Temperature")
