@@ -203,7 +203,6 @@ class App extends React.Component<{}, state> {
                         options={this.options}/>
                     <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={8} step={1} />
                     <DatBoolean path='waterEffects' label='Water effects' />
-                    <DatBoolean path='updatePlan' label='Test update plan' />
                 </DatFolder>
             </DatGui>
         );
