@@ -4,46 +4,48 @@
       "name": "U 1277",
       "longitude": -8.75403,
       "latitude": 41.21611,
-      "depth" : -15,
+      "depth" : -45,
       "assetId": 100885
     },
     {
       "name": "Senhora da Livração",
       "longitude": -8.74995,
       "latitude": 41.20008,
-      "depth" : -15
+      "depth" : -45
     },
     {
       "name": "Farmsum",
       "longitude": -8.69229,
       "latitude": 41.16858,
-      "depth" : -15
+      "depth" : -25
     },
     {
       "name": "Amethyst",
       "longitude": -8.68800,
       "latitude": 41.16017,
-      "depth" : -15
+      "depth" : -30,
+      "assetId": 108247
     },
     {
       "name": "Torbay (possibly)",
       "longitude": -8.68680,
       "latitude": 41.15845,
-      "depth" : -15
+      "depth" : -40,
+      "assetId": 100885
     },
     {
       "name": "unknown",
       "longitude": -8.72128,
       "latitude": 41.16987,
-      "depth" : -15,
+      "depth" : -75,
       "assetId": 90688
     },
     {
       "name": "Vida do Porto",
       "longitude": -8.71132,
       "latitude": 41.18103,
-      "depth" : -15,
-      "assetId": 90688
+      "depth" : -60,
+      "assetId": 108247
     },
 
 
@@ -52,14 +54,14 @@
       "name": "Inge",
       "longitude": -8.79970,
       "latitude": 41.54971,
-      "depth" : -27,
+      "depth" : -67,
       "assetId": 90688
     },
     {
       "name": "unknown",
       "longitude": -8.78326,
       "latitude": 41.53320,
-      "depth" : -27
+      "depth" : -12
     },
     {
       "name": "Padre Cruz",

@@ -60,7 +60,7 @@ class EnvironmentComponent {
         let pinBuilder = new Cesium.PinBuilder();
         let pin = viewer.entities.add({
                 name : model.name.toString(),
-                position : model.assetId !== undefined ? Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+50) :
+                position : model.assetId !== undefined ? Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+70) :
                     Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+10) ,
                 billboard: {
                         image: pinBuilder.fromColor(Cesium.Color.ROYALBLUE, 32).toDataURL(),
@@ -74,7 +74,7 @@ class EnvironmentComponent {
                         0.0,
                         20000.0
                     ),
-                    position : model.assetId !== undefined ? Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+50) :
+                    position : model.assetId !== undefined ? Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+70) :
                         Cesium.Cartesian3.fromDegrees(model.longitude, model.latitude, model.depth+10) ,
 
                 }
