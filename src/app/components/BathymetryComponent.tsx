@@ -2,7 +2,7 @@ import Tile from "./Tile";
 import {TileJSON} from "../utils/TilesUtils";
 
 // Data
-import tiles from '../../data/coordTiles.json';
+import tiles from '../../data/coordTilesColor.json';
 
 const Cesium = require('cesium');
 
@@ -93,9 +93,9 @@ class BathymetryComponent {
         tileset.readyPromise.then(function(){
             tileset._root.transform = Cesium.Matrix4.IDENTITY;
             tileset.modelMatrix = transform;
-            tileset.style = new Cesium.Cesium3DTileStyle({
+           /* tileset.style = new Cesium.Cesium3DTileStyle({
                 color : "color('#3e3e3e', 1)"
-            });
+            });*/
         });
 
         tile.active = true;
