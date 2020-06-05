@@ -169,7 +169,8 @@ class EnvironmentComponent {
             this.waterTempLayer = null;
             EnvironmentComponent.legend = undefined;
         } else {
-            let today = date;
+            let today;
+            date === undefined ? today = new Date() : today = date;
             let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
             if(currentTime.minute > 30)
                 today.setHours(currentTime.hour, 30, 0, 0);
@@ -223,7 +224,8 @@ class EnvironmentComponent {
             });
 
         } else {
-            let today = date;
+            let today;
+            date === undefined ? today = new Date() : today = date;
             let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
             if(currentTime.minute > 30)
                 today.setHours(currentTime.hour, 30, 0, 0);
@@ -274,7 +276,8 @@ class EnvironmentComponent {
             this.wavesHeightLayer = null;
             EnvironmentComponent.legend = undefined;
         } else {
-            let today = date;
+            let today;
+            date === undefined ? today = new Date() : today = date;
             let currentTime = Cesium.JulianDate.toGregorianDate(viewer.clock.currentTime);
             today.setHours(currentTime.hour);
             let time = this.getMultipleTime(3, today);

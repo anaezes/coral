@@ -26,7 +26,7 @@ class BathymetryComponent {
         this.tiles.forEach(tile => {
             dist = Cesium.Cartesian3.distance(auvPosition, new Cesium.Cartesian3.fromDegrees(tile.longitude, tile.latitude)) / 1000;
 
-            if (dist <= 5.0) {
+            if (dist <= 6.0) {
                 if(tile.primitive === undefined) {
                     this.renderTile(tile, viewer, terrainExaggeration);
                 }
@@ -101,7 +101,7 @@ class BathymetryComponent {
         tile.active = true;
         tile.primitive = tileset;
 
-        console.log("render: " + tile.assetId);
+        //console.log("render: " + tile.assetId);
     }
 
     removeTile(tile: Tile, viewer){
@@ -110,7 +110,7 @@ class BathymetryComponent {
         tile.active = false;
         tile.primitive = undefined;
 
-        console.log("remove: " + tile.assetId);
+        //console.log("remove: " + tile.assetId);
     }
 
     onTerrainExaggeration(viewer, terrainExaggeration) {

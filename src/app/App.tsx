@@ -37,9 +37,9 @@ interface MenuOptions {
     water_temp: boolean,
     salinity: boolean,
     bathymetry: boolean,
-    wrecks: boolean
-
-    updatePlan: boolean
+    wrecks: boolean,
+    date: string,
+    //updatePlan: boolean
 }
 
 class App extends React.Component<{}, state> {
@@ -144,8 +144,9 @@ class App extends React.Component<{}, state> {
     /**
      * Update current state of app with changes from controls
      */
-    handleUpdate = newData =>
+    handleUpdate = newData => {
         this.updateRender(newData);
+    }
 
     handleButtonResetLayersClick = (event: any) =>{
         // eslint-disable-next-line
@@ -305,7 +306,7 @@ class App extends React.Component<{}, state> {
         this.CesiumViewer.scene.fog.enabled = true;
         this.CesiumViewer.scene.fog.density = 2.0e-4;
 
-        this.CesiumViewer.animation.viewModel.setShuttleRingTicks([0, 1500]);
+        this.CesiumViewer.animation.viewModel.setShuttleRingTicks([0, 1000]);
 
         // Set bounds timeline [now, +6h]
         this.aisComponent.getBoundsTime(this.CesiumViewer);
@@ -345,6 +346,7 @@ class App extends React.Component<{}, state> {
      * Handles user input and updates components accordingly
      */
     private updateRender(data) : void {
+
         if(data.auvActive !== this.state.options.auvActive) {
             // eslint-disable-next-line
             this.state.options.auvActive = data.auvActive;
@@ -352,7 +354,9 @@ class App extends React.Component<{}, state> {
             this.resetApp()
             this.CesiumViewer.entities.removeAll()
 
+
             if (data.auvActive === 'None') {
+
                 this.CesiumViewer.scene.globe.depthTestAgainstTerrain = false;
                 this.CesiumViewer.scene.globe.show = true;
                 this.CesiumViewer.scene.backgroundColor = Cesium.Color.BLACK;
@@ -372,14 +376,15 @@ class App extends React.Component<{}, state> {
 
             } else {
 
-                this.CesiumViewer.scene.globe.depthTestAgainstTerrain = true;
-                let success = this.auvComponent.setAuv(this.auvs, data.auvActive, this.CesiumViewer);
-
-                if(!success){
-                    console.log("Error: please choose another vehicle.");
+                try {
+                    this.auvComponent.setAuv(this.auvs, data.auvActive, this.CesiumViewer);
+                } catch (error) {
+                    console.error("Ocorreu um erro...");
                     this.createPins();
                     return;
                 }
+
+                this.CesiumViewer.scene.globe.depthTestAgainstTerrain = true;
 
                 //Environment update
                 let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
@@ -389,7 +394,7 @@ class App extends React.Component<{}, state> {
                 // Bathymetry update
                 //let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
                 this.bathymetryComponent.update(auvPosition, this.CesiumViewer, this.state.options.terrainExaggeration);
-                this.updateBathymetryIntervalId = setInterval(this.updateBathymetry.bind(this), 500);
+                this.updateBathymetryIntervalId = setInterval(this.updateBathymetry.bind(this), 1000);
 
                 // Top view
                 this.updateTopView();
@@ -446,10 +451,10 @@ class App extends React.Component<{}, state> {
             this.environmentComponent.showAisDensity(this.CesiumViewer, data.aisDensity);
         }
 
-        if(data.updatePlan !== this.state.options.updatePlan){
+/*        if(data.updatePlan !== this.state.options.updatePlan){
             let newPlan : Array<WaypointJSON> = JSON.parse(JSON.stringify(waypoints.waypoints));
             this.auvComponent.updatePath(newPlan, this.CesiumViewer);
-        }
+        }*/
 
         if(data.date !== this.state.options.date){
             this.environmentComponent.updateLayersTime(this.CesiumViewer, this.dateMap.get(data.date));
@@ -548,7 +553,7 @@ class App extends React.Component<{}, state> {
                             salinity: app.state.options.salinity,
                             bathymetry: app.state.options.bathymetry,
                             wrecks: app.state.options.wrecks,
-                            updatePlan : app.state.options.updatePlan
+                            date : app.state.options.date
                         };
                         app.updateRender(d);
                     }
@@ -584,7 +589,9 @@ class App extends React.Component<{}, state> {
         this.aisComponent.getBoundsTime(this.CesiumViewer);
 
         this.topView.reset();
+
         this.resetEnvironmentLayers();
+        this.environmentComponent.clearAllLayer(this.CesiumViewer);
 
         if(this.bathymetryComponent !== undefined)
             this.bathymetryComponent.tiles.forEach(tile => {
@@ -655,15 +662,21 @@ class App extends React.Component<{}, state> {
 
     private resetEnvironmentLayers() {
         this.environmentComponent.clearAllLayer(this.CesiumViewer);
-        let newData : any = {};
-        newData.date = 'Today';
-        newData.wavesHeight = false;
-        newData.wavesVelocity= false;
-        newData.world_temp= false;
-        newData.water_temp= false;
-        newData.salinity= false;
-        newData.bathymetry= false;
-        newData.wrecks= false;
+        let newData =  {
+                wavesHeight : false,
+                date : 'Today',
+                wavesVelocity : false,
+                water_temp : false,
+                salinity : false,
+                bathymetry : false,
+                wrecks : false,
+                waterEffects: false,
+                terrainExaggeration: 1,
+                auvActive: this.state.options.auvActive,
+                ais: this.state.options.ais ,
+                aisDensity: this.state.options.aisDensity
+            };
+
         this.setState(prevState => ({
             options: { ...prevState.options, ...newData }
         }));

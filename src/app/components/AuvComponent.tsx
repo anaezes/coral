@@ -55,10 +55,13 @@ class AuvComponent {
             viewer.clock.currentTime = currentTime;
 
         viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP; //Loop at the end
-        viewer.clock.multiplier = 1;
+        viewer.clock.multiplier = 15;
 
         //Set timeline to simulation bounds
         viewer.timeline.zoomTo(this.startTime, this.stopTime);
+
+        console.log("this.startTime: " + this.startTime);
+        console.log("this.stopTime: " + this.stopTime);
 
         viewer.clock.canAnimate = false;
         viewer.clock.shouldAnimate = false;
