@@ -178,7 +178,7 @@ class AisComponent {
         viewer.clock.currentTime = this.startTime.clone();
         //viewer.clock.clockStep = Cesium.ClockStep.SYSTEM_CLOCK;
         //viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;
-        //viewer.clock.multiplier = 1;
+        viewer.clock.multiplier = 1;
 
         //Set timeline to simulation bounds
         viewer.timeline.zoomTo(this.startTime, this.stopTime);
