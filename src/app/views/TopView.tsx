@@ -29,11 +29,12 @@ class TopView extends Component {
     };
     private showMenu: boolean = false;
     private auvEntity: any;
-
-
+    private points: any;
+    
     async componentDidMount() {
         if (this.viewer == null) {
             this.initCesium();
+            this.points = this.viewer.scene.primitives.add(new Cesium.PointPrimitiveCollection());
         }
     }
 
@@ -113,10 +114,16 @@ class TopView extends Component {
         let latitude = Cesium.Math.toDegrees(result.latitude);
         let heading = Utils.normalRelativeAngle(180 - Cesium.Math.toDegrees(hpr.heading));
 
-        //let e = this.viewer.entities.getById(auv.name);
         if (this.auvEntity !== undefined) {
             this.auvEntity.position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
             this.auvEntity.billboard.rotation = Cesium.Math.toRadians(heading);
+
+            this.points.add({
+                position : Cesium.Cartesian3.fromDegrees(longitude, latitude),
+                color : Cesium.Color.YELLOW,
+                pixelSize: 2
+            });
+
             return;
         }
 
@@ -128,24 +135,30 @@ class TopView extends Component {
                 image: "../images/auv.png",
                 rotation: Cesium.Math.toRadians(heading),
                 color: Cesium.Color.ORANGERED,
-                scale: 0.075,
+                scale: 0.06,
                 distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
                     0.0,
                     12000.0
-                )
+                ),
+                eyeOffset: new Cesium.Cartesian3(0.0, 0.0, -20)
             },
             name: auv.name,
             id: auv.name,
-            viewFrom: new Cesium.Cartesian3(0, 0, 12000),
+            viewFrom: new Cesium.Cartesian3(0, 0, 12000)
         });
 
-        //this.viewer.trackedEntity = this.auvEntity;
         this.showMenu = true;
 
         let viewer = this.viewer;
         this.viewer.flyTo(this.auvEntity).then(() => {
             viewer.trackedEntity = this.auvEntity;
         })
+
+        this.points.add({
+            position : Cesium.Cartesian3.fromDegrees(longitude, latitude),
+            color : Cesium.Color.YELLOW,
+            pixelSize: 2
+        });
     }
 
     reset() {
@@ -200,8 +213,8 @@ class TopView extends Component {
     }
 
     resetView() {
-        //this.viewer.entities.remove(this.auvEntity);
         this.auvEntity = undefined;
+        this.points.removeAll();
         this.viewer.camera.flyTo({
             destination: Cesium.Cartesian3.fromDegrees(-6.5, 40.0, 2000000),
             duration: 3
