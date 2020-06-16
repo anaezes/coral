@@ -75,7 +75,7 @@ body {
 #legend-env-box {
   position: absolute;
   right: 0;
-  bottom: 5%;
+  bottom: 6%;
   z-index: 3;
 }
 
@@ -121,5 +121,13 @@ body {
   display: none !important;
 }
 
+#auvPos {
+  position: absolute;
+  right: 1%;
+  bottom: 2%;
+  z-index: 3;
+  color: white;
+  font-size: 75%;
+}
 
 

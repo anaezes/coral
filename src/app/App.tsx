@@ -179,8 +179,9 @@ class App extends React.Component<{}, state> {
         return (
             <div>
                 <div id="Container" ref={element => this.container = element}/>
-                {this.isUnderwater && options.waterEffects? <div> <WaterEffect/> <WaterParticles/> </div> : <div/>}
+                {this.isUnderwater && options.waterEffects?  <WaterEffect/> : <div/>}
                 {this.isUnderwater?  this.menuUnderwater() : this.menuSurface()}
+                {this.isUnderwater? this.getAuvPosDiv() : <div/>}
                 <div id="legend-env-box">
                     {EnvironmentComponent.legend !== undefined?  <img src={EnvironmentComponent.legend.src} alt="Legend" />  : <div/>}
                 </div>
@@ -192,20 +193,34 @@ class App extends React.Component<{}, state> {
         );
     }
 
+    private getAuvPosDiv() {
+
+        let auvPosition = this.auvComponent.getAuvEntity().position.getValue(this.CesiumViewer.clock.currentTime);
+        let cartographic = Cesium.Cartographic.fromCartesian(auvPosition, Cesium.Ellipsoid.WGS84);
+        let longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(6);
+        let latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(6);
+
+        return (
+            <div>
+                <p id="auvPos"> { "(" + latitude + ", " + longitude + ")"} </p>
+            </div>
+        );
+    }
+
     menuUnderwater() {
         const {options} = this.state;
 
         return(
-            <DatGui class="mainview" data={options} onUpdate={this.handleUpdate} labelWidth="60%">
-                <DatFolder title="AUV Tracking">
-                    <DatSelect
-                        label="Available AUV's"
-                        path="auvActive"
-                        options={this.options}/>
-                    <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={8} step={1} />
-                    <DatBoolean path='waterEffects' label='Water effects' />
-                </DatFolder>
-            </DatGui>
+                <DatGui class="mainview" data={options} onUpdate={this.handleUpdate} labelWidth="60%">
+                    <DatFolder title="AUV Tracking">
+                        <DatSelect
+                            label="Available AUV's"
+                            path="auvActive"
+                            options={this.options}/>
+                        <DatNumber path='terrainExaggeration' label='Terrain exageration' min={1} max={8} step={1} />
+                        <DatBoolean path='waterEffects' label='Water effects' />
+                    </DatFolder>
+                </DatGui>
         );
     }
 
