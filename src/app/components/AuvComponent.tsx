@@ -84,7 +84,7 @@ class AuvComponent {
 
             //Load the Cesium plane model to represent the entity
             model: {
-                uri: '../models/lauv-80-animated.glb',
+                uri: '../models/lauv-80-animated1.glb',
                 minimumPixelSize: 64,
                 maximumScale: 1.0,
             },
