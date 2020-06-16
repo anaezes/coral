@@ -75,6 +75,7 @@ const WaterShader = {
 
     fragmentShader: [ `
 
+// font: https://www.shadertoy.com/view/Xss3zN
 
 uniform float iTime;
 uniform vec4 iMouse;
