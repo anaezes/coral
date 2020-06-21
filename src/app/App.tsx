@@ -107,17 +107,6 @@ class App extends React.Component<{}, state> {
                 })
             )
             .catch(error => this.setState({error: error, isLoading: false}));
-
-        const ws = new WebSocket('ws://localhost:9090/imcws');
-        ws.onmessage = (evt: MessageEvent) => {
-            const newData =  JSON.parse(evt.data);
-            this.setState((prevState: state) => {
-
-                return {
-                    wsMsg: newData
-                }
-            })
-        };
     }
 
     componentDidUpdate() {
