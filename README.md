@@ -7,4 +7,7 @@ Ana Santos MSc Thesis
 https://youtu.be/tZUFkElf5pE
 
 ### How to run:
+<!---
 npm install & npm start
+-->
+yarn install & yarn run start
