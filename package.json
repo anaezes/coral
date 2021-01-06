@@ -11,7 +11,7 @@
     "@types/cesium": "^1.66.5",
     "@types/styled-components": "^5.1.0",
     "awesome-typescript-loader": "^5.2.1",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cesium": "^1.67.0",
     "cors": "^2.8.5",
     "glslify-loader": "^2.0.0",
