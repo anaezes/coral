@@ -33,7 +33,7 @@
     "source-map-loader": "^0.2.4",
     "static-file-loader": "^0.6.0",
     "styled-components": "^5.1.0",
-    "three": "^0.114.0",
+    "three": "^0.137.0",
     "typescript": "^3.8.3",
     "yarn": "^1.22.4"
   },
